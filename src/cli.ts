@@ -41,7 +41,7 @@ if (typeof globalThis.window === 'undefined') {
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 // Now safe to import game code
-import { games, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
+import { games, allGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
 import type { PhosphorMode } from './themes';
 
 // ---------------------------------------------------------------------------
@@ -379,10 +379,10 @@ function main() {
   // Direct game launch: gamr snake
   const gameName = args[0];
   if (gameName) {
-    const game = games.find(g => g.id === gameName || g.name.toLowerCase() === gameName.toLowerCase());
+    const game = allGames.find(g => g.id === gameName || g.name.toLowerCase() === gameName.toLowerCase());
     if (!game) {
       console.error(`Unknown game: ${gameName}`);
-      console.error(`Available games: ${games.map(g => g.id).join(', ')}`);
+      console.error(`Available active games: ${games.map(g => g.id).join(', ')}`);
       process.exit(1);
       return;
     }

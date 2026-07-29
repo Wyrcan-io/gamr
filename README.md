@@ -1,10 +1,12 @@
 # @abhirup/gamr
 
-18 terminal games that run in any xterm.js terminal or directly in your CLI.
+20 terminal games that run in any xterm.js terminal or directly in your CLI.
 
-**Snake, Tetris, 2048, Pong, Asteroids, Space Invaders, Breakout, Frogger, Tron, Minesweeper, Wordle, Hangman, Simon, Runner, Tower, Typing Test, Crack, Chopper.**
+**Snake, Tetris, 2048, Pong, Asteroids, Space Invaders, Breakout, Frogger, Tron, Minesweeper, Wordle, Hangman, Simon, Runner, Tower, Typing Test, Crack, Chopper, Hyper Fighter, Packet Panic.**
 
 Gamr is a collection of terminal games for developers. Play while your code ships.
+
+The current TUI lineup is intentionally limited to **Packet Panic** while the older game files are being polished and reworked. Their source files remain in the repository.
 
 ## Quick Start
 
@@ -102,6 +104,8 @@ terminal.options.theme = xtermTheme;
 | Tron | Light cycle battle |
 | Crack | Hack the system |
 | Chopper | Deliver passengers |
+| Hyper Fighter | Gem battle vs AI |
+| Packet Panic | Route packets and stop the trace |
 
 ## Controls
 
@@ -109,6 +113,17 @@ terminal.options.theme = xtermTheme;
 - **Enter** — Confirm / select
 - **ESC** — Pause menu
 - **Q** — Quit
+
+### Packet Panic
+
+- **Arrow keys / WASD** — Move the network cursor
+- **1–4** — Select Link, Bend, Split, or Firewall
+- **Enter** — Place a router
+- **R** — Rotate a router
+- **X** — Salvage a router
+- **F** — Purge infected routers
+- **Space** — Focus mode / slow the network
+- **ESC** — Pause
 
 ## About
 

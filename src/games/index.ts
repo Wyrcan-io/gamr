@@ -87,6 +87,8 @@ import { runTronGame } from './tron';
 import { runTypingTest } from './typingtest';
 import { runWordleGame } from './wordle';
 import { runHyperFighterGame } from './hyper-fighter';
+import { runPacketPanicGame } from './packet-panic';
+import { archivedGames } from './archived';
 
 /**
  * Game registry with metadata
@@ -99,33 +101,18 @@ export interface GameInfo {
 }
 
 export const games: GameInfo[] = [
-  // Ordered for first-time discovery enjoyment (most accessible first).
-  { id: 'tetris', name: 'Tetris', description: 'Stack the blocks', run: runTetrisGame },
-  { id: 'snake', name: 'Snake', description: 'Eat and grow', run: runSnakeGame },
-  { id: '2048', name: '2048', description: 'Slide and combine tiles', run: run2048Game },
-  { id: 'runner', name: 'Runner', description: 'Jump and duck', run: runRunnerGame },
-  { id: 'pong', name: 'Pong', description: 'Classic paddle game', run: runPongGame },
-  { id: 'wordle', name: 'Wordle', description: 'Guess the word', run: runWordleGame },
-  { id: 'minesweeper', name: 'Minesweeper', description: 'Clear the mines', run: runMinesweeperGame },
-  { id: 'hangman', name: 'Hangman', description: 'Guess the word', run: runHangmanGame },
-  { id: 'spaceinvaders', name: 'Space Invaders', description: 'Defend Earth', run: runSpaceInvadersGame },
-  { id: 'tower', name: 'Tower', description: 'Build a tower', run: runTowerGame },
-  { id: 'simon', name: 'Simon', description: 'Memory game', run: runSimonGame },
-  { id: 'frogger', name: 'Frogger', description: 'Cross the road', run: runFroggerGame },
-  { id: 'breakout', name: 'Breakout', description: 'Break all the bricks', run: runBreakoutGame },
-  { id: 'asteroids', name: 'Asteroids', description: 'Shoot the rocks', run: runAsteroidsGame },
-  { id: 'typingtest', name: 'Typing Test', description: 'Test your speed', run: runTypingTest },
-  { id: 'tron', name: 'Tron', description: 'Light cycle battle', run: runTronGame },
-  { id: 'crack', name: 'Crack', description: 'Hack the system', run: runCrackGame },
-  { id: 'chopper', name: 'Chopper', description: 'Deliver passengers', run: runCourierGame },
-  { id: 'hyper-fighter', name: 'Hyper Fighter', description: 'Gem battle vs AI', run: runHyperFighterGame },
+  // Active TUI lineup. The older game files and runner exports remain available
+  // for later reactivation, but are intentionally hidden from the game menu.
+  { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', run: runPacketPanicGame },
 ];
+
+export const allGames: GameInfo[] = [...games, ...archivedGames];
 
 /**
  * Get a game by ID
  */
 export function getGame(id: string): GameInfo | undefined {
-  return games.find(g => g.id === id);
+  return allGames.find(g => g.id === id);
 }
 
 /**
@@ -167,6 +154,7 @@ export {
   runTypingTest,
   runWordleGame,
   runHyperFighterGame,
+  runPacketPanicGame,
 };
 
 // Re-export games menu

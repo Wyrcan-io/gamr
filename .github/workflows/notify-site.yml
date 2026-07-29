@@ -1,0 +1,17 @@
+name: Notify site of new release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger site update
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.SITE_REPO_PAT }}
+          repository: abhirup/gamr-site
+          event-type: gamr-updated
+          client-payload: '{"version": "${{ github.event.release.tag_name }}"}'

@@ -1,0 +1,70 @@
+{
+  "name": "@abhirup/gamr",
+  "version": "0.2.4",
+  "description": "Terminal games for xterm.js and CLI — snake, 2048, pong, asteroids, tetris, and more",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "gamr": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./themes": {
+      "types": "./dist/themes.d.ts",
+      "import": "./dist/themes.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "start": "sh -c 'if [ ! -f dist/cli.js ] || find src -type f -newer dist/cli.js | read; then npm run build; fi; node dist/cli.js \"$@\"' --",
+    "start:build": "npm run build && npm run start",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@xterm/xterm": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@xterm/xterm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "@xterm/xterm": "^6.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abhirup/gamr.git"
+  },
+  "keywords": [
+    "terminal",
+    "games",
+    "cli",
+    "xterm",
+    "snake",
+    "tetris",
+    "2048",
+    "pong",
+    "asteroids"
+  ],
+  "author": "wyrcan.io",
+  "dependencies": {
+    "@clack/prompts": "^1.0.1"
+  }
+}

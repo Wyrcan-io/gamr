@@ -94,6 +94,7 @@ import { runLastTrainHomeGame } from './last-train-home';
 import { runRogueLedgerGame } from './rogue-ledger';
 import { runContainmentProtocolGame } from './containment-protocol';
 import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
+import { runGhostShiftGame } from './ghost-shift';
 import { archivedGames } from './archived';
 
 /**
@@ -116,6 +117,7 @@ export const games: GameInfo[] = [
   { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', run: runRogueLedgerGame },
   { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', run: runContainmentProtocolGame },
   { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', run: runFiveMinuteKingdomGame },
+  { id: 'ghost-shift', name: 'Ghost Shift', description: 'Catch the intruder from cameras, door logs, and dwindling power.', run: runGhostShiftGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -173,6 +175,7 @@ export {
   runRogueLedgerGame,
   runContainmentProtocolGame,
   runFiveMinuteKingdomGame,
+  runGhostShiftGame,
 };
 
 // Re-export games menu

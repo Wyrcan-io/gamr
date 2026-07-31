@@ -95,6 +95,7 @@ import { runRogueLedgerGame } from './rogue-ledger';
 import { runContainmentProtocolGame } from './containment-protocol';
 import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
 import { runGhostShiftGame } from './ghost-shift';
+import { runStackTraceGame } from './stack-trace';
 import { archivedGames } from './archived';
 
 /**
@@ -118,6 +119,7 @@ export const games: GameInfo[] = [
   { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', run: runContainmentProtocolGame },
   { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', run: runFiveMinuteKingdomGame },
   { id: 'ghost-shift', name: 'Ghost Shift', description: 'Catch the intruder from cameras, door logs, and dwindling power.', run: runGhostShiftGame },
+  { id: 'stack-trace', name: 'Stack Trace', description: 'Repair the blocks. Pass every test.', run: runStackTraceGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -176,6 +178,7 @@ export {
   runContainmentProtocolGame,
   runFiveMinuteKingdomGame,
   runGhostShiftGame,
+  runStackTraceGame,
 };
 
 // Re-export games menu

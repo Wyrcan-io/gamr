@@ -72,11 +72,11 @@ function padCell(text: string): string {
 
 function bar(value: number, max: number, width: number): string {
   const filled = Math.max(0, Math.min(width, Math.floor((value / max) * width)));
-  return '[' + '#'.repeat(filled) + '.'.repeat(width - filled) + ']';
+  return '▰'.repeat(filled) + '▱'.repeat(width - filled);
 }
 
 function inventoryLine(state: GameState, kind: RouterKind): string {
-  const key = kind === 'link' ? '-' : kind === 'bend' ? 'L' : kind === 'split' ? 'T' : '#';
+  const key = kind === 'link' ? '━' : kind === 'bend' ? '╰' : kind === 'split' ? '┳' : '▣';
   return key + 'x' + String(state.inventory[kind]).padStart(2, ' ');
 }
 
@@ -258,20 +258,20 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     }
 
     const theme = getCurrentThemeColor();
-    const title = gameStarted ? 'PACKET PANIC' : 'PACKET PANIC // NETWORK OPERATOR';
+    const title = gameStarted ? '✦ PACKET PANIC' : '✦ PACKET PANIC // NETWORK OPERATOR';
     writeAt(output, centerX(cols, title), 1, theme + '\x1b[1m' + title + '\x1b[0m');
-    const status = 'SCORE ' + String(state.score).padStart(6, '0') + '   SECTOR ' + state.sector + '/8   TRACE ' + bar(state.trace, 100, 18);
+    const status = 'SCORE ' + String(state.score).padStart(6, '0') + '   ◈ SECTOR ' + state.sector + '/8   ◈ TRACE ' + bar(state.trace, 100, 18);
     writeAt(output, 3, 3, theme + status + '\x1b[0m');
 
     if (!gameStarted) {
-      writeAt(output, centerX(cols, 'ROUTE PACKETS. STOP THE TRACE.'), 9, '\x1b[1;96mROUTE PACKETS. STOP THE TRACE.\x1b[0m');
-      writeAt(output, centerX(cols, 'P: STANDARD SHIFT   T: TUTORIAL   Q: QUIT'), 13, '\x1b[2m' + theme + 'P: STANDARD SHIFT   T: TUTORIAL   Q: QUIT\x1b[0m');
+      writeAt(output, centerX(cols, '◌ ROUTE PACKETS. STOP THE TRACE. ◌'), 9, '\x1b[1;96m◌ ROUTE PACKETS. STOP THE TRACE. ◌\x1b[0m');
+      writeAt(output, centerX(cols, '▶ P: STANDARD SHIFT   T: TUTORIAL   Q: QUIT'), 13, '\x1b[2m' + theme + '▶ P: STANDARD SHIFT   T: TUTORIAL   Q: QUIT\x1b[0m');
       terminal.write(output.join(''));
       return;
     }
 
     if (state.phase === 'upgrade') {
-      writeAt(output, centerX(cols, 'SECTOR CLEAR'), 9, '\x1b[1;93mSECTOR CLEAR\x1b[0m');
+      writeAt(output, centerX(cols, '✦ SECTOR CLEAR ✦'), 9, '\x1b[1;93m✦ SECTOR CLEAR ✦\x1b[0m');
       writeAt(output, centerX(cols, 'CHOOSE YOUR UPGRADE'), 11, theme + 'CHOOSE YOUR UPGRADE\x1b[0m');
       choices.forEach((choice, index) => {
         writeAt(output, centerX(cols, (index + 1) + ': ' + choice.name), 14 + index * 2,
@@ -282,7 +282,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     }
 
     if (state.phase === 'gameOver' || state.phase === 'won') {
-      const heading = state.phase === 'won' ? 'SHIFT COMPLETE' : 'NETWORK BREACHED';
+      const heading = state.phase === 'won' ? '✓ SHIFT COMPLETE' : '☠ NETWORK BREACHED';
       const color = state.phase === 'won' ? '\x1b[1;92m' : '\x1b[1;91m';
       writeAt(output, centerX(cols, heading), 9, color + heading + '\x1b[0m');
       writeAt(output, centerX(cols, 'SCORE ' + state.score + '   MAX TRACE ' + state.maxTrace), 12, theme + 'SCORE ' + state.score + '   MAX TRACE ' + state.maxTrace + '\x1b[0m');
@@ -297,8 +297,9 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
         const tile = state.board[y][x];
         const selected = state.cursor.x === x && state.cursor.y === y;
         const text = selected ? '[' + tileText(tile, state).slice(1, 2) + ']' : tileText(tile, state);
-        const color = selected ? '\x1b[7m' : '';
-        writeAt(output, MAP_LEFT + x * CELL_WIDTH + offsetX, MAP_TOP + y + offsetY, color + padCell(text) + '\x1b[0m');
+        const color = tileColor(tile, state);
+        const selection = selected ? '\x1b[7m' : '';
+        writeAt(output, MAP_LEFT + x * CELL_WIDTH + offsetX, MAP_TOP + y + offsetY, selection + color + padCell(text) + '\x1b[0m');
       }
     }
 
@@ -318,15 +319,15 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     }
 
     const panelX = MAP_LEFT + BOARD_WIDTH * CELL_WIDTH + 5;
-    writeAt(output, panelX, MAP_TOP, theme + '\x1b[1mNETWORK STATUS\x1b[0m');
+    writeAt(output, panelX, MAP_TOP, theme + '\x1b[1m◈ NETWORK STATUS\x1b[0m');
     writeAt(output, panelX, MAP_TOP + 2, 'TOOL: ' + ROUTER_LABELS[selectedTool] + ' R' + previewRotation);
     writeAt(output, panelX, MAP_TOP + 3, 'INV: ' + inventoryLine(state, 'link') + ' ' + inventoryLine(state, 'bend'));
     writeAt(output, panelX, MAP_TOP + 4, '     ' + inventoryLine(state, 'split') + ' ' + inventoryLine(state, 'firewall'));
-    writeAt(output, panelX, MAP_TOP + 6, 'FOCUS: ' + '◆'.repeat(state.focusCharges) + '  PURGE: ' + state.purgeCharges);
+    writeAt(output, panelX, MAP_TOP + 6, 'FOCUS: ' + '◆'.repeat(state.focusCharges) + '  PURGE: ✦' + state.purgeCharges);
     writeAt(output, panelX, MAP_TOP + 8, 'QUOTA: ' + state.deliveredThisSector + ' / ' + state.quota);
     writeAt(output, panelX, MAP_TOP + 9, 'STREAK: ' + state.streak);
     if (state.lastEvent && state.eventTicks > 0) writeAt(output, panelX, MAP_TOP + 11, '\x1b[1;93m' + state.lastEvent + '\x1b[0m');
-    writeAt(output, 3, MAP_TOP + BOARD_HEIGHT + 2, '\x1b[2m' + theme + 'ARROWS MOVE  1-4 TOOL  ENTER PLACE  R ROTATE  X SALVAGE  F PURGE  SPACE FOCUS  ESC PAUSE\x1b[0m');
+    writeAt(output, 3, MAP_TOP + BOARD_HEIGHT + 2, '\x1b[2m' + theme + '←↑↓→ MOVE  1-4 TOOL  ⏎ PLACE  R ROTATE  X SALVAGE  F PURGE  SPACE FOCUS  ESC PAUSE\x1b[0m');
 
     if (state.tutorialStep < 2) writeAt(output, panelX, MAP_TOP + 13, '\x1b[1;96mPLACE ROUTERS TO CONNECT\x1b[0m');
     if (paused) {
@@ -368,16 +369,29 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
 }
 
 function tileText(tile: Tile, state: GameState): string {
-  if (tile.kind === 'blocked') return '###';
-  if (tile.kind === 'source') return '[' + state.sources[tile.id].protocol + ']';
-  if (tile.kind === 'destination') return '[' + state.destinations[tile.id].protocol + ']';
-  if (tile.kind === 'empty') return '   ';
-  if (tile.router.state === 'infected') return ' ! ';
-  if (tile.router.state === 'jammed') return ' x ';
-  if (tile.router.packetId) return ' ' + (state.packets[tile.router.packetId]?.protocol || '•') + ' ';
-  if (tile.router.kind === 'firewall') return '[#]';
+  if (tile.kind === 'blocked') return '▓▓▓';
+  if (tile.kind === 'source') return '◉' + state.sources[tile.id].protocol + ' ';
+  if (tile.kind === 'destination') return '◎' + state.destinations[tile.id].protocol + ' ';
+  if (tile.kind === 'empty') return ' · ';
+  if (tile.router.state === 'infected') return '☠  ';
+  if (tile.router.state === 'jammed') return '✖  ';
+  if (tile.router.packetId) return '◈' + (state.packets[tile.router.packetId]?.protocol || '·') + ' ';
+  if (tile.router.kind === 'firewall') return '▣  ';
   const ports = getPorts(tile);
-  if (tile.router.kind === 'link') return ports.includes('E') ? '---' : ' | ';
+  if (tile.router.kind === 'link') return ports.includes('E') ? '───' : ' │ ';
   if (tile.router.kind === 'bend') return ['└─ ', '┌─ ', '─┐ ', '─┘ '][tile.router.rotation];
   return ['┬─ ', '├─ ', '┴─ ', '─┤ '][tile.router.rotation];
+}
+
+function tileColor(tile: Tile, state: GameState): string {
+  if (tile.kind === 'source') return PROTOCOL_COLORS[state.sources[tile.id].protocol];
+  if (tile.kind === 'destination') return PROTOCOL_COLORS[state.destinations[tile.id].protocol];
+  if (tile.kind === 'router' && tile.router.state === 'infected') return '\x1b[1;91m';
+  if (tile.kind === 'router' && tile.router.state === 'jammed') return '\x1b[1;93m';
+  if (tile.kind === 'router' && tile.router.packetId) {
+    const packet = state.packets[tile.router.packetId];
+    return packet ? PROTOCOL_COLORS[packet.protocol] : '';
+  }
+  if (tile.kind === 'router' && tile.router.kind === 'firewall') return '\x1b[95m';
+  return '';
 }

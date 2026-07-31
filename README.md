@@ -1,12 +1,12 @@
 # @abhirup/gamr
 
-20 terminal games that run in any xterm.js terminal or directly in your CLI.
+22 terminal games that run in any xterm.js terminal or directly in your CLI.
 
-**Snake, Tetris, 2048, Pong, Asteroids, Space Invaders, Breakout, Frogger, Tron, Minesweeper, Wordle, Hangman, Simon, Runner, Tower, Typing Test, Crack, Chopper, Hyper Fighter, Packet Panic.**
+**Snake, Tetris, 2048, Pong, Asteroids, Space Invaders, Breakout, Frogger, Tron, Minesweeper, Wordle, Hangman, Simon, Runner, Tower, Typing Test, Crack, Chopper, Hyper Fighter, Packet Panic, Dead Letter Department, Signal//Noise.**
 
 Gamr is a collection of terminal games for developers. Play while your code ships.
 
-The current TUI lineup is intentionally limited to **Packet Panic** while the older game files are being polished and reworked. Their source files remain in the repository.
+The current TUI lineup includes **Packet Panic**, **Dead Letter Department**, and **Signal//Noise** while the older game files are being polished and reworked. Their source files remain in the repository.
 
 ## Quick Start
 
@@ -106,6 +106,8 @@ terminal.options.theme = xtermTheme;
 | Chopper | Deliver passengers |
 | Hyper Fighter | Gem battle vs AI |
 | Packet Panic | Route packets and stop the trace |
+| Dead Letter Department | Inspect the mail and seal what answers back |
+| Signal//Noise | Isolate transmissions, locate the source, choose your reply |
 
 ## Controls
 
@@ -117,6 +119,7 @@ terminal.options.theme = xtermTheme;
 ### Packet Panic
 
 - **Arrow keys / WASD** — Move the network cursor
+
 - **1–4** — Select Link, Bend, Split, or Firewall
 - **Enter** — Place a router
 - **R** — Rotate a router
@@ -124,6 +127,13 @@ terminal.options.theme = xtermTheme;
 - **F** — Purge infected routers
 - **Space** — Focus mode / slow the network
 - **ESC** — Pause
+
+### Signal//Noise
+
+- **Arrow keys / A,D** — Tune the carrier; **Up/Down** changes bandwidth
+- **M / G / Tab** — Modulation, gain, and receiver station
+- **S / Enter / N / P** — Sweep, capture, notch filter, phase-lock
+- **1–4** — Select broadcast response after triangulating the source
 
 ## About
 

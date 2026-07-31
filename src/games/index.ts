@@ -88,6 +88,8 @@ import { runTypingTest } from './typingtest';
 import { runWordleGame } from './wordle';
 import { runHyperFighterGame } from './hyper-fighter';
 import { runPacketPanicGame } from './packet-panic';
+import { runDeadLetterDepartmentGame } from './dead-letter-department';
+import { runSignalNoiseGame } from './signal-noise';
 import { archivedGames } from './archived';
 
 /**
@@ -104,6 +106,8 @@ export const games: GameInfo[] = [
   // Active TUI lineup. The older game files and runner exports remain available
   // for later reactivation, but are intentionally hidden from the game menu.
   { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', run: runPacketPanicGame },
+  { id: 'dead-letter-department', name: 'Dead Letter Department', description: 'Inspect the mail. Seal what answers back.', run: runDeadLetterDepartmentGame },
+  { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', run: runSignalNoiseGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -155,6 +159,8 @@ export {
   runWordleGame,
   runHyperFighterGame,
   runPacketPanicGame,
+  runDeadLetterDepartmentGame,
+  runSignalNoiseGame,
 };
 
 // Re-export games menu

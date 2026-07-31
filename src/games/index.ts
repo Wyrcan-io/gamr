@@ -90,6 +90,9 @@ import { runHyperFighterGame } from './hyper-fighter';
 import { runPacketPanicGame } from './packet-panic';
 import { runDeadLetterDepartmentGame } from './dead-letter-department';
 import { runSignalNoiseGame } from './signal-noise';
+import { runLastTrainHomeGame } from './last-train-home';
+import { runRogueLedgerGame } from './rogue-ledger';
+import { runContainmentProtocolGame } from './containment-protocol';
 import { archivedGames } from './archived';
 
 /**
@@ -108,6 +111,9 @@ export const games: GameInfo[] = [
   { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', run: runPacketPanicGame },
   { id: 'dead-letter-department', name: 'Dead Letter Department', description: 'Inspect the mail. Seal what answers back.', run: runDeadLetterDepartmentGame },
   { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', run: runSignalNoiseGame },
+  { id: 'last-train-home', name: 'Last Train Home', description: 'Dispatch the last evacuation trains through a collapsing rail network.', run: runLastTrainHomeGame },
+  { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', run: runRogueLedgerGame },
+  { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', run: runContainmentProtocolGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -161,6 +167,9 @@ export {
   runPacketPanicGame,
   runDeadLetterDepartmentGame,
   runSignalNoiseGame,
+  runLastTrainHomeGame,
+  runRogueLedgerGame,
+  runContainmentProtocolGame,
 };
 
 // Re-export games menu

@@ -24,6 +24,26 @@ All games share these characteristics:
 - **Theme awareness**: Use `getCurrentThemeColor()` from `../utils`
 - **Terminal rendering**: ANSI escape codes, alternate buffer mode
 
+## Visual language pass (required for every new game)
+
+Gamr games are terminal-native, but they should not look like plain unstyled text. Before calling a game complete, give the renderer a deliberate **visual language pass** like the earlier Packet Panic and Dead Letter Department polish work:
+
+- Use a small, consistent set of terminal-friendly Unicode symbols where they materially improve scanning: box-drawing track/route glyphs, status icons, bullets, arrows, pips, meters, and semantic markers such as `✓`, `⚠`, `✦`, `◈`, `◎`, `×`, `≈`, `◆`, and `◇`.
+- Prefer one-character icons with predictable terminal width. Keep a meaningful ASCII fallback for every important glyph (`*`, `!`, `+`, `x`, `o`, `-`, `|`, `#`) so the game remains understandable in limited fonts or copied logs.
+- Build a semantic icon vocabulary before implementing the renderer. For example: Packet Panic uses protocol/router symbols and block meters; Dead Letter Department uses mail, audit, warning, success, regulation, and trust-meter symbols. New games should similarly define symbols for their own entities, hazards, actions, and outcomes rather than choosing characters ad hoc.
+- Combine glyphs with colour and weight, but never rely on colour alone. The icon, label, or shape must still communicate the state in monochrome/light themes.
+- Use box-drawing and separators to create hierarchy: map borders, panels, headers, dividers, and meters should guide the eye without filling the screen with decoration.
+- Add a restrained title/glitch treatment and small event accents (for example, a warning flash, arrival marker, or score popup) when they clarify a state change. Avoid animation that makes a turn-based game harder to read.
+- Check every symbol at the supported minimum terminal size and in at least one light theme. If a glyph renders as a tofu box, has ambiguous width, or breaks alignment, replace it with the ASCII fallback.
+
+### Visual checklist before release
+
+1. Identify the 8–15 most important domain concepts and assign each a glyph, colour, and ASCII fallback.
+2. Use those symbols consistently in the map, status panel, event log, menus, and end screens.
+3. Verify visible alignment at `80x28` and a wider terminal; measure/strip ANSI when centering text.
+4. Manually inspect the default and a light theme, including warning, success, paused, game-over, and victory states.
+5. Document any unusual glyph choices near the renderer so future edits preserve the visual vocabulary.
+
 ## File Structure
 
 ```

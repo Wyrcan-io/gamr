@@ -108,6 +108,7 @@ terminal.options.theme = xtermTheme;
 | Packet Panic | Route packets and stop the trace |
 | Dead Letter Department | Inspect the mail and seal what answers back |
 | Signal//Noise | Isolate transmissions, locate the source, choose your reply |
+| Last Train Home | Dispatch evacuation trains through a collapsing rail network |
 
 ## Controls
 
@@ -134,6 +135,13 @@ terminal.options.theme = xtermTheme;
 - **M / G / Tab** — Modulation, gain, and receiver station
 - **S / Enter / N / P** — Sweep, capture, notch filter, phase-lock
 - **1–4** — Select broadcast response after triangulating the source
+
+### Last Train Home
+
+- **Arrow keys / WASD** — Select a tile; **Tab** selects trains
+- **1–4** — Switch, hold, repair, or clear
+- **R** — Route the selected train; **Space** — Commit the turn
+- **H** — Help; **ESC** — Pause
 
 ## About
 

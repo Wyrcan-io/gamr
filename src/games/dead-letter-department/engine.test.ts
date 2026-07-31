@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createState, applyCommand, currentEvaluation } from './engine';
 import { evaluateMessage, rulesForShift } from './rules';
 import { generateShiftDeck, validateDeck } from './generator';
+import { PERKS } from './types';
 
 describe('Dead Letter Department rules', () => {
   it('uses curse precedence over urgency', () => {
@@ -18,6 +19,20 @@ describe('Dead Letter Department rules', () => {
     const second = generateShiftDeck(1234, 4, false);
     expect(first).toEqual(second);
     expect(validateDeck(first, rulesForShift(4))).toEqual([]);
+  });
+
+  it('validates every release shift across representative seeds', () => {
+    for (const seed of [1, 77, 1234, 99991]) {
+      for (let shift = 1; shift <= 6; shift++) {
+        const deck = generateShiftDeck(seed, shift, false);
+        expect(deck).toHaveLength(6 + Math.min(2, shift - 1));
+        expect(validateDeck(deck, rulesForShift(shift))).toEqual([]);
+      }
+    }
+  });
+
+  it('only advertises perks with an engine effect', () => {
+    expect(PERKS.map(perk => perk.id)).toEqual(['registry-tabs', 'quiet-gloves', 'night-overtime']);
   });
 });
 

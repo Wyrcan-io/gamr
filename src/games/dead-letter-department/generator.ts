@@ -5,7 +5,7 @@ import type { Disposition, GameState, Message, MessageFacts, ShiftRules } from '
 
 const dispositions: Disposition[] = ['routine', 'urgent', 'forged', 'cursed'];
 function countForShift(shift: number, extra: boolean): number {
-  return 9 + Math.min(5, shift) + (extra ? 1 : 0);
+  return 6 + Math.min(2, shift - 1) + (extra ? 1 : 0);
 }
 
 function makeFacts(shift: number, disposition: Disposition, index: number, rng: () => number): MessageFacts {

@@ -261,13 +261,16 @@ export function showGamesMenu(terminal: Terminal, optionsOrCallback?: GamesMenuO
     const keyDisplay = keyNum <= 9 ? `${keyNum}` : ' ';
 
     // Build the line content
-    const lineContent = `${prefix} [${keyDisplay}] ${entry.name}`;
+    const lineContent = `${prefix} [${keyDisplay}] ${entry.name}`.slice(0, contentWidth);
     const padding = Math.max(0, contentWidth - lineContent.length);
 
     output += `\x1b[${y};${boxX}H${themeColor}\u2551\x1b[0m${highlight}${keyColor}${lineContent}${' '.repeat(padding)}\x1b[0m${themeColor}\u2551\x1b[0m`;
 
     // Description line
-    const descContent = `    ${entry.description}`;
+    const details = entry.kind === 'game' && entry.maturity && entry.difficulty && entry.session
+      ? `${entry.maturity.toUpperCase()} · ${'◆'.repeat(entry.difficulty)} · ${entry.session} · `
+      : '';
+    const descContent = `    ${details}${entry.description}`.slice(0, contentWidth);
     const descPadding = Math.max(0, contentWidth - descContent.length);
     const descColor = isSelected ? (lightTheme ? '\x1b[2;7;97m' : '\x1b[2;7m') : '\x1b[2m';
 

@@ -96,6 +96,7 @@ import { runContainmentProtocolGame } from './containment-protocol';
 import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
 import { runGhostShiftGame } from './ghost-shift';
 import { runStackTraceGame } from './stack-trace';
+import { runTheQuietHeistGame } from './the-quiet-heist';
 import { archivedGames } from './archived';
 
 /**
@@ -105,21 +106,26 @@ export interface GameInfo {
   id: string;
   name: string;
   description: string;
+  maturity?: 'featured' | 'beta' | 'workshop';
+  pace?: 'real-time' | 'turn-based';
+  difficulty?: 1 | 2 | 3;
+  session?: '5 min' | '10–15 min' | 'campaign';
   run: (terminal: import('@xterm/xterm').Terminal) => { stop: () => void; isRunning: boolean };
 }
 
 export const games: GameInfo[] = [
   // Active TUI lineup. The older game files and runner exports remain available
   // for later reactivation, but are intentionally hidden from the game menu.
-  { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', run: runPacketPanicGame },
-  { id: 'dead-letter-department', name: 'Dead Letter Department', description: 'Inspect the mail. Seal what answers back.', run: runDeadLetterDepartmentGame },
-  { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', run: runSignalNoiseGame },
-  { id: 'last-train-home', name: 'Last Train Home', description: 'Dispatch the last evacuation trains through a collapsing rail network.', run: runLastTrainHomeGame },
-  { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', run: runRogueLedgerGame },
-  { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', run: runContainmentProtocolGame },
-  { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', run: runFiveMinuteKingdomGame },
-  { id: 'ghost-shift', name: 'Ghost Shift', description: 'Catch the intruder from cameras, door logs, and dwindling power.', run: runGhostShiftGame },
-  { id: 'stack-trace', name: 'Stack Trace', description: 'Repair the blocks. Pass every test.', run: runStackTraceGame },
+  { id: 'stack-trace', name: 'Stack Trace', description: 'Repair the blocks. Pass every test.', maturity: 'featured', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runStackTraceGame },
+  { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', maturity: 'featured', pace: 'turn-based', difficulty: 1, session: '5 min', run: runFiveMinuteKingdomGame },
+  { id: 'dead-letter-department', name: 'Dead Letter Department', description: 'Inspect the mail. Seal what answers back.', maturity: 'featured', pace: 'turn-based', difficulty: 1, session: '10–15 min', run: runDeadLetterDepartmentGame },
+  { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', maturity: 'featured', pace: 'real-time', difficulty: 2, session: '10–15 min', run: runPacketPanicGame },
+  { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', maturity: 'beta', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runSignalNoiseGame },
+  { id: 'last-train-home', name: 'Last Train Home', description: 'Dispatch the last evacuation trains through a collapsing rail network.', maturity: 'beta', pace: 'turn-based', difficulty: 3, session: '10–15 min', run: runLastTrainHomeGame },
+  { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runRogueLedgerGame },
+  { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runContainmentProtocolGame },
+  { id: 'ghost-shift', name: 'Ghost Shift', description: 'Catch the intruder from cameras, door logs, and dwindling power.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runGhostShiftGame },
+  { id: 'the-quiet-heist', name: 'The Quiet Heist', description: 'Predict patrols. Steal the object. Find a new way out.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runTheQuietHeistGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -179,6 +185,7 @@ export {
   runFiveMinuteKingdomGame,
   runGhostShiftGame,
   runStackTraceGame,
+  runTheQuietHeistGame,
 };
 
 // Re-export games menu

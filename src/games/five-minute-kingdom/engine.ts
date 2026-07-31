@@ -31,10 +31,10 @@ export function labelFor(offer: Offer): string { return `${offer.kind === 'terra
 export function cellName(cell: Cell): string { return `${cell.terrain ? terrainNames[cell.terrain] : 'Empty'}${cell.citizen ? ` / ${citizenNames[cell.citizen]}` : ''}`; }
 
 function offersFor(seed: number, turn: number, board: Cell[][]): Offer[] {
-  const random = rng(seed + turn * 1777); const empty = allPositions().filter(p => !board[p.y]![p.x]!.terrain);
+  const random = rng(seed + turn * 1777);
   const terrain = TERRAIN[(turn + Math.floor(random() * TERRAIN.length)) % TERRAIN.length]!;
-  const homeTerrain = empty.length ? (board[empty[0]!.y]![empty[0]!.x]!.terrain ?? 'field') : 'field';
-  const validCitizens = CITIZENS.filter(c => citizenHomes[c]!.includes(homeTerrain));
+  const builtTerrains = [...new Set(board.flat().map(cell => cell.terrain).filter((value): value is Terrain => value !== null))];
+  const validCitizens = CITIZENS.filter(c => builtTerrains.some(home => citizenHomes[c]!.includes(home)));
   const citizen: Citizen = (validCitizens.length ? validCitizens : ['merchant' as Citizen])[Math.floor(random() * (validCitizens.length || 1))]!;
   const unused = LAWS.filter(l => !findLaw(board, l)); const law = (unused.length ? unused : LAWS)[Math.floor(random() * (unused.length || LAWS.length))]!;
   if (turn <= 2) return [{ id: `t-${turn}-a`, kind: 'terrain', terrain }, { id: `t-${turn}-b`, kind: 'terrain', terrain: TERRAIN[(turn + 2) % TERRAIN.length]! }, { id: `t-${turn}-c`, kind: 'citizen', citizen: 'farmer' }];

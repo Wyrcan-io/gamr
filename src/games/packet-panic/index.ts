@@ -347,6 +347,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     if (renderInterval) clearInterval(renderInterval);
     if (updateInterval) clearInterval(updateInterval);
     keyListener?.dispose();
+    terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     originalStop();
   };
 

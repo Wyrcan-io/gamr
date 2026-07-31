@@ -4,7 +4,7 @@ import { getCurrentThemeColor } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, createState } from './engine';
 import { renderFrame } from './render';
-import type { Command, Direction, GameState } from './types';
+import type { Command, GameState } from './types';
 
 export interface LastTrainHomeController { stop: () => void; isRunning: boolean; }
 
@@ -29,11 +29,11 @@ export function runLastTrainHomeGame(terminal: Terminal): LastTrainHomeControlle
     if (state.phase === 'start') { if (key === 'q') quit(); else if (key === 't') command({ type: 'startTutorial' }); else if (key === 'p' || key === 'enter') command({ type: 'startCampaign' }); return; }
     if (state.phase === 'briefing') { if (key === 'enter' || key === ' ') command({ type: 'dismissBriefing' }); return; }
     if (state.phase === 'turnReport') { if (key === 'enter' || key === ' ') command({ type: 'dismissReport' }); return; }
-    if (state.phase === 'ending' || state.phase === 'gameOver') { if (key === 'r') restart(); else if (key === 'q') quit(); else if (key === 'n') { running = false; dispatchGameSwitch(terminal); } return; }
+    if (state.phase === 'ending' || state.phase === 'gameOver') { if (key === 'r') restart(); else if (key === 'q') quit(); else if (key === 'n') { if (state.phase === 'ending' && state.scenarioIndex === 0) { state = createState(Date.now(), 1); state.phase = 'briefing'; } else { running = false; dispatchGameSwitch(terminal); } } return; }
     if (key === 'h') { command({ type: 'toggleHelp' }); return; }
     if (key === 'tab') { command({ type: 'selectNextTrain', direction: domEvent.shiftKey ? -1 : 1 }); return; }
     if (key === 'arrowleft' || key === 'a') command({ type: 'moveSelection', dx: -1, dy: 0 }); else if (key === 'arrowright' || key === 'd') command({ type: 'moveSelection', dx: 1, dy: 0 }); else if (key === 'arrowup' || key === 'w') command({ type: 'moveSelection', dx: 0, dy: -1 }); else if (key === 'arrowdown' || key === 's') command({ type: 'moveSelection', dx: 0, dy: 1 });
-    else if (key === '1') command({ type: 'switchJunction' }); else if (key === '2') command({ type: 'holdTrain' }); else if (key === '3') command({ type: 'repair' }); else if (key === '4') command({ type: 'clear' }); else if (key === 'r') command({ type: 'setRoute', exit: 'E' as Direction }); else if (key === ' ' || key === 'enter') command({ type: 'commitTurn' });
+    else if (key === '1') command({ type: 'switchJunction' }); else if (key === '2') command({ type: 'holdTrain' }); else if (key === '3') command({ type: 'repair' }); else if (key === '4') command({ type: 'clear' }); else if (key === ' ' || key === 'enter') command({ type: 'commitTurn' });
   }
   function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), glitchFrame++); if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); terminal.write(output); }
   const originalStop = controller.stop;

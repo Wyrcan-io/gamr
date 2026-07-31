@@ -2,7 +2,7 @@ import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
 import { getCurrentThemeColor } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
-import { applyCommand, createState, type Command } from './engine';
+import { applyCommand, availablePerks, createState, type Command } from './engine';
 import { renderFrame } from './render';
 
 export interface DeadLetterDepartmentController {
@@ -101,11 +101,8 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     }
     if (state.phase === 'perk') {
       if (key === '1' || key === '2' || key === '3') {
-        const perks = [
-          'carbon-copy', 'registry-tabs', 'quiet-gloves', 'priority-tray', 'wax-reference', 'audit-memory', 'night-overtime', 'postmasters-key',
-        ] as const;
-        const start = (state.seed + state.shift * 17) % perks.length;
-        runCommand({ type: 'choosePerk', perkId: perks[(start + Number(key) - 1) % perks.length] });
+        const perk = availablePerks(state)[Number(key) - 1];
+        if (perk) runCommand({ type: 'choosePerk', perkId: perk.id });
       }
       return;
     }

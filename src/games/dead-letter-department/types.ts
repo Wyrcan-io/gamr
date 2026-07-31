@@ -6,7 +6,7 @@ export type Seal = 'copper' | 'ivory' | 'violet' | 'black' | 'broken';
 export type Postage = 'standard' | 'priority' | 'black-seal';
 
 export type RuleId = string;
-export type PerkId = 'carbon-copy' | 'registry-tabs' | 'quiet-gloves' | 'priority-tray' | 'wax-reference' | 'audit-memory' | 'night-overtime' | 'postmasters-key';
+export type PerkId = 'registry-tabs' | 'quiet-gloves' | 'night-overtime';
 export type CaseThreadId = 'vanishing-postmaster' | 'humming-lamps' | 'ash-ward' | 'ferry-names';
 
 export interface MessageFacts {
@@ -106,12 +106,7 @@ export const DESTINATION_LABELS: Record<Destination, string> = {
 };
 
 export const PERKS: Perk[] = [
-  { id: 'carbon-copy', name: 'CARBON COPY', description: 'Verification reveals the audit before a commitment.' },
   { id: 'registry-tabs', name: 'REGISTRY TABS', description: 'Sender codes gain a clear registry marker.' },
   { id: 'quiet-gloves', name: 'QUIET GLOVES', description: 'Correctly sealing a curse restores one Trust once.' },
-  { id: 'priority-tray', name: 'PRIORITY TRAY', description: 'Deadlines stay visible on every inspection view.' },
-  { id: 'wax-reference', name: 'WAX REFERENCE', description: 'Seal names are always printed beside their glyph.' },
-  { id: 'audit-memory', name: 'AUDIT MEMORY', description: 'The last two violated rules remain in the desk panel.' },
   { id: 'night-overtime', name: 'NIGHT OVERTIME', description: '+1 Trust, but the next shift has one extra letter.' },
-  { id: 'postmasters-key', name: "POSTMASTER'S KEY", description: 'Reveal one extra case-thread clue next shift.' },
 ];

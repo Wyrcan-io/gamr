@@ -1,12 +1,12 @@
 # @abhirup/gamr
 
-22 terminal games that run in any xterm.js terminal or directly in your CLI.
+Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
-**Snake, Tetris, 2048, Pong, Asteroids, Space Invaders, Breakout, Frogger, Tron, Minesweeper, Wordle, Hangman, Simon, Runner, Tower, Typing Test, Crack, Chopper, Hyper Fighter, Packet Panic, Dead Letter Department, Signal//Noise.**
+The current lineup contains ten original games. Older games remain available in the source tree while they are reworked.
 
-Gamr is a collection of terminal games for developers. Play while your code ships.
+Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The current TUI lineup includes **Packet Panic**, **Dead Letter Department**, and **Signal//Noise** while the older game files are being polished and reworked. Their source files remain in the repository.
+The TUI catalog is curated by maturity: four Featured games, two public betas, and four Workshop experiments. Difficulty and expected session length are shown in the game menu.
 
 ## Quick Start
 
@@ -109,6 +109,12 @@ terminal.options.theme = xtermTheme;
 | Dead Letter Department | Inspect the mail and seal what answers back |
 | Signal//Noise | Isolate transmissions, locate the source, choose your reply |
 | Last Train Home | Dispatch evacuation trains through a collapsing rail network |
+| Rogue Ledger | Draft rules and survive bizarre quarters |
+| Containment Protocol | Learn the rules and hold the rooms |
+| Five-Minute Kingdom | Draft a tiny kingdom where every square counts |
+| Ghost Shift | Catch the intruder using cameras, door logs, and power |
+| Stack Trace | Repair blocks and pass every test |
+| The Quiet Heist | Predict patrols, steal the object, find a new exit |
 
 ## Controls
 
@@ -147,7 +153,7 @@ terminal.options.theme = xtermTheme;
 
 Built by wyrcan.io.
 
-These games are part of the gamr project, built for developers who enjoy quick arcade-style breaks in the terminal.
+These games are part of the gamr project, built for developers and terminal-puzzle players. Session length varies by game; the menu labels quick sessions and campaigns clearly.
 
 ## Contributing
 

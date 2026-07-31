@@ -93,6 +93,7 @@ import { runSignalNoiseGame } from './signal-noise';
 import { runLastTrainHomeGame } from './last-train-home';
 import { runRogueLedgerGame } from './rogue-ledger';
 import { runContainmentProtocolGame } from './containment-protocol';
+import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
 import { archivedGames } from './archived';
 
 /**
@@ -114,6 +115,7 @@ export const games: GameInfo[] = [
   { id: 'last-train-home', name: 'Last Train Home', description: 'Dispatch the last evacuation trains through a collapsing rail network.', run: runLastTrainHomeGame },
   { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', run: runRogueLedgerGame },
   { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', run: runContainmentProtocolGame },
+  { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', run: runFiveMinuteKingdomGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -170,6 +172,7 @@ export {
   runLastTrainHomeGame,
   runRogueLedgerGame,
   runContainmentProtocolGame,
+  runFiveMinuteKingdomGame,
 };
 
 // Re-export games menu

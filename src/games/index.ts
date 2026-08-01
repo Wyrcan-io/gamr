@@ -100,6 +100,7 @@ import { runStackTraceGame } from './stack-trace';
 import { runTheQuietHeistGame } from './the-quiet-heist';
 import { runOrbitalPostGame } from './orbital-post';
 import { runDiceTribunalGame } from './dice-tribunal';
+import { runTimeCapsuleGame } from './time-capsule';
 import { archivedGames } from './archived';
 
 /**
@@ -132,6 +133,7 @@ export const games: GameInfo[] = [
   { id: 'the-quiet-heist', name: 'The Quiet Heist', description: 'Predict patrols. Steal the object. Find a new way out.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runTheQuietHeistGame },
   { id: 'orbital-post', name: 'Orbital Post', description: 'Schedule the relay. Outrun the solar weather.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runOrbitalPostGame },
   { id: 'dice-tribunal', name: 'Dice Tribunal', description: 'Roll the evidence. Risk the reroll. Rewrite precedent.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runDiceTribunalGame },
+  { id: 'time-capsule', name: 'Time Capsule', description: 'Keep three truths. Rewrite five minutes.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: 'campaign', run: runTimeCapsuleGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -195,6 +197,7 @@ export {
   runTheQuietHeistGame,
   runOrbitalPostGame,
   runDiceTribunalGame,
+  runTimeCapsuleGame,
 };
 
 // Re-export games menu

@@ -91,12 +91,15 @@ import { runPacketPanicGame } from './packet-panic';
 import { runDeadLetterDepartmentGame } from './dead-letter-department';
 import { runSignalNoiseGame } from './signal-noise';
 import { runLastTrainHomeGame } from './last-train-home';
+import { runBlackoutGridGame } from './blackout-grid';
 import { runRogueLedgerGame } from './rogue-ledger';
 import { runContainmentProtocolGame } from './containment-protocol';
 import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
 import { runGhostShiftGame } from './ghost-shift';
 import { runStackTraceGame } from './stack-trace';
 import { runTheQuietHeistGame } from './the-quiet-heist';
+import { runOrbitalPostGame } from './orbital-post';
+import { runDiceTribunalGame } from './dice-tribunal';
 import { archivedGames } from './archived';
 
 /**
@@ -122,10 +125,13 @@ export const games: GameInfo[] = [
   { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', maturity: 'featured', pace: 'real-time', difficulty: 2, session: '10–15 min', run: runPacketPanicGame },
   { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', maturity: 'beta', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runSignalNoiseGame },
   { id: 'last-train-home', name: 'Last Train Home', description: 'Dispatch the last evacuation trains through a collapsing rail network.', maturity: 'beta', pace: 'turn-based', difficulty: 3, session: '10–15 min', run: runLastTrainHomeGame },
+  { id: 'blackout-grid', name: 'Blackout Grid', description: 'Restore the city. Isolate faults. Hold the load.', maturity: 'workshop', pace: 'real-time', difficulty: 2, session: '10–15 min', run: runBlackoutGridGame },
   { id: 'rogue-ledger', name: 'Rogue Ledger', description: 'Draft rules. Survive bizarre quarters.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runRogueLedgerGame },
   { id: 'containment-protocol', name: 'Containment Protocol', description: 'Learn the rules. Hold the rooms.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runContainmentProtocolGame },
   { id: 'ghost-shift', name: 'Ghost Shift', description: 'Catch the intruder from cameras, door logs, and dwindling power.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runGhostShiftGame },
   { id: 'the-quiet-heist', name: 'The Quiet Heist', description: 'Predict patrols. Steal the object. Find a new way out.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runTheQuietHeistGame },
+  { id: 'orbital-post', name: 'Orbital Post', description: 'Schedule the relay. Outrun the solar weather.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runOrbitalPostGame },
+  { id: 'dice-tribunal', name: 'Dice Tribunal', description: 'Roll the evidence. Risk the reroll. Rewrite precedent.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runDiceTribunalGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -180,12 +186,15 @@ export {
   runDeadLetterDepartmentGame,
   runSignalNoiseGame,
   runLastTrainHomeGame,
+  runBlackoutGridGame,
   runRogueLedgerGame,
   runContainmentProtocolGame,
   runFiveMinuteKingdomGame,
   runGhostShiftGame,
   runStackTraceGame,
   runTheQuietHeistGame,
+  runOrbitalPostGame,
+  runDiceTribunalGame,
 };
 
 // Re-export games menu

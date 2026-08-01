@@ -103,6 +103,7 @@ import { runOrbitalPostGame } from './orbital-post';
 import { runDiceTribunalGame } from './dice-tribunal';
 import { runTimeCapsuleGame } from './time-capsule';
 import { runTinyFleetGame } from './tiny-fleet';
+import { runDungeonCourierGame } from './dungeon-courier';
 import { archivedGames } from './archived';
 
 /**
@@ -138,6 +139,7 @@ export const games: GameInfo[] = [
   { id: 'dice-tribunal', name: 'Dice Tribunal', description: 'Roll the evidence. Risk the reroll. Rewrite precedent.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runDiceTribunalGame },
   { id: 'time-capsule', name: 'Time Capsule', description: 'Keep three truths. Rewrite five minutes.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: 'campaign', run: runTimeCapsuleGame },
   { id: 'tiny-fleet', name: 'Tiny Fleet', description: 'Seal three orders. Read the fog. Outguess the pirates.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runTinyFleetGame },
+  { id: 'dungeon-courier', name: 'Dungeon Courier', description: 'Read the label. Choose the route. Deliver it intact.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runDungeonCourierGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -204,6 +206,7 @@ export {
   runDiceTribunalGame,
   runTimeCapsuleGame,
   runTinyFleetGame,
+  runDungeonCourierGame,
 };
 
 // Re-export games menu

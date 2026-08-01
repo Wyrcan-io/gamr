@@ -115,6 +115,7 @@ terminal.options.theme = xtermTheme;
 | Ghost Shift | Catch the intruder using cameras, door logs, and power |
 | Stack Trace | Repair blocks and pass every test |
 | The Quiet Heist | Predict patrols, steal the object, find a new exit |
+| Dungeon Courier | Read the parcel, choose a route, deliver it intact |
 
 ## Controls
 
@@ -122,6 +123,12 @@ terminal.options.theme = xtermTheme;
 - **Enter** — Confirm / select
 - **ESC** — Pause menu
 - **Q** — Quit
+
+### Dungeon Courier
+
+- **Arrow keys / WASD** — Step; **Shift + direction** — Hurry
+- **B** — Brace; **. / Space** — Wait; **E / Enter** — Interact
+- **1–4** — Use satchel item; **I** — Inventory; **Tab** — Survey overlays
 
 ### Packet Panic
 

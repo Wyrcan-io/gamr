@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { advance, applyCommand, createState, serviceRatioForState, upgradeChoices } from './engine';
 import { validateBlueprint, createBlueprint } from './scenario';
 import { canCloseEdge } from './topology';
+import { renderFrame } from './render';
 
 function running(seed = 42) {
   let state = createState(seed);
@@ -34,6 +35,7 @@ describe('Blackout Grid topology and restoration', () => {
   it('rejects a live-source tie that would parallel two sources', () => {
     const state = running();
     state.edges['e-grid-b'].breaker = 'closed';
+    state.edges['e-emergency'].condition = 'intact';
     expect(canCloseEdge(state, 'e-emergency').ok).toBe(false);
     expect(canCloseEdge(state, 'e-emergency').reason).toContain('LIVE SOURCES');
   });
@@ -57,10 +59,11 @@ describe('Blackout Grid topology and restoration', () => {
     for (let i = 0; i < 8; i++) advance(state);
     applyCommand(state, { type: 'toggleBreaker' });
     select(state, 'node', 'hospital'); applyCommand(state, { type: 'toggleDistrict' });
-    select(state, 'edge', 'e-north-r'); applyCommand(state, { type: 'toggleBreaker' });
+    select(state, 'edge', 'e-north-r'); state.edges['e-north-r'].capacityMW = 10; applyCommand(state, { type: 'toggleBreaker' });
+    expect(state.edges['e-north-r'].breaker).toBe('closed');
     select(state, 'node', 'residential'); applyCommand(state, { type: 'toggleDistrict' });
     for (let i = 0; i < 12; i++) advance(state);
-    expect(state.feederTrips + state.sourceTrips).toBeGreaterThanOrEqual(0);
+    expect(state.feederTrips + state.sourceTrips).toBeGreaterThan(0);
     expect(serviceRatioForState(state)).toBeGreaterThanOrEqual(0);
   });
 
@@ -70,5 +73,11 @@ describe('Blackout Grid topology and restoration', () => {
     for (let i = 0; i < 10; i++) { advance(left); advance(right); }
     expect(left).toEqual(right);
     expect(upgradeChoices(left)).toEqual(upgradeChoices(right));
+  });
+
+  it('renders a minimum-size frame and a live frame without throwing', () => {
+    const state = running();
+    expect(renderFrame(state, 79, 28, '\x1b[36m', 0)).toContain('TERMINAL TOO SMALL');
+    expect(renderFrame(state, 80, 28, '\x1b[36m', 0)).toContain('BLACKOUT GRID');
   });
 });

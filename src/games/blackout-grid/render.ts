@@ -60,18 +60,19 @@ function nodeColor(node: GridNode): string {
 }
 
 function lineForCell(state: GameState, point: Point): string {
+  const cellSelected = state.selected.kind === 'cell' && state.selected.point.x === point.x && state.selected.point.y === point.y;
   const node = nodeAt(state, point);
   if (node) {
     const glyph = nodeGlyph(node);
     const text = ` ${glyph} `;
-    return selected(state, 'node', node.id) ? `\x1b[7m${text}${RESET}` : nodeColor(node) + text + RESET;
+    return cellSelected || selected(state, 'node', node.id) ? `\x1b[7m${text}${RESET}` : nodeColor(node) + text + RESET;
   }
   const edge = edgeAt(state, point);
   if (!edge) return '   ';
   const index = edge.route.findIndex(item => item.x === point.x && item.y === point.y);
   let text = routeGlyph(edge, index);
   if (index === Math.floor(edge.route.length / 2)) text = edge.breaker === 'closed' ? (edge.energized ? `${CYAN}●${RESET}` : ' ● ') : `${DIM}○${RESET}`;
-  if (selected(state, 'edge', edge.id)) text = `\x1b[7m${text}${RESET}`;
+  if (cellSelected || selected(state, 'edge', edge.id)) text = `\x1b[7m${text}${RESET}`;
   return text;
 }
 

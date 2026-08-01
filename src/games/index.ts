@@ -106,6 +106,7 @@ import { runTinyFleetGame } from './tiny-fleet';
 import { runDungeonCourierGame } from './dungeon-courier';
 import { runNightFrequencyGame } from './night-frequency';
 import { runBotanyLabGame } from './botany-lab';
+import { runThe13thLiftGame } from './the-13th-lift';
 import { archivedGames } from './archived';
 
 /**
@@ -144,6 +145,7 @@ export const games: GameInfo[] = [
   { id: 'dungeon-courier', name: 'Dungeon Courier', description: 'Read the label. Choose the route. Deliver it intact.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runDungeonCourierGame },
   { id: 'night-frequency', name: 'Night Frequency', description: 'Take the calls. Build the case. Stay on the air.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: 'campaign', run: runNightFrequencyGame },
   { id: 'botany-lab', name: 'Botany Lab', description: 'Grow strange plants. Fill the contracts. Hold the glass.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runBotanyLabGame },
+  { id: 'the-13th-lift', name: 'The 13th Lift', description: 'Read the riders. Program the route. Do not stop at thirteen.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runThe13thLiftGame },
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
@@ -213,6 +215,7 @@ export {
   runDungeonCourierGame,
   runNightFrequencyGame,
   runBotanyLabGame,
+  runThe13thLiftGame,
 };
 
 // Re-export games menu

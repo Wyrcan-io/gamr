@@ -95,6 +95,7 @@ import { runBlackoutGridGame } from './blackout-grid';
 import { runRogueLedgerGame } from './rogue-ledger';
 import { runContainmentProtocolGame } from './containment-protocol';
 import { runFiveMinuteKingdomGame } from './five-minute-kingdom';
+import { runMarketOfMirrorsGame } from './market-of-mirrors';
 import { runGhostShiftGame } from './ghost-shift';
 import { runStackTraceGame } from './stack-trace';
 import { runTheQuietHeistGame } from './the-quiet-heist';
@@ -123,6 +124,7 @@ export const games: GameInfo[] = [
   // for later reactivation, but are intentionally hidden from the game menu.
   { id: 'stack-trace', name: 'Stack Trace', description: 'Repair the blocks. Pass every test.', maturity: 'featured', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runStackTraceGame },
   { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', maturity: 'featured', pace: 'turn-based', difficulty: 1, session: '5 min', run: runFiveMinuteKingdomGame },
+  { id: 'market-of-mirrors', name: 'Market of Mirrors', description: 'Trade strange goods. Plant the rumor. Sell the story.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: '10–15 min', run: runMarketOfMirrorsGame },
   { id: 'dead-letter-department', name: 'Dead Letter Department', description: 'Inspect the mail. Seal what answers back.', maturity: 'featured', pace: 'turn-based', difficulty: 1, session: '10–15 min', run: runDeadLetterDepartmentGame },
   { id: 'packet-panic', name: 'Packet Panic', description: 'Route packets. Stop the trace.', maturity: 'featured', pace: 'real-time', difficulty: 2, session: '10–15 min', run: runPacketPanicGame },
   { id: 'signal-noise', name: 'Signal//Noise', description: 'Isolate transmissions. Find the source. Choose your reply.', maturity: 'beta', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runSignalNoiseGame },
@@ -194,6 +196,7 @@ export {
   runRogueLedgerGame,
   runContainmentProtocolGame,
   runFiveMinuteKingdomGame,
+  runMarketOfMirrorsGame,
   runGhostShiftGame,
   runStackTraceGame,
   runTheQuietHeistGame,

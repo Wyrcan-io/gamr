@@ -1,0 +1,19 @@
+name: Game proposal
+description: Propose a new game or a substantial game redesign.
+title: "[Game]: "
+labels: [game-proposal]
+body:
+  - type: textarea
+    id: pitch
+    attributes:
+      label: Game pitch
+      description: What is the core loop and why does it fit a terminal?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and interaction model
+      description: Describe controls, session length, and whether it is turn-based or real-time.
+    validations:
+      required: true

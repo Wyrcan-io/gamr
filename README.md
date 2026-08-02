@@ -2,11 +2,11 @@
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
-The current lineup contains twenty original games. Older games remain available in the source tree while they are reworked.
+The active lineup contains twenty games. Nineteen legacy games remain importable and directly launchable for compatibility, but are hidden from the main menu and are not held to the active-catalog support promise.
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. Difficulty and expected session length are shown in the game menu.
+The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. Difficulty and expected session length are shown in the game menu. Most games are designed for terminals at least 80 columns by 28 rows and require a Unicode-capable font.
 
 ## Quick Start
 
@@ -31,6 +31,8 @@ gamr
 # Or as a project dependency (for xterm.js integration)
 npm install @wyrcan/gamr
 ```
+
+Gamr is an ESM package and supports Node.js 22 or newer. The CLI performs a best-effort npm registry update check on startup; set `GAMR_DISABLE_UPDATE_CHECK=1` in offline, automated, or privacy-sensitive environments.
 
 ## CLI Usage
 
@@ -83,6 +85,8 @@ terminal.options.theme = xtermTheme;
 ```
 
 ## Games
+
+The table below includes both the active catalog and legacy games that remain available through direct IDs and library exports. Use `gamr --list` for the supported active catalog.
 
 | Game | Description |
 |------|-------------|

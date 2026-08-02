@@ -2,7 +2,7 @@
  * @wyrcan/gamr
  *
  * Terminal games for xterm.js and CLI.
- * 18 games: snake, tetris, 2048, pong, asteroids, and more.
+ * 20 active games plus 19 legacy runners: snake, tetris, 2048, pong, asteroids, and more.
  *
  * Library usage (xterm.js):
  *   import { games, setTheme } from '@wyrcan/gamr';

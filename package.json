@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public"
@@ -40,10 +40,11 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "pack:smoke": "node scripts/pack-smoke.mjs",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "peerDependencies": {
-    "@xterm/xterm": ">=5.0.0"
+    "@xterm/xterm": ">=5.0.0 <7"
   },
   "peerDependenciesMeta": {
     "@xterm/xterm": {
@@ -51,7 +52,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^25.3.2",
+    "@types/node": "^22.0.0",
     "@xterm/xterm": "^6.0.0",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",
@@ -60,6 +61,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Wyrcan-io/gamr.git"
+  },
+  "homepage": "https://github.com/Wyrcan-io/gamr#readme",
+  "bugs": {
+    "url": "https://github.com/Wyrcan-io/gamr/issues"
   },
   "keywords": [
     "terminal",
@@ -74,7 +79,6 @@
   ],
   "author": "wyrcan.io",
   "dependencies": {
-    "@clack/prompts": "^1.0.1",
-    "@wyrcan/gamr": "^0.3.0"
+    "@clack/prompts": "^1.0.1"
   }
 }

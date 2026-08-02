@@ -25,17 +25,51 @@ const FETCH_TIMEOUT_MS = 3000; // Don't block startup for slow networks
 // Version helpers
 // ---------------------------------------------------------------------------
 
-function parseVersion(v: string): [number, number, number] {
-  const parts = v.replace(/^v/, '').split('.').map(Number);
-  return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+interface ParsedVersion {
+  major: number;
+  minor: number;
+  patch: number;
+  prerelease: string[];
 }
 
-function isNewer(latest: string, current: string): boolean {
-  const [lMaj, lMin, lPat] = parseVersion(latest);
-  const [cMaj, cMin, cPat] = parseVersion(current);
-  if (lMaj !== cMaj) return lMaj > cMaj;
-  if (lMin !== cMin) return lMin > cMin;
-  return lPat > cPat;
+function parseVersion(v: string): ParsedVersion {
+  const match = v.trim().replace(/^v/, '').match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?/);
+  if (!match) return { major: 0, minor: 0, patch: 0, prerelease: [] };
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3]),
+    prerelease: match[4]?.split('.') ?? [],
+  };
+}
+
+export function isNewerVersion(latest: string, current: string): boolean {
+  const l = parseVersion(latest);
+  const c = parseVersion(current);
+  for (const key of ['major', 'minor', 'patch'] as const) {
+    if (l[key] !== c[key]) return l[key] > c[key];
+  }
+  if (l.prerelease.length === 0 || c.prerelease.length === 0) {
+    return l.prerelease.length === 0 && c.prerelease.length > 0;
+  }
+  for (let i = 0; i < Math.max(l.prerelease.length, c.prerelease.length); i += 1) {
+    const left = l.prerelease[i];
+    const right = c.prerelease[i];
+    if (left === undefined) return false;
+    if (right === undefined) return true;
+    if (left === right) continue;
+    const leftNumber = /^\d+$/.test(left) ? Number(left) : null;
+    const rightNumber = /^\d+$/.test(right) ? Number(right) : null;
+    if (leftNumber !== null && rightNumber !== null) return leftNumber > rightNumber;
+    if (leftNumber !== null) return false;
+    if (rightNumber !== null) return true;
+    return left > right;
+  }
+  return false;
+}
+
+function updateChecksDisabled(): boolean {
+  return process.env.GAMR_DISABLE_UPDATE_CHECK === '1';
 }
 
 // ---------------------------------------------------------------------------
@@ -82,7 +116,7 @@ function readCache(): CacheData | null {
 function writeCache(latest: string) {
   try {
     if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(CACHE_FILE, JSON.stringify({ checkedAt: Date.now(), latest }));
+    writeFileSync(CACHE_FILE, JSON.stringify({ checkedAt: Date.now(), latest }), { mode: 0o600 });
   } catch { /* ignore write errors */ }
 }
 
@@ -96,7 +130,7 @@ async function fetchLatestVersion(): Promise<string | null> {
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     const res = await fetch(
-      `https://registry.npmjs.org/${PACKAGE_NAME}/latest`,
+      `https://registry.npmjs.org/${encodeURIComponent(PACKAGE_NAME)}/latest`,
       { signal: controller.signal },
     );
     clearTimeout(timeout);
@@ -119,12 +153,13 @@ interface UpdateInfo {
 }
 
 async function getUpdateInfo(): Promise<UpdateInfo | null> {
+  if (updateChecksDisabled()) return null;
   const current = getCurrentVersion();
 
   // Check cache first
   const cache = readCache();
   if (cache && Date.now() - cache.checkedAt < CHECK_INTERVAL_MS) {
-    if (isNewer(cache.latest, current)) {
+    if (isNewerVersion(cache.latest, current)) {
       return { current, latest: cache.latest };
     }
     return null;
@@ -136,7 +171,7 @@ async function getUpdateInfo(): Promise<UpdateInfo | null> {
 
   writeCache(latest);
 
-  if (isNewer(latest, current)) {
+  if (isNewerVersion(latest, current)) {
     return { current, latest };
   }
   return null;

@@ -1,4 +1,4 @@
-# @abhirup/gamr
+# @wyrcan/gamr
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
@@ -12,24 +12,24 @@ The TUI catalog is curated by maturity: four Featured games, two public betas, a
 
 ```bash
 # Play now — no install needed
-npx @abhirup/gamr
+npx @wyrcan/gamr
 
 # Launch a specific game
-npx @abhirup/gamr snake
+npx @wyrcan/gamr snake
 
 # With a color theme
-npx @abhirup/gamr tetris --theme green
+npx @wyrcan/gamr tetris --theme green
 ```
 
 ## Install
 
 ```bash
 # Global install
-npm install -g @abhirup/gamr
+npm install -g @wyrcan/gamr
 gamr
 
 # Or as a project dependency (for xterm.js integration)
-npm install @abhirup/gamr
+npm install @wyrcan/gamr
 ```
 
 ## CLI Usage
@@ -49,7 +49,7 @@ gamr --help             # Show help
 ## Library Usage (xterm.js)
 
 ```typescript
-import { games, setTheme, runGame } from '@abhirup/gamr';
+import { games, setTheme, runGame } from '@wyrcan/gamr';
 
 // Set the color theme
 setTheme('cyan');
@@ -75,7 +75,7 @@ import {
   getAnsiColor,
   getTerminalTheme,
   type PhosphorMode,
-} from '@abhirup/gamr/themes';
+} from '@wyrcan/gamr/themes';
 
 // Get a full xterm.js theme object
 const xtermTheme = getTerminalTheme('cyan');

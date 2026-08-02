@@ -1,16 +1,16 @@
 /**
- * @abhirup/gamr
+ * @wyrcan/gamr
  *
  * Terminal games for xterm.js and CLI.
  * 18 games: snake, tetris, 2048, pong, asteroids, and more.
  *
  * Library usage (xterm.js):
- *   import { games, setTheme } from '@abhirup/gamr';
+ *   import { games, setTheme } from '@wyrcan/gamr';
  *   setTheme('cyan');
  *   const controller = games[0].run(terminal);
  *
  * CLI usage:
- *   npx @abhirup/gamr
+ *   npx @wyrcan/gamr
  */
 
 export {

@@ -1,5 +1,5 @@
 /**
- * Auto-update checker for @abhirup/gamr
+ * Auto-update checker for @wyrcan/gamr
  *
  * Checks the npm registry for newer versions, caches results for 24h,
  * and provides both passive (print notice) and interactive (offer update) modes.
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 // Constants
 // ---------------------------------------------------------------------------
 
-const PACKAGE_NAME = '@abhirup/gamr';
+const PACKAGE_NAME = '@wyrcan/gamr';
 const CACHE_DIR = resolve(homedir(), '.gamr');
 const CACHE_FILE = resolve(CACHE_DIR, 'update-check.json');
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours

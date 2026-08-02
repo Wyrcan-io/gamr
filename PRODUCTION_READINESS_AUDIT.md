@@ -23,9 +23,9 @@ Gamr has a strong game-engine foundation, but the repository is not yet ready to
 
 ### 1. Public installation is unavailable
 
-An unauthenticated npm registry request for `@abhirup/gamr` returns `404 Not Found`. As a result, the installation and `npx` commands currently shown in the README will fail for public users.
+An unauthenticated npm registry request for `@wyrcan/gamr` must succeed before public installation is announced. Until publication, the installation and `npx` commands shown in the README will fail for public users.
 
-The canonical GitHub repository is `Wyrcan-io/gamr`. At audit time, the package metadata and developer CLI still pointed at `abhirup/gamr`; those repository-side references have now been corrected.
+The canonical GitHub repository is `Wyrcan-io/gamr`, and the package is now named `@wyrcan/gamr`.
 
 **Remaining action:** Make `Wyrcan-io/gamr` publicly accessible and publish a prerelease package before advertising the installation commands.
 
@@ -87,7 +87,7 @@ Keep the lockfile under review as tooling releases change.
 The game generator executes:
 
 ```text
-npx skills add abhirup/gamr -a claude-code -s game-dev -y
+npx skills add Wyrcan-io/gamr -a claude-code -s game-dev -y
 ```
 
 The package and skill revision are not pinned. Future registry or upstream changes could therefore determine code executed on a contributor's machine.
@@ -277,9 +277,9 @@ The remaining items below require access to external services or a maintainer de
 
 ## Manual P0: make public installation real
 
-The package and README currently advertise `npx @abhirup/gamr`, but the npm registry and GitHub API did not expose a public package/repository during this audit. Complete these steps from an account that owns the intended namespace:
+The package and README now advertise `npx @wyrcan/gamr`, but the npm package must still be published before public installation works. Complete these steps from an account that owns the intended namespace:
 
-1. Keep `Wyrcan-io/gamr` as the canonical GitHub repository. Decide whether the npm package should remain under `@abhirup/gamr` or move to a scope controlled by the release owner.
+1. Keep `Wyrcan-io/gamr` as the canonical GitHub repository and verify that your npm account or organization controls the `wyrcan` scope.
 2. Make `Wyrcan-io/gamr` **Public**, push this branch, and set the intended default branch (`main` or `master`).
 3. Create the npm account/organization for the chosen scope. Enable 2FA for publishing, sign in with `npm login`, and verify that the package name is available with `npm view <package-name>`.
 4. Review package contents with `npm pack --dry-run`. From the release commit, bump to a deliberate version (for example `0.3.0-beta.1`) and publish with `npm publish --access public`. The repository now sets `publishConfig.access` to public, but publication still requires your credentials and ownership.

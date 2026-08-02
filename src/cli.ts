@@ -1,5 +1,5 @@
 /**
- * CLI entry point for @abhirup/gamr
+ * CLI entry point for @wyrcan/gamr
  *
  * Provides a Node.js terminal adapter that maps stdin/stdout
  * to an xterm.js-compatible Terminal interface, allowing all
@@ -333,7 +333,7 @@ function launchGame(terminal: NodeTerminal, game: GameInfo) {
 
 function printHelp() {
   console.log(`
-  @abhirup/gamr — Terminal games
+  @wyrcan/gamr — Terminal games
 
   Usage:
     gamr                    Interactive game menu

@@ -1,5 +1,5 @@
 /**
- * @abhirup/gamr
+ * @wyrcan/gamr
  *
  * Terminal games for xterm.js and CLI
  *

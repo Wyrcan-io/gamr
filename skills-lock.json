@@ -2,7 +2,7 @@
   "version": 1,
   "skills": {
     "game-dev": {
-      "source": "abhirup/gamr",
+      "source": "Wyrcan-io/gamr",
       "sourceType": "github",
       "computedHash": "6dfefe3d79cbe69549ea3438ffceb4b84a2e43707cfb65c09f5a5a4b4813f612"
     }

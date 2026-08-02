@@ -1,6 +1,6 @@
 {
-  "name": "@abhirup/gamr",
-  "version": "0.2.4",
+  "name": "@wyrcan/gamr",
+  "version": "0.3.0-beta.1",
   "description": "Terminal games for xterm.js and CLI — snake, 2048, pong, asteroids, tetris, and more",
   "license": "AGPL-3.0",
   "type": "module",

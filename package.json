@@ -74,6 +74,7 @@
   ],
   "author": "wyrcan.io",
   "dependencies": {
-    "@clack/prompts": "^1.0.1"
+    "@clack/prompts": "^1.0.1",
+    "@wyrcan/gamr": "^0.3.0"
   }
 }

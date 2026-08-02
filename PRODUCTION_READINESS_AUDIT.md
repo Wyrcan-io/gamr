@@ -245,7 +245,7 @@ Also consider:
 - Make the repository public.
 - Correct repository links throughout the project.
 - Add open-source community and security files.
-- Publish `0.3.0-beta.1` and verify installation on clean machines.
+- Publish stable `0.3.0` and verify installation on clean machines.
 
 ### Phase 3: Secure the contributor and release workflow
 
@@ -277,13 +277,13 @@ The remaining items below require access to external services or a maintainer de
 
 ## Manual P0: make public installation real
 
-The package and README now advertise `npx @wyrcan/gamr@beta`, but the npm package must still be published before public installation works. Complete these steps from an account that owns the intended namespace:
+The package and README now advertise `npx @wyrcan/gamr`, and stable `0.3.0` must be published before public installation works. Complete these steps from an account that owns the intended namespace:
 
 1. Keep `Wyrcan-io/gamr` as the canonical GitHub repository and verify that your npm account or organization controls the `wyrcan` scope.
 2. Make `Wyrcan-io/gamr` **Public**, push this branch, and set the intended default branch (`main` or `master`).
 3. Create the npm account/organization for the chosen scope. Enable 2FA for publishing, sign in with `npm login`, and verify that the package name is available with `npm view <package-name>`.
-4. Review package contents with `npm pack --dry-run`. From the release commit, bump to a deliberate version (for example `0.3.0-beta.1`) and publish a prerelease with `npm publish --access public --tag beta`. The repository now sets `publishConfig.access` to public, but publication still requires your credentials and ownership.
-5. From a clean directory and a second machine/Node environment, verify `npx <package-name>@beta --list`, `npx <package-name>@beta --help`, and `npm install <package-name>@beta`. Confirm the packed library imports and the CLI starts. Remove the `@beta` suffix from documentation only after a stable `latest` release exists.
+4. Review package contents with `npm pack --dry-run`. From the release commit, publish stable `0.3.0` with `npm publish --access public`; npm will assign the normal `latest` tag. The repository sets `publishConfig.access` to public, but publication still requires your credentials and ownership.
+5. From a clean directory and a second machine/Node environment, verify `npx <package-name> --list`, `npx <package-name> --help`, and `npm install <package-name>`. Confirm the packed library imports and the CLI starts.
 6. Configure npm trusted publishing/provenance if your release setup supports it. Otherwise keep the publish token out of the repository and CI logs.
 7. Configure GitHub branch protection, required CI checks, Dependabot/security alerts, secret scanning/push protection, and private vulnerability reporting. Rotate or replace `SITE_REPO_PAT` with a fine-grained token limited to the target site repository.
 

@@ -19,6 +19,7 @@ This audit has now been acted on in the working tree:
 - repaired CI push/PR triggers, added Node 22/24 coverage, minimal permissions, concurrency, and SHA-pinned actions;
 - added `scripts/pack-smoke.mjs`, release tag validation, a provenance-ready publish workflow, and post-publish site notification ordering;
 - added an update-check opt-out, stronger SemVer comparison, scoped registry URL encoding, and restrictive cache-file permissions;
+- made non-interactive CLI exits return cleanly on Windows Node 24 and made the package smoke test disable network update checks;
 - added Node/xterm/legacy-catalog documentation, a changelog, security reporting link, Code of Conduct, issue forms, PR template, and Dependabot configuration.
 
 The remaining blockers are account/repository operations: push these changes, confirm GitHub sees successful runs, configure branch protection and the `release` environment, enable npm trusted publishing/private vulnerability reporting, rotate or replace `SITE_REPO_PAT`, and create the historical `v0.3.0` release/tag only after verifying its source commit.

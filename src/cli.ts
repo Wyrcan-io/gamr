@@ -371,14 +371,14 @@ function main() {
 
   if (args.includes('--help') || args.includes('-h')) {
     printHelp();
-    process.exit(0);
+    return;
   }
 
   if (args.includes('--list') || args.includes('-l')) {
     for (const game of games) {
       console.log(`  ${game.id.padEnd(16)} ${game.description}`);
     }
-    process.exit(0);
+    return;
   }
 
   let theme: PhosphorMode = 'cyan';
@@ -389,19 +389,23 @@ function main() {
   }
   setTheme(theme);
 
+  // Validate direct game launches before creating a terminal that resumes stdin.
+  const gameName = args[0];
+  const game = gameName
+    ? allGames.find(g => g.id === gameName || g.name.toLowerCase() === gameName.toLowerCase())
+    : undefined;
+  if (gameName && !game) {
+    console.error(`Unknown game: ${gameName}`);
+    console.error(`Available active games: ${games.map(g => g.id).join(', ')}`);
+    process.exitCode = 1;
+    return;
+  }
+
   const terminal = createNodeTerminal();
   setupGameEvents(terminal);
 
   // Direct game launch: gamr snake
-  const gameName = args[0];
-  if (gameName) {
-    const game = allGames.find(g => g.id === gameName || g.name.toLowerCase() === gameName.toLowerCase());
-    if (!game) {
-      console.error(`Unknown game: ${gameName}`);
-      console.error(`Available active games: ${games.map(g => g.id).join(', ')}`);
-      process.exit(1);
-      return;
-    }
+  if (game) {
     launchGame(terminal, game);
     return;
   }

@@ -67,7 +67,11 @@ try {
   const help = execFileSync(process.execPath, [installedCli, '--help'], {
     cwd: installDir,
     encoding: 'utf8',
-    env: { ...process.env, npm_config_update_notifier: 'false' },
+    env: {
+      ...process.env,
+      GAMR_DISABLE_UPDATE_CHECK: '1',
+      npm_config_update_notifier: 'false',
+    },
   });
   if (!help.includes('Terminal games')) throw new Error('Installed CLI did not print help');
 

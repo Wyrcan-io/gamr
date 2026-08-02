@@ -159,9 +159,9 @@ async function findOrSetupRepo(): Promise<string | null> {
   }
 
   const s = p.spinner();
-  s.start('Cloning abhirup/gamr...');
+  s.start('Cloning Wyrcan-io/gamr...');
   try {
-    execSync('git clone https://github.com/abhirup/gamr.git', {
+    execSync('git clone https://github.com/Wyrcan-io/gamr.git', {
       cwd,
       stdio: 'ignore',
     });
@@ -315,7 +315,7 @@ async function doCreate(repoRoot: string, initialName?: string) {
     const s = p.spinner();
     s.start('Installing game-dev skill for Claude Code...');
     try {
-      execSync('npx skills add abhirup/gamr -a claude-code -s game-dev -y', {
+      execSync('npx skills add Wyrcan-io/gamr -a claude-code -s game-dev -y', {
         cwd: repoRoot,
         stdio: 'ignore',
       });

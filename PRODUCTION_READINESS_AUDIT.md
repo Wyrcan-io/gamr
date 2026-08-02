@@ -25,14 +25,9 @@ Gamr has a strong game-engine foundation, but the repository is not yet ready to
 
 An unauthenticated npm registry request for `@abhirup/gamr` returns `404 Not Found`. As a result, the installation and `npx` commands currently shown in the README will fail for public users.
 
-The repository also refers to two different GitHub locations:
+The canonical GitHub repository is `Wyrcan-io/gamr`. At audit time, the package metadata and developer CLI still pointed at `abhirup/gamr`; those repository-side references have now been corrected.
 
-- The local Git remote uses `Wyrcan-io/gamr`.
-- `package.json`, the developer CLI, and other metadata use `abhirup/gamr`.
-
-Both locations returned 404 to unauthenticated public API requests during the audit. They may be private rather than nonexistent, but neither currently works as a public open-source project URL.
-
-**Required action:** Decide the permanent owner and repository URL, make the repository publicly accessible, update every reference, and publish a prerelease package before advertising the installation commands.
+**Remaining action:** Make `Wyrcan-io/gamr` publicly accessible and publish a prerelease package before advertising the installation commands.
 
 ### 2. Game switching leaks timers and input listeners (addressed; needs regression tests)
 
@@ -71,9 +66,9 @@ The workflow now covers pushes to both `main` and `master`. Standardize on one b
 
 `src/create.ts` expects `.claude/skills/game-dev` to be a directory containing `templates/game-scaffold.ts`. In the repository, `.claude/skills/game-dev` is a regular text file containing a relative path to `.agents/skills/game-dev` rather than a working directory or symlink.
 
-The resulting template lookup fails. Outside the repository, the command attempts to clone the currently unavailable `abhirup/gamr` URL.
+The resulting template lookup failed. Outside the repository, the command now uses the canonical `Wyrcan-io/gamr` clone URL.
 
-The generator now resolves the checked-in pointer file and safely serializes descriptions. The fallback clone URL still depends on the final public repository owner.
+The generator now resolves the checked-in pointer file and safely serializes descriptions. Its fallback clone URL now matches the canonical repository.
 
 ## P1: Security and Supply-Chain Findings
 
@@ -284,8 +279,8 @@ The remaining items below require access to external services or a maintainer de
 
 The package and README currently advertise `npx @abhirup/gamr`, but the npm registry and GitHub API did not expose a public package/repository during this audit. Complete these steps from an account that owns the intended namespace:
 
-1. Choose the canonical GitHub owner and npm scope. If `abhirup` is not the release owner, decide the final names first; this changes the clone URL, package name, repository metadata, and README commands.
-2. Create or transfer the GitHub repository, make it **Public**, push this branch, and set the intended default branch (`main` or `master`). Update every old URL in `package.json`, `src/create.ts`, workflows, and documentation.
+1. Keep `Wyrcan-io/gamr` as the canonical GitHub repository. Decide whether the npm package should remain under `@abhirup/gamr` or move to a scope controlled by the release owner.
+2. Make `Wyrcan-io/gamr` **Public**, push this branch, and set the intended default branch (`main` or `master`).
 3. Create the npm account/organization for the chosen scope. Enable 2FA for publishing, sign in with `npm login`, and verify that the package name is available with `npm view <package-name>`.
 4. Review package contents with `npm pack --dry-run`. From the release commit, bump to a deliberate version (for example `0.3.0-beta.1`) and publish with `npm publish --access public`. The repository now sets `publishConfig.access` to public, but publication still requires your credentials and ownership.
 5. From a clean directory and a second machine/Node environment, verify `npx <package-name> --list`, `npx <package-name> --help`, and `npm install <package-name>`. Confirm the packed library imports and the CLI starts.

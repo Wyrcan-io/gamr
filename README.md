@@ -12,24 +12,24 @@ The TUI catalog is curated by maturity: four Featured games, two public betas, a
 
 ```bash
 # Play now — no install needed
-npx @wyrcan/gamr
+npx @wyrcan/gamr@beta
 
 # Launch a specific game
-npx @wyrcan/gamr snake
+npx @wyrcan/gamr@beta snake
 
 # With a color theme
-npx @wyrcan/gamr tetris --theme green
+npx @wyrcan/gamr@beta tetris --theme green
 ```
 
 ## Install
 
 ```bash
 # Global install
-npm install -g @wyrcan/gamr
+npm install -g @wyrcan/gamr@beta
 gamr
 
 # Or as a project dependency (for xterm.js integration)
-npm install @wyrcan/gamr
+npm install @wyrcan/gamr@beta
 ```
 
 ## CLI Usage

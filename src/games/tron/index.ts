@@ -890,7 +890,7 @@ export function runTronGame(terminal: Terminal): TronController {
               stopGameLoop();
               clearInterval(renderInterval);
               clearInterval(particleInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
@@ -898,7 +898,7 @@ export function runTronGame(terminal: Terminal): TronController {
               stopGameLoop();
               clearInterval(renderInterval);
               clearInterval(particleInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -915,14 +915,14 @@ export function runTronGame(terminal: Terminal): TronController {
           stopGameLoop();
           clearInterval(renderInterval);
           clearInterval(particleInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (key === 'n') {
           if (countdownTimer) clearInterval(countdownTimer);
           stopGameLoop();
           clearInterval(renderInterval);
           clearInterval(particleInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

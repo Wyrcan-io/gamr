@@ -19,7 +19,7 @@ export function runLastTrainHomeGame(terminal: Terminal): LastTrainHomeControlle
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, domEvent); pauseSelection = result.newSelection;
     if (!result.confirmed) return true;
-    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); }
+    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
     return true;
   }
   function handleKey(domEvent: KeyboardEvent): void {
@@ -29,7 +29,7 @@ export function runLastTrainHomeGame(terminal: Terminal): LastTrainHomeControlle
     if (state.phase === 'start') { if (key === 'q') quit(); else if (key === 't') command({ type: 'startTutorial' }); else if (key === 'p' || key === 'enter') command({ type: 'startCampaign' }); return; }
     if (state.phase === 'briefing') { if (key === 'enter' || key === ' ') command({ type: 'dismissBriefing' }); return; }
     if (state.phase === 'turnReport') { if (key === 'enter' || key === ' ') command({ type: 'dismissReport' }); return; }
-    if (state.phase === 'ending' || state.phase === 'gameOver') { if (key === 'r') restart(); else if (key === 'q') quit(); else if (key === 'n') { if (state.phase === 'ending' && state.scenarioIndex === 0) { state = createState(Date.now(), 1); state.phase = 'briefing'; } else { running = false; dispatchGameSwitch(terminal); } } return; }
+    if (state.phase === 'ending' || state.phase === 'gameOver') { if (key === 'r') restart(); else if (key === 'q') quit(); else if (key === 'n') { if (state.phase === 'ending' && state.scenarioIndex === 0) { state = createState(Date.now(), 1); state.phase = 'briefing'; } else { controller.stop(); dispatchGameSwitch(terminal); } } return; }
     if (key === 'h') { command({ type: 'toggleHelp' }); return; }
     if (key === 'tab') { command({ type: 'selectNextTrain', direction: domEvent.shiftKey ? -1 : 1 }); return; }
     if (key === 'arrowleft' || key === 'a') command({ type: 'moveSelection', dx: -1, dy: 0 }); else if (key === 'arrowright' || key === 'd') command({ type: 'moveSelection', dx: 1, dy: 0 }); else if (key === 'arrowup' || key === 'w') command({ type: 'moveSelection', dx: 0, dy: -1 }); else if (key === 'arrowdown' || key === 's') command({ type: 'moveSelection', dx: 0, dy: 1 });

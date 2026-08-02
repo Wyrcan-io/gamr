@@ -474,14 +474,14 @@ export function runBreakoutGame(terminal: Terminal): BreakoutController {
             case 0: paused = false; break;
             case 1: level = 1; initGame(); gameStarted = true; launchBall(); paused = false; break;
             case 2: clearInterval(renderInterval); clearInterval(gameInterval); controller.stop(); dispatchGameQuit(terminal); break;
-            case 3: clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGamesMenu(terminal); break;
-            case 4: clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGameSwitch(terminal); break;
+            case 3: controller.stop(); dispatchGamesMenu(terminal); break;
+            case 4: controller.stop(); dispatchGameSwitch(terminal); break;
           }
           return;
         }
         if (key === 'r') { level = 1; initGame(); gameStarted = true; launchBall(); paused = false; }
-        else if (key === 'l') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGamesMenu(terminal); }
-        else if (key === 'n') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGameSwitch(terminal); }
+        else if (key === 'l') { controller.stop(); dispatchGamesMenu(terminal); }
+        else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
         return;
       }
 

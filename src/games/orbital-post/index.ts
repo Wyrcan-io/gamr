@@ -27,8 +27,8 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) restartShift();
     else if (pauseSelection === 2) quit();
-    else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); }
-    else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); }
+    else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
+    else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
     return true;
   };
   const selectQueue = (delta: number): void => {

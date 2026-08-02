@@ -32,8 +32,8 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
       case 0: paused = false; break;
       case 1: restart(); break;
       case 2: quit(); break;
-      case 3: running = false; dispatchGamesMenu(terminal); break;
-      case 4: running = false; dispatchGameSwitch(terminal); break;
+      case 3: controller.stop(); dispatchGamesMenu(terminal); break;
+      case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
     return true;
@@ -73,7 +73,7 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
     if (state.phase === 'start') { if (key === 't') run({ type: 'start', mode: 'tutorial' }); else if (key === 'p' || key === 'enter') run({ type: 'start', mode: 'campaign' }); return; }
     if (state.phase === 'brief') { if (key === 'enter' || key === ' ') run({ type: 'continueBrief' }); return; }
     if (state.phase === 'report') { if (key === 'enter' || key === ' ') run({ type: 'continue' }); return; }
-    if (state.phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { running = false; dispatchGameSwitch(terminal); } return; }
+    if (state.phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } return; }
     if (state.phase === 'caller' || state.phase === 'response' || state.phase === 'music') {
       if (key === '1' || key === 'a' || event.key === 'ArrowLeft') chooseBinary(0);
       else if (key === '2' || key === 'd' || event.key === 'ArrowRight') chooseBinary(1);

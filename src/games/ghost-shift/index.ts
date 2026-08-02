@@ -21,7 +21,7 @@ export function runGhostShiftGame(terminal: Terminal): GhostShiftController {
   const doorAtRoom = (): DoorId | undefined => Object.values(state.doors).find(d => d.a === selectedRoom() || d.b === selectedRoom())?.id;
   const handlePause = (key: string, event: KeyboardEvent): boolean => {
     if (!paused) return false; const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event); pauseSelection = result.newSelection; if (!result.confirmed) return true;
-    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) { run({ type: 'restart' }); paused = false; } else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); } return true;
+    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) { run({ type: 'restart' }); paused = false; } else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); } return true;
   };
   const moveSelection = (dx: number, dy: number): void => { const current = rooms.indexOf(selectedRoom()); const next = Math.max(0, Math.min(rooms.length - 1, current + (dx !== 0 ? dx : dy * 3))); run({ type: 'select', selection: { kind: 'room', id: rooms[next] } }); };
   const handleKey = (event: KeyboardEvent): void => {

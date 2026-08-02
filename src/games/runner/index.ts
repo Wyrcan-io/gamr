@@ -905,13 +905,13 @@ export function runRunnerGame(terminal: Terminal): RunnerController {
             case 3: // List Games
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -926,12 +926,12 @@ export function runRunnerGame(terminal: Terminal): RunnerController {
         } else if (key === 'l') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (key === 'n') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

@@ -641,12 +641,12 @@ export function runHangmanGame(terminal: Terminal): HangmanController {
               break;
             case 3: // List Games
               clearInterval(renderInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
               clearInterval(renderInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -660,11 +660,11 @@ export function runHangmanGame(terminal: Terminal): HangmanController {
           paused = false;
         } else if (key === 'l') {
           clearInterval(renderInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (key === 'n') {
           clearInterval(renderInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

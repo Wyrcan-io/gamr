@@ -50,8 +50,8 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
       case 0: paused = false; break;
       case 1: restart(); break;
       case 2: quit(); break;
-      case 3: running = false; dispatchGamesMenu(terminal); break;
-      case 4: running = false; dispatchGameSwitch(terminal); break;
+      case 3: controller.stop(); dispatchGamesMenu(terminal); break;
+      case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
     return true;
@@ -113,7 +113,7 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     }
     if (state.phase === 'ending') {
       if (key === 'r') restart();
-      else if (key === 'n') { running = false; dispatchGameSwitch(terminal); }
+      else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
       else if (key === 'q') quit();
     }
   }

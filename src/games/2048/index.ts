@@ -743,13 +743,13 @@ export function run2048Game(terminal: Terminal): Game2048Controller {
             case 3:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -757,8 +757,8 @@ export function run2048Game(terminal: Terminal): Game2048Controller {
         }
 
         if (key === 'r') { initGame(); gameStarted = true; paused = false; }
-        else if (key === 'l') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGamesMenu(terminal); }
-        else if (key === 'n') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGameSwitch(terminal); }
+        else if (key === 'l') { controller.stop(); dispatchGamesMenu(terminal); }
+        else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
         return;
       }
 

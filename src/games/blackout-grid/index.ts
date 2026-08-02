@@ -53,8 +53,8 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) { state = createState(state.seed, state.mode); state.phase = 'briefing'; paused = false; pauseSelection = 0; }
     else if (pauseSelection === 2) quit();
-    else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); }
-    else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); }
+    else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
+    else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
     return true;
   }
 
@@ -72,7 +72,7 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
       if (key === '1' || key === '2' || key === '3') { const choice = upgradeChoices(state)[Number(key) - 1]; if (choice) runCommand({ type: 'chooseUpgrade', upgradeId: choice.id }); }
       return;
     }
-    if (state.phase === 'won' || state.phase === 'gameOver') { if (key === 'r') runCommand({ type: 'restartSameSeed' }); else if (key === 'q') quit(); else if (key === 'n') { running = false; dispatchGameSwitch(terminal); } return; }
+    if (state.phase === 'won' || state.phase === 'gameOver') { if (key === 'r') runCommand({ type: 'restartSameSeed' }); else if (key === 'q') quit(); else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } return; }
     if (key === 'h') { helpOpen = !helpOpen; return; }
     if (key === 'tab') { runCommand({ type: 'cycleSelection', direction: domEvent.shiftKey ? -1 : 1 }); return; }
     if (key === 'arrowleft' || key === 'a') runCommand({ type: 'moveSelection', dx: -1, dy: 0 });
@@ -132,4 +132,3 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   }, 50);
   return controller;
 }
-

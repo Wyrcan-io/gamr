@@ -5,8 +5,8 @@
  * and submitting PRs — all powered by clack prompts and Claude Code.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
-import { resolve, relative } from 'path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, statSync } from 'fs';
+import { resolve, relative, dirname } from 'path';
 import { execSync, spawn } from 'child_process';
 import * as p from '@clack/prompts';
 
@@ -36,6 +36,28 @@ function isCliGamesRepo(dir: string): boolean {
     existsSync(resolve(dir, 'src/games/index.ts'));
 }
 
+/** Resolve the skill whether it is a real directory or a checked-in pointer file. */
+function resolveSkillDirectory(repoRoot: string): string | null {
+  const candidates = [
+    resolve(repoRoot, '.claude/skills/game-dev'),
+    resolve(repoRoot, '.agents/skills/game-dev'),
+  ];
+  for (const candidate of candidates) {
+    if (!existsSync(candidate)) continue;
+    try {
+      if (statSync(candidate).isDirectory()) return candidate;
+      const pointer = readFileSync(candidate, 'utf-8').trim();
+      if (pointer) {
+        const target = resolve(dirname(candidate), pointer);
+        if (existsSync(target) && statSync(target).isDirectory()) return target;
+      }
+    } catch {
+      // Try the next candidate if a skill path is malformed or inaccessible.
+    }
+  }
+  return null;
+}
+
 function findRepoRoot(from: string): string | null {
   let dir = resolve(from);
   const root = resolve('/');
@@ -58,10 +80,11 @@ interface RegisteredGame {
 
 function parseRegisteredGames(indexContent: string): RegisteredGame[] {
   const games: RegisteredGame[] = [];
-  const regex = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*description:\s*'([^']+)'/g;
+  const regex = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*description:\s*(?:"((?:\\.|[^"\\])*)"|'([^']+)')/g;
   let match;
   while ((match = regex.exec(indexContent)) !== null) {
-    games.push({ id: match[1], name: match[2], description: match[3] });
+    const description = match[3] !== undefined ? JSON.parse(`"${match[3]}"`) : match[4];
+    games.push({ id: match[1], name: match[2], description });
   }
   return games;
 }
@@ -184,7 +207,7 @@ function addToIndex(indexPath: string, kebab: string, title: string, description
 
   if (lastEntry) {
     const lineEnd = index.indexOf('\n', lastEntry.index);
-    const entry = `\n  { id: '${kebab}', name: '${title}', description: '${description}', run: ${runFn} },`;
+    const entry = `\n  { id: '${kebab}', name: '${title}', description: ${JSON.stringify(description)}, run: ${runFn} },`;
     index = index.slice(0, lineEnd) + entry + index.slice(lineEnd);
   }
 
@@ -287,8 +310,8 @@ async function doCreate(repoRoot: string, initialName?: string) {
   const runFn = `run${pascal}Game`;
 
   // Install skill if needed
-  const skillPath = resolve(repoRoot, '.claude/skills/game-dev');
-  if (!existsSync(skillPath)) {
+  let skillPath = resolveSkillDirectory(repoRoot);
+  if (!skillPath) {
     const s = p.spinner();
     s.start('Installing game-dev skill for Claude Code...');
     try {
@@ -300,19 +323,23 @@ async function doCreate(repoRoot: string, initialName?: string) {
     } catch {
       s.stop('Could not install game-dev skill.');
     }
+    skillPath = resolveSkillDirectory(repoRoot);
   }
 
   // Read and fill template
-  const templatePath = resolve(repoRoot, '.claude/skills/game-dev/templates/game-scaffold.ts');
-  if (!existsSync(templatePath)) {
-    p.cancel(`Template not found at ${templatePath}`);
+  const templatePath = skillPath ? resolve(skillPath, 'templates/game-scaffold.ts') : null;
+  if (!templatePath || !existsSync(templatePath)) {
+    p.cancel('Template not found. Install the game-dev skill or restore the checked-in template.');
     return;
   }
 
   let template = readFileSync(templatePath, 'utf-8');
+  // The description is placed in a block comment in the scaffold. Prevent a
+  // crafted `*/` from ending that comment and becoming generated source.
+  const templateDescription = description.replace(/\*\//g, '* /');
   template = template.replace(/\{GameName\}/g, pascal);
   template = template.replace(/\{GAME_NAME\}/g, title);
-  template = template.replace(/\{GAME_DESCRIPTION\}/g, description);
+  template = template.replace(/\{GAME_DESCRIPTION\}/g, templateDescription);
   template = template.replace(/\{TITLE_LINE_1\}/g, title.toUpperCase());
   template = template.replace(/\{TITLE_LINE_2\}/g, '═'.repeat(title.length));
   template = template.replace(/\{CONTROLS_HINT\}/g, 'Arrow keys to move, Space to act');

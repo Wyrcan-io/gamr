@@ -719,12 +719,12 @@ export function runTypingTest(terminal: Terminal): TypingTestController {
               break;
             case 3: // List Games
               clearInterval(renderInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
               clearInterval(renderInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -738,11 +738,11 @@ export function runTypingTest(terminal: Terminal): TypingTestController {
           paused = false;
         } else if (keyLower === 'l') {
           clearInterval(renderInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (keyLower === 'n') {
           clearInterval(renderInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

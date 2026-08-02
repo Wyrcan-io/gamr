@@ -839,14 +839,14 @@ export function runTetrisGame(terminal: Terminal): TetrisController {
               clearInterval(renderInterval);
               clearInterval(gameInterval);
               window.removeEventListener('keyup', handleKeyUp);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
               clearInterval(renderInterval);
               clearInterval(gameInterval);
               window.removeEventListener('keyup', handleKeyUp);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -862,13 +862,13 @@ export function runTetrisGame(terminal: Terminal): TetrisController {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
           window.removeEventListener('keyup', handleKeyUp);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (key === 'n') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
           window.removeEventListener('keyup', handleKeyUp);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

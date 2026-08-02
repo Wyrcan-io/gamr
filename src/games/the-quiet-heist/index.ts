@@ -17,7 +17,7 @@ export function runTheQuietHeistGame(terminal: Terminal): TheQuietHeistControlle
   const restart = (): void => { state = createState(state.seed); paused = false; pauseSelection = 0; };
   function pauseInput(key: string, event: KeyboardEvent): boolean {
     if (!paused) return false; const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event); pauseSelection = result.newSelection; if (!result.confirmed) return true;
-    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); } return true;
+    if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); } return true;
   }
   function help(): void { state = { ...state, notice: 'READ ARROWS, AP, AND AMBER FORECAST. GUARDS MOVE ONLY ON ENTER.' }; }
   function onKey(event: KeyboardEvent): void {

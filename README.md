@@ -2,11 +2,11 @@
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
-The current lineup contains ten original games. Older games remain available in the source tree while they are reworked.
+The current lineup contains twenty original games. Older games remain available in the source tree while they are reworked.
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The TUI catalog is curated by maturity: four Featured games, two public betas, and four Workshop experiments. Difficulty and expected session length are shown in the game menu.
+The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. Difficulty and expected session length are shown in the game menu.
 
 ## Quick Start
 
@@ -115,6 +115,15 @@ terminal.options.theme = xtermTheme;
 | Ghost Shift | Catch the intruder using cameras, door logs, and power |
 | Stack Trace | Repair blocks and pass every test |
 | The Quiet Heist | Predict patrols, steal the object, find a new exit |
+| Market of Mirrors | Trade strange goods and sell the story |
+| Blackout Grid | Restore the city and isolate faults |
+| Orbital Post | Schedule the relay and outrun solar weather |
+| Dice Tribunal | Roll the evidence and rewrite precedent |
+| Time Capsule | Keep three truths and rewrite five minutes |
+| Tiny Fleet | Seal orders, read the fog, outguess pirates |
+| Night Frequency | Take calls, build the case, stay on air |
+| Botany Lab | Grow strange plants and fill contracts |
+| The 13th Lift | Program the route and do not stop at thirteen |
 | Dungeon Courier | Read the parcel, choose a route, deliver it intact |
 
 ## Controls

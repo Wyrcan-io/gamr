@@ -232,9 +232,13 @@ function createNodeTerminal(): NodeTerminal {
     },
   };
 
-  process.on('exit', cleanup);
-  process.on('SIGINT', () => { cleanup(); process.exit(0); });
-  process.on('SIGTERM', () => { cleanup(); process.exit(0); });
+  process.on('exit', () => {
+    activeController?.stop();
+    activeController = null;
+    cleanup();
+  });
+  process.on('SIGINT', () => { activeController?.stop(); cleanup(); process.exit(0); });
+  process.on('SIGTERM', () => { activeController?.stop(); cleanup(); process.exit(0); });
 
   return terminal;
 }
@@ -243,17 +247,27 @@ function createNodeTerminal(): NodeTerminal {
 // Game lifecycle
 // ---------------------------------------------------------------------------
 
+let activeController: { stop: () => void; isRunning: boolean } | null = null;
+
+function stopActiveGame() {
+  activeController?.stop();
+  activeController = null;
+}
+
 function setupGameEvents(terminal: NodeTerminal) {
   // Listen for game quit/switch/menu events dispatched via window
   windowPolyfill.addEventListener(GAME_EVENTS.QUIT, () => {
+    stopActiveGame();
     setTimeout(() => openMenu(terminal), 100);
   });
   windowPolyfill.addEventListener(GAME_EVENTS.SWITCH, () => {
+    stopActiveGame();
     // Launch a random game
     const randomGame = games[Math.floor(Math.random() * games.length)];
     setTimeout(() => launchGame(terminal, randomGame), 100);
   });
   windowPolyfill.addEventListener(GAME_EVENTS.GAMES_MENU, () => {
+    stopActiveGame();
     setTimeout(() => openMenu(terminal), 100);
   });
   windowPolyfill.addEventListener(GAME_EVENTS.LAUNCH_GAME, ((event: CustomEvent) => {
@@ -266,6 +280,7 @@ function setupGameEvents(terminal: NodeTerminal) {
 }
 
 function openMenu(terminal: NodeTerminal) {
+  stopActiveGame();
   // Use the exact same games menu from the library
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   showGamesMenu(terminal as any, {
@@ -307,8 +322,9 @@ function launchVibeFromMenu() {
 }
 
 function launchGame(terminal: NodeTerminal, game: GameInfo) {
+  stopActiveGame();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  game.run(terminal as any);
+  activeController = game.run(terminal as any);
 }
 
 // ---------------------------------------------------------------------------

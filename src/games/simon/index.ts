@@ -729,13 +729,13 @@ export function runSimonGame(terminal: Terminal): SimonController {
             case 3:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -744,8 +744,8 @@ export function runSimonGame(terminal: Terminal): SimonController {
 
         // Legacy shortcuts
         if (key === 'r') { initGame(); gameStarted = true; paused = false; }
-        else if (key === 'l') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGamesMenu(terminal); }
-        else if (key === 'n') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGameSwitch(terminal); }
+        else if (key === 'l') { controller.stop(); dispatchGamesMenu(terminal); }
+        else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
         return;
       }
 

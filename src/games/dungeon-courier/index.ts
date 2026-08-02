@@ -29,8 +29,8 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) restart();
     else if (pauseSelection === 2) quit();
-    else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); }
-    else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); }
+    else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
+    else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
     return true;
   };
 
@@ -94,4 +94,3 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
 
 export { applyCommand, createState } from './engine';
 export type { GameState, Command } from './types';
-

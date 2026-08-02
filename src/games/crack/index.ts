@@ -844,7 +844,7 @@ export function runCrackGame(terminal: Terminal): CrackController {
         } else if (keyLower === 'n') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;
@@ -888,13 +888,13 @@ export function runCrackGame(terminal: Terminal): CrackController {
             case 4: // List Games
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 5: // Next Game
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -909,12 +909,12 @@ export function runCrackGame(terminal: Terminal): CrackController {
         } else if (keyLower === 'l') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (keyLower === 'n') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         } else if (keyLower === 'h') {
           showHelp = true;

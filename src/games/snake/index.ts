@@ -528,13 +528,13 @@ export function runSnakeGame(terminal: Terminal): SnakeController {
             case 3: // List Games
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4: // Next Game
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -549,12 +549,12 @@ export function runSnakeGame(terminal: Terminal): SnakeController {
         } else if (key === 'l') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGamesMenu(terminal);
         } else if (key === 'n') {
           clearInterval(renderInterval);
           clearInterval(gameInterval);
-          running = false;
+          controller.stop();
           dispatchGameSwitch(terminal);
         }
         return;

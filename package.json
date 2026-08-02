@@ -4,6 +4,15 @@
   "description": "Terminal games for xterm.js and CLI — snake, 2048, pong, asteroids, tetris, and more",
   "license": "AGPL-3.0",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,7 +34,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "start": "sh -c 'if [ ! -f dist/cli.js ] || find src -type f -newer dist/cli.js | read; then npm run build; fi; node dist/cli.js \"$@\"' --",
+    "start": "node scripts/start.mjs",
     "start:build": "npm run build && npm run start",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",

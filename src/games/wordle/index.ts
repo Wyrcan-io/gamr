@@ -772,13 +772,13 @@ export function runWordleGame(terminal: Terminal): WordleController {
             case 3:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGamesMenu(terminal);
               break;
             case 4:
               clearInterval(renderInterval);
               clearInterval(gameInterval);
-              running = false;
+              controller.stop();
               dispatchGameSwitch(terminal);
               break;
           }
@@ -787,8 +787,8 @@ export function runWordleGame(terminal: Terminal): WordleController {
 
         // Legacy shortcuts
         if (keyLower === 'r') { initGame(); gameStarted = true; paused = false; }
-        else if (keyLower === 'l') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGamesMenu(terminal); }
-        else if (keyLower === 'n') { clearInterval(renderInterval); clearInterval(gameInterval); running = false; dispatchGameSwitch(terminal); }
+        else if (keyLower === 'l') { controller.stop(); dispatchGamesMenu(terminal); }
+        else if (keyLower === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
         return;
       }
 

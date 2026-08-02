@@ -31,8 +31,8 @@ export function runStackTraceGame(terminal: Terminal): StackTraceController {
       case 0: paused = false; break;
       case 1: command({ type: 'restart' }); paused = false; pauseSelection = 0; break;
       case 2: quit(); break;
-      case 3: running = false; dispatchGamesMenu(terminal); break;
-      case 4: running = false; dispatchGameSwitch(terminal); break;
+      case 3: controller.stop(); dispatchGamesMenu(terminal); break;
+      case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
     return true;
@@ -43,7 +43,7 @@ export function runStackTraceGame(terminal: Terminal): StackTraceController {
     if (state.phase === 'start') { if (key === 't') command({ type: 'start', mode: 'tutorial' }); else if (key === 'd') command({ type: 'start', mode: 'daily' }); else if (key === 'p' || key === 'enter' || key === ' ') command({ type: 'start', mode: 'campaign' }); else if (key === 'q') quit(); return; }
     if (key === 'escape') { paused = !paused; pauseSelection = 0; return; }
     if (handlePause(key, event)) return;
-    if (state.phase === 'ending') { if (key === 'r') command({ type: 'restart' }); else if (key === 'n') { running = false; dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
+    if (state.phase === 'ending') { if (key === 'r') command({ type: 'restart' }); else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
     if (state.phase === 'complete') { if (key === 'n' || key === 'enter') command({ type: 'next' }); else if (key === 'r') command({ type: 'restart' }); else if (key === 'q') quit(); return; }
     if (key === 'q') { quit(); return; }
     if (key === 'tab') { focusCycle(); return; }

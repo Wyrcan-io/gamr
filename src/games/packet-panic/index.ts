@@ -172,10 +172,10 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     else if (pauseSelection === 1) reset(true);
     else if (pauseSelection === 2) quit();
     else if (pauseSelection === 3) {
-      running = false;
+      controller.stop();
       dispatchGamesMenu(terminal);
     } else if (pauseSelection === 4) {
-      running = false;
+      controller.stop();
       dispatchGameSwitch(terminal);
     }
     return true;
@@ -215,7 +215,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
       if (key === 'r') reset(true);
       else if (key === 'q') quit();
       else if (key === 'n') {
-        running = false;
+        controller.stop();
         dispatchGameSwitch(terminal);
       }
       return;

@@ -15,7 +15,7 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
   const controller: FiveMinuteKingdomController = { stop: () => { running = false; }, get isRunning() { return running; } };
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
   const restart = (): void => { state = createState(state.seed); paused = false; pauseSelection = 0; };
-  function handlePause(key: string, event: KeyboardEvent): boolean { if (!paused) return false; const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event); pauseSelection = result.newSelection; if (!result.confirmed) return true; if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { running = false; dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { running = false; dispatchGameSwitch(terminal); } return true; }
+  function handlePause(key: string, event: KeyboardEvent): boolean { if (!paused) return false; const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event); pauseSelection = result.newSelection; if (!result.confirmed) return true; if (pauseSelection === 0) paused = false; else if (pauseSelection === 1) restart(); else if (pauseSelection === 2) quit(); else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); } else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); } return true; }
   function run(command: Parameters<typeof applyCommand>[1]): void { state = applyCommand(state, command); }
   function handleKey(event: KeyboardEvent): void {
     const key = event.key.toLowerCase(); event.preventDefault(); event.stopPropagation();

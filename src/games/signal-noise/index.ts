@@ -31,8 +31,8 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
       case 0: paused = false; break;
       case 1: restart(); break;
       case 2: quit(); break;
-      case 3: running = false; dispatchGamesMenu(terminal); break;
-      case 4: running = false; dispatchGameSwitch(terminal); break;
+      case 3: controller.stop(); dispatchGamesMenu(terminal); break;
+      case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
     return true;
@@ -51,7 +51,7 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
     if (phase === 'start') { if (key === 'q') quit(); else if (key === 't') run({ type: 'start', mode: 'tutorial' }); else if (key === 'p' || key === 'enter') run({ type: 'start', mode: 'campaign' }); return; }
     if (phase === 'brief') { if (key === 'enter' || key === ' ') run({ type: 'continueBrief' }); return; }
     if (phase === 'debrief') { if (key === 'enter' || key === ' ') run({ type: 'continueDebrief' }); return; }
-    if (phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { running = false; dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
+    if (phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
     if (key === 'q') { quit(); return; }
     if (event.key === 'ArrowLeft' || key === 'a') run({ type: 'changeCentre', delta: -1 });
     else if (event.key === 'ArrowRight' || key === 'd') run({ type: 'changeCentre', delta: 1 });

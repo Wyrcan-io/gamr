@@ -52,7 +52,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.1.2",
     "@xterm/xterm": "^6.0.0",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",

@@ -41,8 +41,8 @@ if (typeof globalThis.window === 'undefined') {
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 // Now safe to import game code
-import { games, allGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
-import type { PhosphorMode } from './themes';
+import { games, allGames, archiveGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
+import { getUiThemeModes, isValidThemeMode, type PhosphorMode } from './themes';
 
 // ---------------------------------------------------------------------------
 // Node Terminal Adapter
@@ -272,7 +272,7 @@ function setupGameEvents(terminal: NodeTerminal) {
   });
   windowPolyfill.addEventListener(GAME_EVENTS.LAUNCH_GAME, ((event: CustomEvent) => {
     const gameId = event.detail?.gameId;
-    const game = games.find(g => g.id === gameId);
+    const game = allGames.find(g => g.id === gameId);
     if (game) {
       setTimeout(() => launchGame(terminal, game), 100);
     }
@@ -285,7 +285,7 @@ function openMenu(terminal: NodeTerminal) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   showGamesMenu(terminal as any, {
     onGameSelect: (gameId: string) => {
-      const game = games.find(g => g.id === gameId);
+      const game = allGames.find(g => g.id === gameId);
       if (game) launchGame(terminal, game);
     },
     onActionSelect: (actionId: string) => {
@@ -343,15 +343,14 @@ function printHelp() {
     gamr remove <name>      Remove a game
     gamr --theme <theme>    Set color theme
     gamr --list             List all games
+    gamr --archive          List compatibility games
     gamr --help             Show this help
 
   Games:
     ${games.map(g => `${g.id.padEnd(16)} ${g.description}`).join('\n    ')}
 
   Themes:
-    cyan (default), amber, green, white, hotpink, blood, ice,
-    bladerunner, tron, kawaii, oled, solarized, nord, highcontrast,
-    banana, cream — plus Light variants (e.g. cyanLight)
+    carbon (default), paper, indigo, lichen, contrast
 
   Controls:
     Arrow keys / WASD    Move / navigate
@@ -360,9 +359,9 @@ function printHelp() {
     Q                    Quit
 
   Examples:
-    gamr snake
-    gamr tetris --theme green
-    gamr --theme amber
+    gamr stack-trace
+    gamr snake                 # archived compatibility game
+    gamr packet-panic --theme indigo
 `);
 }
 
@@ -381,10 +380,24 @@ function main() {
     return;
   }
 
-  let theme: PhosphorMode = 'cyan';
+  if (args.includes('--archive')) {
+    for (const game of archiveGames) {
+      console.log(`  ${game.id.padEnd(16)} ${game.description}`);
+    }
+    return;
+  }
+
+  let theme: PhosphorMode = 'carbon';
   const themeIdx = args.indexOf('--theme');
   if (themeIdx !== -1 && args[themeIdx + 1]) {
-    theme = args[themeIdx + 1] as PhosphorMode;
+    const requestedTheme = args[themeIdx + 1];
+    if (!isValidThemeMode(requestedTheme)) {
+      console.error(`Unknown theme: ${requestedTheme}`);
+      console.error(`Available themes: ${getUiThemeModes().join(', ')}`);
+      process.exitCode = 1;
+      return;
+    }
+    theme = requestedTheme;
     args.splice(themeIdx, 2);
   }
   setTheme(theme);

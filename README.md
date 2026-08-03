@@ -2,11 +2,11 @@
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
-The active lineup contains twenty games. Nineteen legacy games remain importable and directly launchable for compatibility, but are hidden from the main menu and are not held to the active-catalog support promise.
+The active lineup contains twenty games. Nineteen classic games remain importable and directly launchable through the **Arcade Archive** for compatibility; they are intentionally separate from the active support promise.
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. Difficulty and expected session length are shown in the game menu. Most games are designed for terminals at least 80 columns by 28 rows and require a Unicode-capable font.
+The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. The index shows difficulty, pace, and expected session length before launch. The current active-game layout targets terminals at least 80 columns by 28 rows; compact-layout work is in progress.
 
 ## Quick Start
 
@@ -14,11 +14,11 @@ The TUI catalog is curated by maturity: four Featured games, two public betas, a
 # Play now — no install needed
 npx @wyrcan/gamr
 
-# Launch a specific game
+# Launch a specific active or archived game
 npx @wyrcan/gamr snake
 
-# With a color theme
-npx @wyrcan/gamr tetris --theme green
+# Use a material edition
+npx @wyrcan/gamr stack-trace --theme carbon
 ```
 
 ## Install
@@ -41,20 +41,21 @@ gamr                    # Interactive game menu
 gamr <game>             # Launch a game directly
 gamr --theme <theme>    # Set color theme
 gamr --list             # List all games
+gamr --archive          # List Arcade Archive games
 gamr --help             # Show help
 ```
 
 ### Available Themes
 
-`cyan` (default), `amber`, `green`, `white`, `hotpink`, `blood`, `ice`, `bladerunner`, `tron`, `kawaii`, `oled`, `solarized`, `nord`, `highcontrast`, `banana`, `cream`, and their light variants (e.g. `cyanLight`).
+The current editions are `carbon` (default), `paper`, `indigo`, `lichen`, and `contrast`. Older theme IDs remain accepted as compatibility aliases while the new semantic theme system rolls out.
 
 ## Library Usage (xterm.js)
 
 ```typescript
-import { games, setTheme, runGame } from '@wyrcan/gamr';
+import { games, archiveGames, setTheme, runGame } from '@wyrcan/gamr';
 
 // Set the color theme
-setTheme('cyan');
+setTheme('carbon');
 
 // Run a game in an xterm.js Terminal instance
 const controller = runGame('snake', terminal);
@@ -65,6 +66,11 @@ controller?.stop();
 // Browse all games
 for (const game of games) {
   console.log(`${game.id}: ${game.name} - ${game.description}`);
+}
+
+// Compatibility collection, intentionally separate from the active catalog.
+for (const game of archiveGames) {
+  console.log(`archive/${game.id}: ${game.name}`);
 }
 ```
 
@@ -80,13 +86,13 @@ import {
 } from '@wyrcan/gamr/themes';
 
 // Get a full xterm.js theme object
-const xtermTheme = getTerminalTheme('cyan');
+const xtermTheme = getTerminalTheme('carbon');
 terminal.options.theme = xtermTheme;
 ```
 
 ## Games
 
-The table below includes both the active catalog and legacy games that remain available through direct IDs and library exports. Use `gamr --list` for the supported active catalog.
+The table below is a complete compatibility reference. The interactive index separates the active catalog from the Arcade Archive; use `gamr --list` for active games and `gamr --archive` for the nineteen classic games.
 
 | Game | Description |
 |------|-------------|

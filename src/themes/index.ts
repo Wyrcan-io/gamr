@@ -8,6 +8,13 @@
  * Available theme identifiers
  */
 export type PhosphorMode =
+  // Small Machines editions (the current product surface).
+  | 'carbon'
+  | 'paper'
+  | 'indigo'
+  | 'lichen'
+  | 'contrast'
+  // Pre-V2 names remain accepted as compatibility aliases.
   | 'cyan'
   | 'cyanLight'
   | 'amber'
@@ -60,9 +67,85 @@ export interface ThemeColors {
 }
 
 /**
+ * Semantic terminal tokens used by the V2 shell and future game renderers.
+ * Game code should request meaning (focus, warning, data) instead of a raw
+ * ANSI colour. The legacy ThemeColors API remains available for compatibility.
+ */
+export interface UiTheme {
+  id: 'carbon' | 'paper' | 'indigo' | 'lichen' | 'contrast';
+  name: string;
+  appearance: 'dark' | 'light';
+  bg: string;
+  surface: string;
+  ink: string;
+  muted: string;
+  line: string;
+  focus: string;
+  good: string;
+  warning: string;
+  danger: string;
+  data: readonly [string, string, string, string];
+}
+
+/**
  * All theme definitions with CSS colors
  */
 export const themes: Record<PhosphorMode, ThemeColors> = {
+  carbon: {
+    name: 'Carbon',
+    icon: 'C',
+    primary: '#D8C8A8',
+    secondary: '#E06B4F',
+    glow: 'rgba(224, 107, 79, 0.18)',
+    glowIntense: 'rgba(224, 107, 79, 0.32)',
+    bg: '#11110F',
+    statusBarBg: '#1C1B18',
+    foreground: '#D8C8A8',
+  },
+  paper: {
+    name: 'Paper',
+    icon: 'P',
+    primary: '#29251F',
+    secondary: '#A63D2F',
+    glow: 'rgba(166, 61, 47, 0.12)',
+    glowIntense: 'rgba(166, 61, 47, 0.22)',
+    bg: '#F1E8D8',
+    statusBarBg: '#E7DDCB',
+    foreground: '#29251F',
+  },
+  indigo: {
+    name: 'Indigo',
+    icon: 'I',
+    primary: '#D4D4C6',
+    secondary: '#E5A15B',
+    glow: 'rgba(229, 161, 91, 0.16)',
+    glowIntense: 'rgba(229, 161, 91, 0.28)',
+    bg: '#171D2C',
+    statusBarBg: '#222A3E',
+    foreground: '#D4D4C6',
+  },
+  lichen: {
+    name: 'Lichen',
+    icon: 'L',
+    primary: '#D3D8C8',
+    secondary: '#C6A75E',
+    glow: 'rgba(198, 167, 94, 0.15)',
+    glowIntense: 'rgba(198, 167, 94, 0.28)',
+    bg: '#151A17',
+    statusBarBg: '#202923',
+    foreground: '#D3D8C8',
+  },
+  contrast: {
+    name: 'Contrast',
+    icon: '!',
+    primary: '#FFFFFF',
+    secondary: '#FFFF00',
+    glow: 'rgba(255, 255, 255, 0.06)',
+    glowIntense: 'rgba(255, 255, 255, 0.12)',
+    bg: '#000000',
+    statusBarBg: '#111111',
+    foreground: '#FFFFFF',
+  },
   cyan: {
     name: 'Cyberpunk',
     icon: '🔵',
@@ -337,10 +420,43 @@ export const themes: Record<PhosphorMode, ThemeColors> = {
   },
 };
 
+const uiThemes: Record<UiTheme['id'], UiTheme> = {
+  carbon: {
+    id: 'carbon', name: 'Carbon', appearance: 'dark', bg: '#11110F', surface: '#1C1B18',
+    ink: '#D8C8A8', muted: '#8D887B', line: '#514C43', focus: '#E06B4F', good: '#92C47A',
+    warning: '#E5A15B', danger: '#E05A5A', data: ['#D8C8A8', '#7FB7A3', '#8E9DDB', '#C7A2D9'],
+  },
+  paper: {
+    id: 'paper', name: 'Paper', appearance: 'light', bg: '#F1E8D8', surface: '#E7DDCB',
+    ink: '#29251F', muted: '#6E665B', line: '#B6A992', focus: '#A63D2F', good: '#3F7748',
+    warning: '#956318', danger: '#9B2C2C', data: ['#29251F', '#2C6E75', '#4B5B9A', '#7E4B80'],
+  },
+  indigo: {
+    id: 'indigo', name: 'Indigo', appearance: 'dark', bg: '#171D2C', surface: '#222A3E',
+    ink: '#D4D4C6', muted: '#8B92A7', line: '#4B5874', focus: '#E5A15B', good: '#8CCB9B',
+    warning: '#E5A15B', danger: '#ED7878', data: ['#D4D4C6', '#7FC5C5', '#A8B6F0', '#D8A9DC'],
+  },
+  lichen: {
+    id: 'lichen', name: 'Lichen', appearance: 'dark', bg: '#151A17', surface: '#202923',
+    ink: '#D3D8C8', muted: '#8E9B8E', line: '#4D5B4E', focus: '#C6A75E', good: '#9CCB7B',
+    warning: '#C6A75E', danger: '#DC7770', data: ['#D3D8C8', '#83B99A', '#91B6CB', '#C6A2C9'],
+  },
+  contrast: {
+    id: 'contrast', name: 'Contrast', appearance: 'dark', bg: '#000000', surface: '#111111',
+    ink: '#FFFFFF', muted: '#D0D0D0', line: '#FFFFFF', focus: '#FFFF00', good: '#00FF00',
+    warning: '#FFFF00', danger: '#FF6666', data: ['#FFFFFF', '#00FFFF', '#FFFF00', '#FF66FF'],
+  },
+};
+
 /**
  * ANSI escape codes for terminal text coloring
  */
 const ansiCodes: Record<PhosphorMode, string> = {
+  carbon: '\x1b[38;5;180m',
+  paper: '\x1b[38;5;52m',
+  indigo: '\x1b[38;5;152m',
+  lichen: '\x1b[38;5;151m',
+  contrast: '\x1b[97m',
   cyan: '\x1b[96m',
   cyanLight: '\x1b[38;5;31m',
   amber: '\x1b[93m',
@@ -373,6 +489,7 @@ const ansiCodes: Record<PhosphorMode, string> = {
  * Light themes that need dark text
  */
 const lightThemes: Set<PhosphorMode> = new Set([
+  'paper',
   'cyanLight',
   'hotpinkLight',
   'iceLight',
@@ -390,6 +507,11 @@ const lightThemes: Set<PhosphorMode> = new Set([
  * Subtle background colors for game elements
  */
 const subtleColors: Partial<Record<PhosphorMode, string>> = {
+  carbon: '\x1b[38;5;242m',
+  paper: '\x1b[38;5;246m',
+  indigo: '\x1b[38;5;239m',
+  lichen: '\x1b[38;5;242m',
+  contrast: '\x1b[38;5;238m',
   cyanLight: '\x1b[38;5;153m',
   hotpinkLight: '\x1b[38;5;225m',
   iceLight: '\x1b[38;5;195m',
@@ -442,6 +564,19 @@ export function getSubtleColor(mode: PhosphorMode): string {
  */
 export function getThemeModes(): PhosphorMode[] {
   return Object.keys(themes) as PhosphorMode[];
+}
+
+/** Get the current Small Machines semantic theme definition. */
+export function getUiTheme(mode: PhosphorMode): UiTheme {
+  if (mode in uiThemes) return uiThemes[mode as UiTheme['id']];
+  if (mode.endsWith('Light')) return uiThemes.paper;
+  if (mode === 'highcontrast') return uiThemes.contrast;
+  return uiThemes.carbon;
+}
+
+/** IDs exposed by the V2 appearance picker. */
+export function getUiThemeModes(): UiTheme['id'][] {
+  return ['carbon', 'paper', 'indigo', 'lichen', 'contrast'];
 }
 
 const VALID_THEME_MODES = new Set<string>(Object.keys(themes));

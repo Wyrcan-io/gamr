@@ -6,7 +6,7 @@
  *
  * Library usage (xterm.js):
  *   import { games, setTheme } from '@wyrcan/gamr';
- *   setTheme('cyan');
+ *   setTheme('carbon');
  *   const controller = games[0].run(terminal);
  *
  * CLI usage:
@@ -16,6 +16,8 @@
 export {
   // Game registry
   games,
+  allGames,
+  archiveGames,
   getGame,
   getRandomGame,
   runGame,
@@ -29,7 +31,10 @@ export {
   getSubtleBackgroundColor,
   getVerticalAnchor,
   getThemeColorCode,
+  getUiTheme,
+  getUiThemeModes,
   type PhosphorMode,
+  type UiTheme,
 
   // Terminal buffer management
   enterAlternateBuffer,
@@ -151,3 +156,12 @@ export {
   type ScreenShakeState,
   type FlashState,
 } from './games';
+
+export {
+  displayWidth,
+  stripAnsi,
+  clipToWidth,
+  padToWidth,
+  centerText,
+  wrapText,
+} from './ui/terminal';

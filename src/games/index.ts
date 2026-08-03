@@ -4,7 +4,7 @@
  * Terminal games for xterm.js and CLI
  *
  * Usage:
- * 1. Set the theme: setTheme('cyan')
+ * 1. Set the theme: setTheme('carbon')
  * 2. Run a game: games.snake.run(terminal)
  * 3. Handle game events: listen for GAME_EVENTS on window
  */
@@ -26,6 +26,9 @@ export {
 } from './utils';
 
 export type { PhosphorMode } from './utils';
+
+export { getUiTheme, getUiThemeModes } from '../themes';
+export type { UiTheme } from '../themes';
 
 // Re-export transitions
 export {
@@ -149,6 +152,9 @@ export const games: GameInfo[] = [
 ];
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
+
+/** Compatibility collection, intentionally separate from the active catalog. */
+export { archivedGames as archiveGames };
 
 /**
  * Get a game by ID

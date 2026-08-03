@@ -20,7 +20,7 @@ import {
 /**
  * Current theme mode - configured by the consuming application
  */
-let currentTheme: PhosphorMode = 'cyan';
+let currentTheme: PhosphorMode = 'carbon';
 
 /**
  * Set the current theme mode

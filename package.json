@@ -27,6 +27,10 @@
     "./themes": {
       "types": "./dist/themes.d.ts",
       "import": "./dist/themes.js"
+    },
+    "./playtest": {
+      "types": "./dist/playtest.d.ts",
+      "import": "./dist/playtest.js"
     }
   },
   "files": [
@@ -34,6 +38,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "playtest": "npm run build && node scripts/playtest.mjs",
     "start": "node scripts/start.mjs",
     "start:build": "npm run build && npm run start",
     "dev": "tsup --watch",

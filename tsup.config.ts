@@ -6,6 +6,7 @@ export default defineConfig([
     entry: {
       index: 'src/index.ts',
       themes: 'src/themes/index.ts',
+      playtest: 'src/playtest/index.ts',
     },
     format: ['esm'],
     dts: true,

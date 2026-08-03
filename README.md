@@ -74,6 +74,19 @@ for (const game of archiveGames) {
 }
 ```
 
+### Automated Playtesting
+
+Gamr includes a terminal-level playtesting harness. It drives games through the same keyboard path as a human, captures the ANSI screen, records milestones, and emits replayable action traces.
+
+```typescript
+import { runPlaytest } from '@wyrcan/gamr/playtest';
+
+const report = await runPlaytest('dead-letter-department', { seed: 42 });
+console.log(report.status, report.milestones, report.replay);
+```
+
+From a checkout, run one game with `node scripts/playtest.mjs dead-letter-department --seed=42` or run the complete catalog with `node scripts/playtest.mjs --all`. New games receive generic launch and interaction coverage automatically; deeper progression is added through a game-specific playtest profile.
+
 ### Themes
 
 ```typescript

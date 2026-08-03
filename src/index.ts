@@ -27,6 +27,8 @@ export {
   setTheme,
   getTheme,
   getCurrentThemeColor,
+  getCurrentThemePalette,
+  getThemePalette,
   isLightTheme,
   getSubtleBackgroundColor,
   getVerticalAnchor,
@@ -34,6 +36,7 @@ export {
   getUiTheme,
   getUiThemeModes,
   type PhosphorMode,
+  type TerminalThemePalette,
   type UiTheme,
 
   // Terminal buffer management

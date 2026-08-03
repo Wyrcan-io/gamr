@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, availablePerks, createState, type Command } from './engine';
 import { renderFrame } from './render';
@@ -14,7 +14,6 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
   let running = true;
   let paused = false;
   let pauseSelection = 0;
-  let glitchFrame = 0;
   let state = createState(Date.now());
   let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
@@ -30,7 +29,9 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
   }
 
   function restart(): void {
-    state = createState(Date.now());
+    const mode = state.mode;
+    state = createState(state.seed);
+    state.mode = mode;
     state.phase = 'briefing';
     paused = false;
     pauseSelection = 0;
@@ -61,6 +62,18 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     const key = domEvent.key.toLowerCase();
     domEvent.preventDefault();
     domEvent.stopPropagation();
+    if (state.helpOpen) {
+      if (key === '?' || key === 'h' || key === 'escape') runCommand({ type: 'toggleHelp' });
+      return;
+    }
+    if (state.ledgerOpen && (key === 'l' || key === 'escape')) {
+      runCommand({ type: 'toggleLedger' });
+      return;
+    }
+    if (key === '?' || key === 'h') {
+      runCommand({ type: 'toggleHelp' });
+      return;
+    }
     if (key === 'escape' && state.phase !== 'start' && state.phase !== 'ending' && state.phase !== 'gameOver') {
       paused = !paused;
       pauseSelection = 0;
@@ -86,13 +99,11 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
       else if (key === 'tab') runCommand({ type: 'cycleInspectionView' });
       else if (key === 'l') runCommand({ type: 'toggleLedger' });
       else if (key === 'v') runCommand({ type: 'useVerification' });
-      else if (key === 'h') runCommand({ type: 'toggleHelp' });
-      else if (key === 'q') quit();
       return;
     }
     if (state.phase === 'audit') {
       if (key === 'enter' || key === ' ') runCommand({ type: 'dismissAudit' });
-      else if (key === 'h') runCommand({ type: 'toggleHelp' });
+      else if (key === 'l') runCommand({ type: 'toggleLedger' });
       return;
     }
     if (state.phase === 'report') {
@@ -119,9 +130,8 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
   }
 
   function render(): void {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), glitchFrame++);
-    if (paused && terminal.cols >= 80 && terminal.rows >= 28) {
-      output += `\x1b[${Math.floor(terminal.rows / 2) - 5};1H`;
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette());
+    if (paused && !state.helpOpen && !state.ledgerOpen && terminal.cols >= 80 && terminal.rows >= 28) {
       output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     }
     terminal.write(output);

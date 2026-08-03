@@ -9,9 +9,60 @@ import type { Terminal } from '@xterm/xterm';
 import {
   type PhosphorMode,
   getAnsiColor,
+  getUiTheme,
   isLightTheme as checkLightTheme,
   getSubtleColor,
 } from '../themes';
+
+/** ANSI roles used by the Small Machines renderers. */
+export interface TerminalThemePalette {
+  ink: string;
+  muted: string;
+  line: string;
+  focus: string;
+  good: string;
+  warning: string;
+  danger: string;
+  data: readonly [string, string, string, string];
+  reset: string;
+}
+
+const RESET = '\x1b[0m';
+
+/**
+ * Terminal-safe semantic roles for the five V2 editions.
+ *
+ * These are deliberately ANSI values rather than the browser hex values in
+ * the theme registry. Games ask for meaning (focus, warning, good) and keep
+ * their status markers readable after colour is stripped.
+ */
+const TERMINAL_PALETTES: Record<'carbon' | 'paper' | 'indigo' | 'lichen' | 'contrast', TerminalThemePalette> = {
+  carbon: {
+    ink: '\x1b[38;5;253m', muted: '\x1b[38;5;245m', line: '\x1b[38;5;238m', focus: '\x1b[38;5;180m',
+    good: '\x1b[38;5;150m', warning: '\x1b[38;5;180m', danger: '\x1b[38;5;174m',
+    data: ['\x1b[38;5;180m', '\x1b[38;5;151m', '\x1b[38;5;181m', '\x1b[38;5;146m'], reset: RESET,
+  },
+  paper: {
+    ink: '\x1b[38;5;235m', muted: '\x1b[38;5;242m', line: '\x1b[38;5;250m', focus: '\x1b[38;5;88m',
+    good: '\x1b[38;5;22m', warning: '\x1b[38;5;130m', danger: '\x1b[38;5;124m',
+    data: ['\x1b[38;5;88m', '\x1b[38;5;23m', '\x1b[38;5;130m', '\x1b[38;5;54m'], reset: RESET,
+  },
+  indigo: {
+    ink: '\x1b[38;5;252m', muted: '\x1b[38;5;247m', line: '\x1b[38;5;239m', focus: '\x1b[38;5;215m',
+    good: '\x1b[38;5;151m', warning: '\x1b[38;5;215m', danger: '\x1b[38;5;203m',
+    data: ['\x1b[38;5;215m', '\x1b[38;5;153m', '\x1b[38;5;221m', '\x1b[38;5;183m'], reset: RESET,
+  },
+  lichen: {
+    ink: '\x1b[38;5;252m', muted: '\x1b[38;5;246m', line: '\x1b[38;5;239m', focus: '\x1b[38;5;179m',
+    good: '\x1b[38;5;151m', warning: '\x1b[38;5;179m', danger: '\x1b[38;5;174m',
+    data: ['\x1b[38;5;179m', '\x1b[38;5;151m', '\x1b[38;5;186m', '\x1b[38;5;145m'], reset: RESET,
+  },
+  contrast: {
+    ink: '\x1b[97m', muted: '\x1b[37m', line: '\x1b[90m', focus: '\x1b[93m',
+    good: '\x1b[97m', warning: '\x1b[93m', danger: '\x1b[91m',
+    data: ['\x1b[97m', '\x1b[93m', '\x1b[96m', '\x1b[95m'], reset: RESET,
+  },
+};
 
 // ============================================================================
 // Theme Configuration
@@ -35,6 +86,16 @@ export function setTheme(mode: PhosphorMode): void {
  */
 export function getTheme(): PhosphorMode {
   return currentTheme;
+}
+
+/** Resolve semantic terminal roles for a specific theme mode. */
+export function getThemePalette(mode: PhosphorMode = currentTheme): TerminalThemePalette {
+  return TERMINAL_PALETTES[getUiTheme(mode).id];
+}
+
+/** Resolve semantic terminal roles for the currently selected theme. */
+export function getCurrentThemePalette(): TerminalThemePalette {
+  return getThemePalette(currentTheme);
 }
 
 // ============================================================================

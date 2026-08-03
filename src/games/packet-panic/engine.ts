@@ -95,6 +95,10 @@ export interface GameState {
   tutorialStep: number;
 }
 
+function progressTutorial(state: GameState): void {
+  if (state.sector === 1 && state.tutorialStep < 6) state.tutorialStep++;
+}
+
 export const UPGRADES: Upgrade[] = [
   { id: 'links', name: 'SPARE LINKS', description: '+3 Link routers next sector' },
   { id: 'split', name: 'JUNCTION KIT', description: '+1 Split router next sector' },
@@ -256,7 +260,8 @@ export function placeRouter(state: GameState, position: Position, kind: RouterKi
   state.inventory[kind]--;
   state.lastEvent = kind.toUpperCase() + ' PLACED';
   state.eventTicks = 14;
-  if (state.phase === 'tutorial') state.phase = 'playing';
+  progressTutorial(state);
+  if (state.phase === 'tutorial' && state.tutorialStep >= 2) state.phase = 'playing';
   return true;
 }
 
@@ -266,6 +271,8 @@ export function rotateRouter(state: GameState, position: Position): boolean {
   tile.router.rotation = ((tile.router.rotation + 1) % 4) as 0 | 1 | 2 | 3;
   state.lastEvent = 'ROUTER ROTATED';
   state.eventTicks = 10;
+  progressTutorial(state);
+  if (state.phase === 'tutorial' && state.tutorialStep >= 2) state.phase = 'playing';
   return true;
 }
 
@@ -276,6 +283,7 @@ export function salvageRouter(state: GameState, position: Position): boolean {
   state.board[position.y][position.x] = { kind: 'empty' };
   state.lastEvent = 'ROUTER SALVAGED';
   state.eventTicks = 10;
+  progressTutorial(state);
   return true;
 }
 
@@ -486,6 +494,7 @@ export function advance(state: GameState): TickResult {
     state.lastEvent = state.phase === 'won' ? 'SHIFT COMPLETE' : 'SECTOR CLEAR — CHOOSE UPGRADE';
     state.eventTicks = 40;
   }
+  if (result.delivered.length) progressTutorial(state);
   return result;
 }
 
@@ -517,5 +526,6 @@ export function purge(state: GameState, position: Position): boolean {
   state.purgeCharges--;
   state.lastEvent = 'ROUTER PURGED';
   state.eventTicks = 18;
+  progressTutorial(state);
   return true;
 }

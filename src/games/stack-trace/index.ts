@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { activePuzzle, applyCommand, createState } from './engine';
 import { renderFrame } from './render';
@@ -11,8 +11,8 @@ export interface StackTraceController { stop: () => void; isRunning: boolean; }
 export function runStackTraceGame(terminal: Terminal): StackTraceController {
   let running = true;
   let paused = false;
+  let helpOpen = false;
   let pauseSelection = 0;
-  let frame = 0;
   let state: StackTraceState = createState();
   let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
@@ -40,12 +40,13 @@ export function runStackTraceGame(terminal: Terminal): StackTraceController {
 
   function handleKey(event: KeyboardEvent): void {
     const key = event.key.toLowerCase(); event.preventDefault(); event.stopPropagation();
-    if (state.phase === 'start') { if (key === 't') command({ type: 'start', mode: 'tutorial' }); else if (key === 'd') command({ type: 'start', mode: 'daily' }); else if (key === 'p' || key === 'enter' || key === ' ') command({ type: 'start', mode: 'campaign' }); else if (key === 'q') quit(); return; }
+    if (helpOpen) { if (key === '?' || key === 'escape') helpOpen = false; return; }
+    if (state.phase === 'start') { if (key === 't') command({ type: 'start', mode: 'tutorial' }); else if (key === 'd') command({ type: 'start', mode: 'daily' }); else if (key === 'p' || key === 'enter' || key === ' ') command({ type: 'start', mode: 'campaign' }); else if (key === '?') helpOpen = true; else if (key === 'q') quit(); return; }
     if (key === 'escape') { paused = !paused; pauseSelection = 0; return; }
     if (handlePause(key, event)) return;
     if (state.phase === 'ending') { if (key === 'r') command({ type: 'restart' }); else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
     if (state.phase === 'complete') { if (key === 'n' || key === 'enter') command({ type: 'next' }); else if (key === 'r') command({ type: 'restart' }); else if (key === 'q') quit(); return; }
-    if (key === 'q') { quit(); return; }
+    if (key === '?') { helpOpen = true; return; }
     if (key === 'tab') { focusCycle(); return; }
     if (key === '1') { command({ type: 'focus', focus: 'tape' }); return; }
     if (key === '2') { command({ type: 'focus', focus: 'tray' }); return; }
@@ -66,9 +67,9 @@ export function runStackTraceGame(terminal: Terminal): StackTraceController {
   }
 
   function render(): void {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor());
-    if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
-    terminal.write(output); frame += 1;
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { helpOpen });
+    if (paused && !helpOpen && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
+    terminal.write(output);
   }
 
   const baseStop = controller.stop;

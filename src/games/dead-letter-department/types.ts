@@ -1,6 +1,7 @@
 export type Destination = 'dispatch' | 'express' | 'return' | 'seal';
 export type Disposition = 'routine' | 'urgent' | 'forged' | 'cursed';
 export type Phase = 'start' | 'briefing' | 'working' | 'audit' | 'perk' | 'report' | 'gameOver' | 'ending';
+export type RunMode = 'campaign' | 'tutorial';
 export type InspectionView = 'envelope' | 'letter' | 'insert';
 export type Seal = 'copper' | 'ivory' | 'violet' | 'black' | 'broken';
 export type Postage = 'standard' | 'priority' | 'black-seal';
@@ -80,6 +81,8 @@ export interface Perk { id: PerkId; name: string; description: string; }
 export interface GameState {
   version: 1;
   seed: number;
+  mode: RunMode;
+  tutorialStep: number;
   phase: Phase;
   shift: number;
   rules: ShiftRules;

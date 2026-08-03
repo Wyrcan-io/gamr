@@ -3,6 +3,7 @@ import {
   createState,
   getPorts,
   placeRouter,
+  rotateRouter,
   advance,
   BOARD_WIDTH,
   type Tile,
@@ -55,5 +56,18 @@ describe('Packet Panic deterministic simulation', () => {
     for (let i = 0; i < 40; i++) delivered += advance(state).delivered.length;
     expect(delivered).toBeGreaterThan(0);
     expect(state.trace).toBeLessThan(100);
+  });
+
+  it('progresses the opening tutorial through observable placement steps', () => {
+    const state = createState(42);
+    const position = state.board.flatMap((row, y) => row.map((tile, x) => ({ tile, x, y }))).find(({ tile }) => tile.kind === 'empty');
+    expect(position).toBeDefined();
+    expect(state.phase).toBe('tutorial');
+    expect(placeRouter(state, { x: position!.x, y: position!.y }, 'link')).toBe(true);
+    expect(state.tutorialStep).toBe(1);
+    expect(state.phase).toBe('tutorial');
+    expect(rotateRouter(state, { x: position!.x, y: position!.y })).toBe(true);
+    expect(state.tutorialStep).toBe(2);
+    expect(state.phase).toBe('playing');
   });
 });

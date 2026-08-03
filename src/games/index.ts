@@ -14,6 +14,8 @@ export {
   setTheme,
   getTheme,
   getCurrentThemeColor,
+  getCurrentThemePalette,
+  getThemePalette,
   isLightTheme,
   getSubtleBackgroundColor,
   getVerticalAnchor,
@@ -25,7 +27,7 @@ export {
   isTerminalValid,
 } from './utils';
 
-export type { PhosphorMode } from './utils';
+export type { PhosphorMode, TerminalThemePalette } from './utils';
 
 export { getUiTheme, getUiThemeModes } from '../themes';
 export type { UiTheme } from '../themes';

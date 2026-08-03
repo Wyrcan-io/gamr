@@ -48,4 +48,20 @@ describe('Dead Letter Department flow', () => {
     expect(state.inboxIndex).toBe(1);
     expect(state.history[0].correct).toBe(true);
   });
+
+  it('runs the induction as a finite six-letter tutorial', () => {
+    let state = createState(42);
+    state = applyCommand(state, { type: 'startTutorial' }).state;
+    expect(state.mode).toBe('tutorial');
+    state = applyCommand(state, { type: 'dismissBriefing' }).state;
+    for (let index = 0; index < 6; index += 1) {
+      const evaluation = currentEvaluation(state)!;
+      state = applyCommand(state, { type: 'chooseDestination', destination: evaluation.expected }).state;
+      state = applyCommand(state, { type: 'dismissAudit' }).state;
+    }
+    expect(state.tutorialStep).toBe(6);
+    expect(state.phase).toBe('report');
+    state = applyCommand(state, { type: 'continueReport' }).state;
+    expect(state.phase).toBe('ending');
+  });
 });

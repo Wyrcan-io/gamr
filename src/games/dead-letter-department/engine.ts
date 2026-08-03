@@ -32,6 +32,8 @@ export function createState(seed: number = Date.now(), shift = 1, perks: PerkId[
   return {
     version: 1,
     seed: seed >>> 0,
+    mode: 'campaign',
+    tutorialStep: 0,
     phase: 'start',
     shift,
     rules: rulesForShift(shift),
@@ -96,18 +98,24 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
   switch (command.type) {
     case 'startCampaign': {
       const fresh = createState(command.seed ?? state.seed);
+      fresh.mode = 'campaign';
+      fresh.tutorialStep = 0;
       fresh.phase = 'briefing';
       fresh.lastNotice = 'SHIFT 01: LEARN THE DESTINATIONS.';
       return { state: fresh, events: ['start'] };
     }
     case 'startTutorial': {
       const fresh = createState(state.seed, 1, []);
+      fresh.mode = 'tutorial';
+      fresh.tutorialStep = 0;
       fresh.phase = 'briefing';
       fresh.lastNotice = 'INDUCTION: THE FOUR DESKS ARE WAITING.';
       return { state: fresh, events: ['tutorial'] };
     }
     case 'restart': {
       const fresh = createState(command.seed ?? state.seed);
+      fresh.mode = state.mode;
+      fresh.tutorialStep = 0;
       fresh.phase = 'briefing';
       return { state: fresh, events: ['restart'] };
     }
@@ -160,6 +168,9 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     }
     case 'dismissAudit':
       if (state.phase !== 'audit') break;
+      if (state.mode === 'tutorial') {
+        state.tutorialStep = Math.min(6, state.tutorialStep + 1);
+      }
       state.pendingAudit = null;
       state.inboxIndex++;
       if (state.trust <= 0) { state.phase = 'gameOver'; state.lastNotice = 'TRUST EXHAUSTED — THE DESK IS UNDER AUDIT.'; events.push('lost'); }
@@ -168,7 +179,8 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
       break;
     case 'continueReport':
       if (state.phase !== 'report') break;
-      if (state.shift >= 6) { state.phase = 'ending'; events.push('ending'); }
+      if (state.mode === 'tutorial') { state.phase = 'ending'; state.lastNotice = 'INDUCTION COMPLETE. THE DESK IS YOURS.'; events.push('tutorialComplete'); }
+      else if (state.shift >= 6) { state.phase = 'ending'; events.push('ending'); }
       else { state.phase = 'perk'; state.lastNotice = 'CHOOSE ONE OFFICE PERK FOR THE NEXT SHIFT.'; events.push('perk'); }
       break;
     case 'choosePerk':

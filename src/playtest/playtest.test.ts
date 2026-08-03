@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { allGames } from '../games';
-import { createPlaytestRegistry, missingPlaytestSpecs } from './specs';
+import { createPlaytestRegistry, incompletePlaytestSpecs, missingPlaytestSpecs } from './specs';
 import { PlaytestRunner } from './runner';
 import { VirtualScreen } from './screen';
 import { VirtualTerminal } from './terminal';
@@ -46,6 +46,8 @@ describe('playtest registry', () => {
     const registry = createPlaytestRegistry(allGames);
     expect(missingPlaytestSpecs(allGames, registry)).toEqual([]);
     expect(registry.size).toBe(allGames.length);
+    expect(incompletePlaytestSpecs(allGames, registry)).not.toContain('stack-trace');
+    expect(incompletePlaytestSpecs(allGames, registry)).toContain('five-minute-kingdom');
   });
 });
 
@@ -73,4 +75,45 @@ describe('playtest runner', () => {
     expect(report.actions.length).toBeGreaterThan(0);
     expect(report.replay).toContain('dead-letter-department');
   }, 10000);
+
+  it('completes the first Stack Trace repair through keyboard input', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 40 }).run('stack-trace', {
+      seed: 7,
+      maxActions: 8,
+      maxElapsedMs: 2500,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.coverage).toBe('seeded-completion');
+    expect(report.milestones['first-clear']).toBe(true);
+  }, 10000);
+
+  it('reaches the Wordle ending through typed guesses', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 20 }).run('wordle', {
+      seed: 9,
+      maxActions: 45,
+      maxElapsedMs: 8000,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.milestones['cipher-ending']).toBe(true);
+  }, 15000);
+
+  it('exercises a real-time Snake session through game over', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('snake', {
+      seed: 11,
+      maxActions: 40,
+      maxElapsedMs: 7000,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.milestones['snake-ending']).toBe(true);
+  }, 15000);
+
+  it('starts Packet Panic and accepts route-building input', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('packet-panic', {
+      seed: 13,
+      maxActions: 18,
+      maxElapsedMs: 6000,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.milestones['router-action']).toBe(true);
+  }, 15000);
 });

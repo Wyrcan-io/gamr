@@ -1,5 +1,7 @@
 export type PlaytestKey = string;
 
+export type PlaytestCoverage = 'generic-smoke' | 'black-box-progress' | 'seeded-completion';
+
 export interface PlaytestAction {
   key: PlaytestKey;
   /** Milliseconds to keep a key held for real-time games. */
@@ -44,6 +46,8 @@ export interface PlaytestMilestone {
 
 export interface PlaytestSpec {
   gameId: string;
+  profileVersion?: number;
+  coverage?: PlaytestCoverage;
   category: 'turn-based' | 'real-time' | 'text-entry' | 'unknown';
   description?: string;
   seeds?: number[];
@@ -81,6 +85,7 @@ export interface PlaytestFailure {
 
 export interface PlaytestRunReport {
   gameId: string;
+  coverage?: PlaytestCoverage;
   status: PlaytestRunStatus;
   seed?: number;
   actionCount: number;

@@ -76,7 +76,8 @@ export class PlaytestRunner {
       for (const milestone of spec.milestones) {
         if (!milestones[milestone.id] && milestone.detect(current, observations)) milestones[milestone.id] = true;
       }
-      stalledFrames = current.changed ? 0 : stalledFrames + 1;
+      const waitedForFrame = (lastAction?.waitMs ?? this.defaultWaitMs) >= 30;
+      stalledFrames = current.changed ? 0 : waitedForFrame ? stalledFrames + 1 : stalledFrames;
       return current;
     };
 
@@ -125,6 +126,7 @@ export class PlaytestRunner {
     return {
       gameId,
       status,
+      coverage: spec.coverage,
       seed: options.seed,
       actionCount: actions.length,
       elapsedMs,
@@ -147,6 +149,7 @@ export class PlaytestRunner {
     return {
       gameId,
       status,
+      coverage: undefined,
       actionCount: 0,
       elapsedMs: 0,
       milestones: {},

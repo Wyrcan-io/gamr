@@ -46,11 +46,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      SITE_REPO_PAT: ${{ secrets.SITE_REPO_PAT }}
     steps:
+      - name: Skip site notification when no token is configured
+        if: ${{ env.SITE_REPO_PAT == '' }}
+        run: echo "SITE_REPO_PAT is not configured; skipping site notification."
       - name: Trigger site update
+        if: ${{ env.SITE_REPO_PAT != '' }}
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
-          token: ${{ secrets.SITE_REPO_PAT }}
+          token: ${{ env.SITE_REPO_PAT }}
           repository: abhirup/gamr-site
           event-type: gamr-updated
           client-payload: '{"version": "${{ github.ref_name }}"}'

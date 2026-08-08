@@ -3,7 +3,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { allGames } from '../dist/index.js';
 import { archiveGames, games } from '../dist/index.js';
-import { PlaytestRunner, createPlaytestRegistry } from '../dist/playtest.js';
+import { PlaytestRunner, coverageSummary, createPlaytestRegistry, featuredCoverageGaps } from '../dist/playtest.js';
 
 const args = process.argv.slice(2);
 const json = args.includes('--json');
@@ -15,6 +15,18 @@ const artifactArgument = args.find(value => value.startsWith('--artifacts='));
 const artifactRoot = artifactArgument?.slice('--artifacts='.length);
 const requested = args.filter(value => !value.startsWith('--'));
 const registry = createPlaytestRegistry(allGames);
+if (args.includes('--coverage-report')) {
+  const summary = coverageSummary(allGames, registry);
+  console.log('GAME COVERAGE');
+  for (const item of summary) console.log(`${item.group.padEnd(8)} ${String(item.coverage ?? 'missing').padEnd(22)} v${item.profileVersion}  ${item.gameId}`);
+  const counts = summary.reduce((all, item) => {
+    const key = item.coverage ?? 'missing';
+    all[key] = (all[key] ?? 0) + 1;
+    return all;
+  }, {});
+  console.log(`\nTOTAL ${summary.length}  GENERIC ${counts['generic-smoke'] ?? 0}  PROGRESS ${counts['black-box-progress'] ?? 0}  COMPLETE ${counts['seeded-completion'] ?? 0}`);
+  process.exit(featuredCoverageGaps(allGames, registry).length > 0 ? 1 : 0);
+}
 const catalog = args.includes('--active') ? games : args.includes('--archive') ? archiveGames : allGames;
 const selectedCatalog = suite === 'smoke'
   ? catalog

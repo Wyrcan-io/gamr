@@ -58,6 +58,18 @@ function packetPanicPolicy(_observation: PlaytestObservation, memory: PlaytestMe
   return { key: sequence[index]!, waitMs: 70, label: 'build route' };
 }
 
+function fiveMinutePolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
+  const sequence: string[] = [];
+  for (let turn = 1; turn <= 9; turn += 1) {
+    sequence.push('1', 'Enter', 'Enter', 'Enter');
+    if (turn === 3 || turn === 6 || turn === 9) sequence.push('Enter');
+  }
+  const index = Number(memory.values.get('five-minute-index') ?? 0);
+  if (index >= sequence.length) return undefined;
+  memory.values.set('five-minute-index', index + 1);
+  return { key: sequence[index]!, waitMs: 70, label: 'draft kingdom' };
+}
+
 function baseSpec(game: GameInfo): PlaytestSpec {
   const category = game.pace === 'real-time' ? 'real-time' : 'turn-based';
   return {
@@ -163,6 +175,22 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
       },
     ],
   },
+  'five-minute-kingdom': {
+    profileVersion: 1,
+    coverage: 'seeded-completion',
+    category: 'turn-based',
+    startActions: [{ key: 'Enter', waitMs: 90, label: 'open deed market' }],
+    policy: fiveMinutePolicy,
+    maxActions: 45,
+    maxElapsedMs: 9000,
+    maxStalledFrames: 50,
+    milestones: [
+      { id: 'kingdom-market', description: 'The deed market is open.', required: true, detect: textIncludes('deed market', 'choose one offer') },
+      { id: 'placement-preview', description: 'A legal placement projection is visible.', required: true, detect: textIncludes('projection', 'legal target', 'preview') },
+      { id: 'placement-recorded', description: 'A placement is committed and score changes.', required: true, detect: textIncludes('placement recorded', 'glory') },
+      { id: 'kingdom-ending', description: 'The final kingdom chronicle is reached.', required: true, detect: textIncludes('kingdom chronicle sealed', 'final glory') },
+    ],
+  },
 };
 
 export function createPlaytestRegistry(games: readonly GameInfo[] = allGames): Map<string, PlaytestSpec> {
@@ -184,4 +212,32 @@ export function incompletePlaytestSpecs(games: readonly GameInfo[], registry: Re
     if (!spec || spec.coverage === 'generic-smoke') incomplete.push(game.id);
   }
   return incomplete;
+}
+
+export function featuredCoverageGaps(games: readonly GameInfo[], registry: ReadonlyMap<string, PlaytestSpec>): string[] {
+  return games
+    .filter(game => game.maturity === 'featured')
+    .filter(game => registry.get(game.id)?.coverage !== 'seeded-completion')
+    .map(game => game.id);
+}
+
+export interface CoverageSummary {
+  gameId: string;
+  name: string;
+  group: 'featured' | 'beta' | 'workshop' | 'archive';
+  coverage: PlaytestSpec['coverage'];
+  profileVersion: number;
+}
+
+export function coverageSummary(games: readonly GameInfo[], registry: ReadonlyMap<string, PlaytestSpec>): CoverageSummary[] {
+  return games.map(game => {
+    const spec = registry.get(game.id);
+    return {
+      gameId: game.id,
+      name: game.name,
+      group: game.maturity ?? 'archive',
+      coverage: spec?.coverage,
+      profileVersion: spec?.profileVersion ?? 0,
+    };
+  });
 }

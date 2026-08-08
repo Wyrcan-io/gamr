@@ -2,7 +2,8 @@ export { VirtualScreen, normalizeTerminalText } from './screen';
 export { VirtualTerminal, resetPlaytestWindowListeners } from './terminal';
 export { PlaytestRunner, runPlaytest } from './runner';
 export { installDeterminism } from './determinism';
-export { createPlaytestRegistry, incompletePlaytestSpecs, missingPlaytestSpecs } from './specs';
+export { createPlaytestRegistry, coverageSummary, featuredCoverageGaps, incompletePlaytestSpecs, missingPlaytestSpecs } from './specs';
+export type { CoverageSummary } from './specs';
 export type {
   PlaytestAction,
   PlaytestFailure,

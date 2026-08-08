@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { allGames } from '../games';
-import { createPlaytestRegistry, incompletePlaytestSpecs, missingPlaytestSpecs } from './specs';
+import { coverageSummary, createPlaytestRegistry, featuredCoverageGaps, incompletePlaytestSpecs, missingPlaytestSpecs } from './specs';
 import { PlaytestRunner } from './runner';
 import { VirtualScreen } from './screen';
 import { VirtualTerminal } from './terminal';
@@ -47,7 +47,9 @@ describe('playtest registry', () => {
     expect(missingPlaytestSpecs(allGames, registry)).toEqual([]);
     expect(registry.size).toBe(allGames.length);
     expect(incompletePlaytestSpecs(allGames, registry)).not.toContain('stack-trace');
-    expect(incompletePlaytestSpecs(allGames, registry)).toContain('five-minute-kingdom');
+    expect(incompletePlaytestSpecs(allGames, registry)).not.toContain('five-minute-kingdom');
+    expect(featuredCoverageGaps(allGames, registry)).toEqual(['dead-letter-department', 'packet-panic']);
+    expect(coverageSummary(allGames, registry)).toHaveLength(allGames.length);
   });
 });
 
@@ -116,4 +118,15 @@ describe('playtest runner', () => {
     expect(report.status).toBe('passed');
     expect(report.milestones['router-action']).toBe(true);
   }, 15000);
+
+  it('completes a nine-turn Five-Minute Kingdom chronicle', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('five-minute-kingdom', {
+      seed: 17,
+      maxActions: 45,
+      maxElapsedMs: 9000,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.coverage).toBe('seeded-completion');
+    expect(report.milestones['kingdom-ending']).toBe(true);
+  }, 20000);
 });

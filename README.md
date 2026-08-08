@@ -85,7 +85,7 @@ const report = await runPlaytest('dead-letter-department', { seed: 42 });
 console.log(report.status, report.milestones, report.replay);
 ```
 
-From a checkout, run one game with `node scripts/playtest.mjs dead-letter-department --seed=42` or run the complete catalog with `node scripts/playtest.mjs --all`. New games receive generic launch and interaction coverage automatically; deeper progression is added through a game-specific playtest profile.
+From a checkout, run one game with `node scripts/playtest.mjs dead-letter-department --seed=42`, run a tier with `node scripts/playtest.mjs --suite=progression`, or inspect the catalog with `node scripts/playtest.mjs --coverage-report`. New games receive generic launch and interaction coverage automatically; deeper progression is added through a game-specific playtest profile.
 
 ### Themes
 

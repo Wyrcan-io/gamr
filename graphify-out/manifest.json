@@ -1,0 +1,1102 @@
+{
+  ".agents/skills/game-dev/templates/game-scaffold.ts": {
+    "mtime": 1785309977.5403292,
+    "ast_hash": "3f94a90d40c2b80f772c03313e52a695",
+    "semantic_hash": "3f94a90d40c2b80f772c03313e52a695"
+  },
+  ".codex/hooks.json": {
+    "mtime": 1786217318.5763426,
+    "ast_hash": "5ebef3dd159986e465ab65e4014107ec",
+    "semantic_hash": "5ebef3dd159986e465ab65e4014107ec"
+  },
+  "hyperspace.json": {
+    "mtime": 1785309977.4273748,
+    "ast_hash": "eac91ced4e229620d9ee7554026741e3",
+    "semantic_hash": "eac91ced4e229620d9ee7554026741e3"
+  },
+  "package.json": {
+    "mtime": 1785771652.9754965,
+    "ast_hash": "75c9a46917569ec400acc1a7a0589a63",
+    "semantic_hash": "75c9a46917569ec400acc1a7a0589a63"
+  },
+  "scripts/pack-smoke.mjs": {
+    "mtime": 1785659491.485111,
+    "ast_hash": "c6230642c74b0f35e5eab6b71a30df20",
+    "semantic_hash": "c6230642c74b0f35e5eab6b71a30df20"
+  },
+  "scripts/playtest.mjs": {
+    "mtime": 1785774272.154804,
+    "ast_hash": "939696e29a239c6e25ed2d7a35d5e7a3",
+    "semantic_hash": "939696e29a239c6e25ed2d7a35d5e7a3"
+  },
+  "scripts/start.mjs": {
+    "mtime": 1785649908.5818956,
+    "ast_hash": "4e37762d550f4a15be9988753b98ecdf",
+    "semantic_hash": "4e37762d550f4a15be9988753b98ecdf"
+  },
+  "scripts/verify-release.mjs": {
+    "mtime": 1785657497.4801953,
+    "ast_hash": "cb645cf04f0ecefda9872d0a292bdad4",
+    "semantic_hash": "cb645cf04f0ecefda9872d0a292bdad4"
+  },
+  "skills-lock.json": {
+    "mtime": 1785651994.4183543,
+    "ast_hash": "ee6914fb8c884e5809eb020c3de2cbff",
+    "semantic_hash": "ee6914fb8c884e5809eb020c3de2cbff"
+  },
+  "src/cli.ts": {
+    "mtime": 1785762002.696081,
+    "ast_hash": "10db6b83ea3dc90a6be224a4a1bb721c",
+    "semantic_hash": "10db6b83ea3dc90a6be224a4a1bb721c"
+  },
+  "src/create.ts": {
+    "mtime": 1785651482.1571712,
+    "ast_hash": "3aa513e6a5c82dbbc9962f8d30c2758a",
+    "semantic_hash": "3aa513e6a5c82dbbc9962f8d30c2758a"
+  },
+  "src/games/2048/index.ts": {
+    "mtime": 1785649685.2086196,
+    "ast_hash": "95bdcbb13b122f9cad9bb25083143ba7",
+    "semantic_hash": "95bdcbb13b122f9cad9bb25083143ba7"
+  },
+  "src/games/2048/slideLogic.test.ts": {
+    "mtime": 1785309977.6895063,
+    "ast_hash": "3e8676d2c5da0bcb0aa6f9ec5965b30e",
+    "semantic_hash": "3e8676d2c5da0bcb0aa6f9ec5965b30e"
+  },
+  "src/games/2048/slideLogic.ts": {
+    "mtime": 1785309977.6996622,
+    "ast_hash": "4e3f2a08c51bb42a6a5f9d05a70e2b2a",
+    "semantic_hash": "4e3f2a08c51bb42a6a5f9d05a70e2b2a"
+  },
+  "src/games/archived.ts": {
+    "mtime": 1785313760.192264,
+    "ast_hash": "9b2770259922006ee43beb31dd78b36a",
+    "semantic_hash": "9b2770259922006ee43beb31dd78b36a"
+  },
+  "src/games/asteroids/index.ts": {
+    "mtime": 1785309977.7086625,
+    "ast_hash": "4508c1f45002d30f2e2875ea684435d1",
+    "semantic_hash": "4508c1f45002d30f2e2875ea684435d1"
+  },
+  "src/games/blackout-grid/content.ts": {
+    "mtime": 1785584141.08927,
+    "ast_hash": "57f564c09dea1746abbfa312af3fbd1b",
+    "semantic_hash": "57f564c09dea1746abbfa312af3fbd1b"
+  },
+  "src/games/blackout-grid/engine.test.ts": {
+    "mtime": 1785585184.048517,
+    "ast_hash": "33dd7c3a20b03169d299b2f6f2baddee",
+    "semantic_hash": "33dd7c3a20b03169d299b2f6f2baddee"
+  },
+  "src/games/blackout-grid/engine.ts": {
+    "mtime": 1785584741.8867686,
+    "ast_hash": "dc7c6fefda490cf60156ae24c29c120e",
+    "semantic_hash": "dc7c6fefda490cf60156ae24c29c120e"
+  },
+  "src/games/blackout-grid/index.ts": {
+    "mtime": 1785649615.01907,
+    "ast_hash": "12abf70998a14b5acbd28be0b2978977",
+    "semantic_hash": "12abf70998a14b5acbd28be0b2978977"
+  },
+  "src/games/blackout-grid/render.ts": {
+    "mtime": 1785584946.0131953,
+    "ast_hash": "18e003fea8c0740573c945328b521c99",
+    "semantic_hash": "18e003fea8c0740573c945328b521c99"
+  },
+  "src/games/blackout-grid/scenario.ts": {
+    "mtime": 1785584650.4287746,
+    "ast_hash": "d19a7e9673238cef2c72f1195966c892",
+    "semantic_hash": "d19a7e9673238cef2c72f1195966c892"
+  },
+  "src/games/blackout-grid/seed.ts": {
+    "mtime": 1785584138.1285286,
+    "ast_hash": "94803fb35f98565fc86a2af48e46feb4",
+    "semantic_hash": "94803fb35f98565fc86a2af48e46feb4"
+  },
+  "src/games/blackout-grid/topology.ts": {
+    "mtime": 1785584267.1622553,
+    "ast_hash": "290695d44ae54920ab8899ef1a9fceb9",
+    "semantic_hash": "290695d44ae54920ab8899ef1a9fceb9"
+  },
+  "src/games/blackout-grid/types.ts": {
+    "mtime": 1785584774.8684459,
+    "ast_hash": "5b67e635c8477a2df98128704b05906c",
+    "semantic_hash": "5b67e635c8477a2df98128704b05906c"
+  },
+  "src/games/botany-lab/content.ts": {
+    "mtime": 1785616308.139114,
+    "ast_hash": "ba7ab6643888eea53a2fa1fe6116485d",
+    "semantic_hash": "ba7ab6643888eea53a2fa1fe6116485d"
+  },
+  "src/games/botany-lab/engine.test.ts": {
+    "mtime": 1785616779.2967947,
+    "ast_hash": "2640a13abf525274b021514ce249988a",
+    "semantic_hash": "2640a13abf525274b021514ce249988a"
+  },
+  "src/games/botany-lab/engine.ts": {
+    "mtime": 1785616923.0056603,
+    "ast_hash": "d0330d47f897841ed8b1f16556420224",
+    "semantic_hash": "d0330d47f897841ed8b1f16556420224"
+  },
+  "src/games/botany-lab/index.ts": {
+    "mtime": 1785616843.7333963,
+    "ast_hash": "53516bbe0ba948faad2c9a612eff03a7",
+    "semantic_hash": "53516bbe0ba948faad2c9a612eff03a7"
+  },
+  "src/games/botany-lab/render.test.ts": {
+    "mtime": 1785616856.701602,
+    "ast_hash": "d4dbcf29e9c3c2271ebac73d21cbe367",
+    "semantic_hash": "d4dbcf29e9c3c2271ebac73d21cbe367"
+  },
+  "src/games/botany-lab/render.ts": {
+    "mtime": 1785616740.541648,
+    "ast_hash": "b0f1e0c6743ea3f79a075826f6514535",
+    "semantic_hash": "b0f1e0c6743ea3f79a075826f6514535"
+  },
+  "src/games/botany-lab/types.ts": {
+    "mtime": 1785616241.5605755,
+    "ast_hash": "2717dfa504d443c863030e0eb5be7c5b",
+    "semantic_hash": "2717dfa504d443c863030e0eb5be7c5b"
+  },
+  "src/games/breakout/index.ts": {
+    "mtime": 1785649657.7631936,
+    "ast_hash": "24ec9bc815c21a2bb98ce449a48cea23",
+    "semantic_hash": "24ec9bc815c21a2bb98ce449a48cea23"
+  },
+  "src/games/catalog.test.ts": {
+    "mtime": 1785658304.2966137,
+    "ast_hash": "18fc35a1a0316c80325bdb91573dc603",
+    "semantic_hash": "18fc35a1a0316c80325bdb91573dc603"
+  },
+  "src/games/chopper/effects.ts": {
+    "mtime": 1785309977.7401867,
+    "ast_hash": "ae11e5d2b3fdad797d0b7b2a98f0eab3",
+    "semantic_hash": "ae11e5d2b3fdad797d0b7b2a98f0eab3"
+  },
+  "src/games/chopper/index.ts": {
+    "mtime": 1785309977.7401867,
+    "ast_hash": "bba914a9b696230fc9ee175efa8ae2dd",
+    "semantic_hash": "bba914a9b696230fc9ee175efa8ae2dd"
+  },
+  "src/games/chopper/levels.ts": {
+    "mtime": 1785309977.7559106,
+    "ast_hash": "bdb0d0958f5573d62cf694834b1e35c3",
+    "semantic_hash": "bdb0d0958f5573d62cf694834b1e35c3"
+  },
+  "src/games/containment-protocol/content.ts": {
+    "mtime": 1785493776.4382725,
+    "ast_hash": "e38659750f1e288f6d436a56d593f0cf",
+    "semantic_hash": "e38659750f1e288f6d436a56d593f0cf"
+  },
+  "src/games/containment-protocol/engine.test.ts": {
+    "mtime": 1785493863.1996996,
+    "ast_hash": "5f482e6eae53a3d2e7188297fc528f0a",
+    "semantic_hash": "5f482e6eae53a3d2e7188297fc528f0a"
+  },
+  "src/games/containment-protocol/engine.ts": {
+    "mtime": 1785493833.325407,
+    "ast_hash": "8c2a7e66496581e5a58772cba30313fc",
+    "semantic_hash": "8c2a7e66496581e5a58772cba30313fc"
+  },
+  "src/games/containment-protocol/index.ts": {
+    "mtime": 1785649620.0551832,
+    "ast_hash": "491635de799f250c1e6ad3b1832904bf",
+    "semantic_hash": "491635de799f250c1e6ad3b1832904bf"
+  },
+  "src/games/containment-protocol/render.ts": {
+    "mtime": 1785493746.094337,
+    "ast_hash": "ebd11e60ca0da18bede1ae2a279d655e",
+    "semantic_hash": "ebd11e60ca0da18bede1ae2a279d655e"
+  },
+  "src/games/containment-protocol/types.ts": {
+    "mtime": 1785493709.45302,
+    "ast_hash": "7acaf73b2479574e6a1152916c3c735f",
+    "semantic_hash": "7acaf73b2479574e6a1152916c3c735f"
+  },
+  "src/games/crack/index.ts": {
+    "mtime": 1785649843.2005658,
+    "ast_hash": "16dbf28cbf22323bbd8e235e5c465dff",
+    "semantic_hash": "16dbf28cbf22323bbd8e235e5c465dff"
+  },
+  "src/games/dead-letter-department/content.ts": {
+    "mtime": 1785314809.414225,
+    "ast_hash": "b23afc6bbc12c355657bb5db84504267",
+    "semantic_hash": "b23afc6bbc12c355657bb5db84504267"
+  },
+  "src/games/dead-letter-department/engine.test.ts": {
+    "mtime": 1785764270.3796399,
+    "ast_hash": "8126448b80a72571cc9710941d15a586",
+    "semantic_hash": "8126448b80a72571cc9710941d15a586"
+  },
+  "src/games/dead-letter-department/engine.ts": {
+    "mtime": 1785764091.0091352,
+    "ast_hash": "11214fa40285bf42f7ac66ef81126a48",
+    "semantic_hash": "11214fa40285bf42f7ac66ef81126a48"
+  },
+  "src/games/dead-letter-department/generator.ts": {
+    "mtime": 1785511527.1422732,
+    "ast_hash": "e53668c117798f28e0e7a64162cde5a1",
+    "semantic_hash": "e53668c117798f28e0e7a64162cde5a1"
+  },
+  "src/games/dead-letter-department/index.test.ts": {
+    "mtime": 1785764288.1328428,
+    "ast_hash": "e1edd886a9738ea82f093cedaa2c13bf",
+    "semantic_hash": "e1edd886a9738ea82f093cedaa2c13bf"
+  },
+  "src/games/dead-letter-department/index.ts": {
+    "mtime": 1785764226.5338404,
+    "ast_hash": "104ba4e59c5c0dafc4f793133ba3762b",
+    "semantic_hash": "104ba4e59c5c0dafc4f793133ba3762b"
+  },
+  "src/games/dead-letter-department/render.test.ts": {
+    "mtime": 1785764259.3783693,
+    "ast_hash": "c2cff14cc31f382bf5d6875d96ee9606",
+    "semantic_hash": "c2cff14cc31f382bf5d6875d96ee9606"
+  },
+  "src/games/dead-letter-department/render.ts": {
+    "mtime": 1785764315.1556785,
+    "ast_hash": "5a928e190b0b701d3166abfa622b3fc6",
+    "semantic_hash": "5a928e190b0b701d3166abfa622b3fc6"
+  },
+  "src/games/dead-letter-department/rules.ts": {
+    "mtime": 1785315340.081611,
+    "ast_hash": "9b4a3420fec9cc9195f76ba71d76d712",
+    "semantic_hash": "9b4a3420fec9cc9195f76ba71d76d712"
+  },
+  "src/games/dead-letter-department/seed.ts": {
+    "mtime": 1785314808.2611725,
+    "ast_hash": "aa4ea51d554356267e89ce840aef9c0b",
+    "semantic_hash": "aa4ea51d554356267e89ce840aef9c0b"
+  },
+  "src/games/dead-letter-department/types.ts": {
+    "mtime": 1785764089.942477,
+    "ast_hash": "8ef3c6cda312e3c8128dc01694a58cfa",
+    "semantic_hash": "8ef3c6cda312e3c8128dc01694a58cfa"
+  },
+  "src/games/dice-tribunal/content.ts": {
+    "mtime": 1785581859.6718607,
+    "ast_hash": "db1014c323292b286b5e36964605b127",
+    "semantic_hash": "db1014c323292b286b5e36964605b127"
+  },
+  "src/games/dice-tribunal/engine.test.ts": {
+    "mtime": 1785582661.5247045,
+    "ast_hash": "f8e3d200ed9b841d4145971157de31b1",
+    "semantic_hash": "f8e3d200ed9b841d4145971157de31b1"
+  },
+  "src/games/dice-tribunal/engine.ts": {
+    "mtime": 1785582796.0611324,
+    "ast_hash": "20a454fe8db4ee8461c290ea43f15160",
+    "semantic_hash": "20a454fe8db4ee8461c290ea43f15160"
+  },
+  "src/games/dice-tribunal/evaluator.ts": {
+    "mtime": 1785582751.99845,
+    "ast_hash": "678c8568901bb2e5d0392a1493e9f4f9",
+    "semantic_hash": "678c8568901bb2e5d0392a1493e9f4f9"
+  },
+  "src/games/dice-tribunal/index.ts": {
+    "mtime": 1785649619.1765907,
+    "ast_hash": "5426c1f372ca52764bbdb99bb8b47685",
+    "semantic_hash": "5426c1f372ca52764bbdb99bb8b47685"
+  },
+  "src/games/dice-tribunal/render.ts": {
+    "mtime": 1785582877.2142098,
+    "ast_hash": "7c867b7bfc9a319763aa7d754ab16175",
+    "semantic_hash": "7c867b7bfc9a319763aa7d754ab16175"
+  },
+  "src/games/dice-tribunal/types.ts": {
+    "mtime": 1785581890.92653,
+    "ast_hash": "94d9d8a3fca698e134e6df86e3a6862d",
+    "semantic_hash": "94d9d8a3fca698e134e6df86e3a6862d"
+  },
+  "src/games/dungeon-courier/content.ts": {
+    "mtime": 1785612312.078295,
+    "ast_hash": "de714c18c3fd198d93bb40ecb9fcc76d",
+    "semantic_hash": "de714c18c3fd198d93bb40ecb9fcc76d"
+  },
+  "src/games/dungeon-courier/engine.test.ts": {
+    "mtime": 1785612750.7225902,
+    "ast_hash": "00b54d0de006fb5256e6298ac6ab8118",
+    "semantic_hash": "00b54d0de006fb5256e6298ac6ab8118"
+  },
+  "src/games/dungeon-courier/engine.ts": {
+    "mtime": 1785612865.831578,
+    "ast_hash": "d6d7e8a1e1b0416f018018f66b77df85",
+    "semantic_hash": "d6d7e8a1e1b0416f018018f66b77df85"
+  },
+  "src/games/dungeon-courier/index.ts": {
+    "mtime": 1785649618.288397,
+    "ast_hash": "cb033d61a61c5ab065f23376c362d6b0",
+    "semantic_hash": "cb033d61a61c5ab065f23376c362d6b0"
+  },
+  "src/games/dungeon-courier/render.ts": {
+    "mtime": 1785612873.3488085,
+    "ast_hash": "f965d27880e2e54f2bea4a09861218f6",
+    "semantic_hash": "f965d27880e2e54f2bea4a09861218f6"
+  },
+  "src/games/dungeon-courier/seed.ts": {
+    "mtime": 1785612311.0652285,
+    "ast_hash": "a00c2c4414a38129769d2654a14b0c03",
+    "semantic_hash": "a00c2c4414a38129769d2654a14b0c03"
+  },
+  "src/games/dungeon-courier/types.ts": {
+    "mtime": 1785612337.5099468,
+    "ast_hash": "bcdfaa44165a2a7863349af66813d44c",
+    "semantic_hash": "bcdfaa44165a2a7863349af66813d44c"
+  },
+  "src/games/effects/hack.ts": {
+    "mtime": 1785309977.7928078,
+    "ast_hash": "28c77fc8d6ac46a3a44ebbfa2a6ee829",
+    "semantic_hash": "28c77fc8d6ac46a3a44ebbfa2a6ee829"
+  },
+  "src/games/effects/index.ts": {
+    "mtime": 1785309977.802822,
+    "ast_hash": "e5c3297d2302ff74670affb7a9d7cdf6",
+    "semantic_hash": "e5c3297d2302ff74670affb7a9d7cdf6"
+  },
+  "src/games/effects/matrix.ts": {
+    "mtime": 1785309977.8131964,
+    "ast_hash": "1c270b3655d30b27d84031d1cf2b2621",
+    "semantic_hash": "1c270b3655d30b27d84031d1cf2b2621"
+  },
+  "src/games/effects/reboot.ts": {
+    "mtime": 1785309977.8231826,
+    "ast_hash": "b98c987742d0037ad922b34b101dfb42",
+    "semantic_hash": "b98c987742d0037ad922b34b101dfb42"
+  },
+  "src/games/five-minute-kingdom/engine.test.ts": {
+    "mtime": 1785511766.737194,
+    "ast_hash": "3036bcf590e29d83632e003534256f0f",
+    "semantic_hash": "3036bcf590e29d83632e003534256f0f"
+  },
+  "src/games/five-minute-kingdom/engine.ts": {
+    "mtime": 1785511537.8147652,
+    "ast_hash": "63764e0a54bcb95125abbf8ae3161edd",
+    "semantic_hash": "63764e0a54bcb95125abbf8ae3161edd"
+  },
+  "src/games/five-minute-kingdom/index.test.ts": {
+    "mtime": 1785764025.8454163,
+    "ast_hash": "b3dcb734d7576016b6b092a905b9966c",
+    "semantic_hash": "b3dcb734d7576016b6b092a905b9966c"
+  },
+  "src/games/five-minute-kingdom/index.ts": {
+    "mtime": 1785764713.4741516,
+    "ast_hash": "1e54c9d89e0905bda23a25377a428c77",
+    "semantic_hash": "1e54c9d89e0905bda23a25377a428c77"
+  },
+  "src/games/five-minute-kingdom/render.test.ts": {
+    "mtime": 1785763977.858572,
+    "ast_hash": "8fc7febe319fb07f9b8e7b9d8a0d7553",
+    "semantic_hash": "8fc7febe319fb07f9b8e7b9d8a0d7553"
+  },
+  "src/games/five-minute-kingdom/render.ts": {
+    "mtime": 1785763994.1293316,
+    "ast_hash": "0af805c2fda7c7aa3dfee72dbbe3b567",
+    "semantic_hash": "0af805c2fda7c7aa3dfee72dbbe3b567"
+  },
+  "src/games/frogger/index.ts": {
+    "mtime": 1785649844.1977746,
+    "ast_hash": "fb9018bbbe5aa2c66d8aac2cc3d93428",
+    "semantic_hash": "fb9018bbbe5aa2c66d8aac2cc3d93428"
+  },
+  "src/games/gameTransitions.ts": {
+    "mtime": 1785309977.6328878,
+    "ast_hash": "1366de6e7a9144b2ffc1e4569cffdf45",
+    "semantic_hash": "1366de6e7a9144b2ffc1e4569cffdf45"
+  },
+  "src/games/gamesMenu.test.ts": {
+    "mtime": 1785761949.5841763,
+    "ast_hash": "058be83579edfc07baf66c6e999fd81b",
+    "semantic_hash": "058be83579edfc07baf66c6e999fd81b"
+  },
+  "src/games/gamesMenu.ts": {
+    "mtime": 1785761910.6995144,
+    "ast_hash": "6e18679ef3fd692b5da812b7c148db63",
+    "semantic_hash": "6e18679ef3fd692b5da812b7c148db63"
+  },
+  "src/games/ghost-shift/content.ts": {
+    "mtime": 1785494985.4022243,
+    "ast_hash": "dc9ff5adaf5015854746043dfe4bc499",
+    "semantic_hash": "dc9ff5adaf5015854746043dfe4bc499"
+  },
+  "src/games/ghost-shift/engine.test.ts": {
+    "mtime": 1785495252.049776,
+    "ast_hash": "b6ec3aa19224ca6e287785552e6776ac",
+    "semantic_hash": "b6ec3aa19224ca6e287785552e6776ac"
+  },
+  "src/games/ghost-shift/engine.ts": {
+    "mtime": 1785495291.9063396,
+    "ast_hash": "b38f7d3ec226a3075e374c1615a7fdea",
+    "semantic_hash": "b38f7d3ec226a3075e374c1615a7fdea"
+  },
+  "src/games/ghost-shift/index.ts": {
+    "mtime": 1785649615.7550712,
+    "ast_hash": "88a4ecf0803c64a96034cf1357c7d3c7",
+    "semantic_hash": "88a4ecf0803c64a96034cf1357c7d3c7"
+  },
+  "src/games/ghost-shift/render.ts": {
+    "mtime": 1785495293.6699378,
+    "ast_hash": "8c2a19a47acbf884a9efe5b80fb805b4",
+    "semantic_hash": "8c2a19a47acbf884a9efe5b80fb805b4"
+  },
+  "src/games/ghost-shift/types.ts": {
+    "mtime": 1785494945.1753762,
+    "ast_hash": "67999cf26562d1ce8ad481ec538e2132",
+    "semantic_hash": "67999cf26562d1ce8ad481ec538e2132"
+  },
+  "src/games/hangman/index.ts": {
+    "mtime": 1785649721.8680289,
+    "ast_hash": "bcd5238c6b4562e1abf64420349e0f76",
+    "semantic_hash": "bcd5238c6b4562e1abf64420349e0f76"
+  },
+  "src/games/hyper-fighter/ai.ts": {
+    "mtime": 1785309977.8726,
+    "ast_hash": "7143aaa48053745e32bbcec3bd2018e5",
+    "semantic_hash": "7143aaa48053745e32bbcec3bd2018e5"
+  },
+  "src/games/hyper-fighter/characters.ts": {
+    "mtime": 1785309977.8893821,
+    "ast_hash": "73e581885f99519d475daa045c629537",
+    "semantic_hash": "73e581885f99519d475daa045c629537"
+  },
+  "src/games/hyper-fighter/effects.ts": {
+    "mtime": 1785309977.8893821,
+    "ast_hash": "23745e4e7041b6edc72d69d9c1ceb8a9",
+    "semantic_hash": "23745e4e7041b6edc72d69d9c1ceb8a9"
+  },
+  "src/games/hyper-fighter/engine.test.ts": {
+    "mtime": 1785309977.9044597,
+    "ast_hash": "aa5b3cbbde4a396b4e5bd9bfe3d55062",
+    "semantic_hash": "aa5b3cbbde4a396b4e5bd9bfe3d55062"
+  },
+  "src/games/hyper-fighter/engine.ts": {
+    "mtime": 1785309977.9207883,
+    "ast_hash": "2d20b36a9310a84e0a73201f9ab30a9f",
+    "semantic_hash": "2d20b36a9310a84e0a73201f9ab30a9f"
+  },
+  "src/games/hyper-fighter/index.ts": {
+    "mtime": 1785309977.9293456,
+    "ast_hash": "d5fe5f51c67cfa87e38ffd9a5c41362b",
+    "semantic_hash": "d5fe5f51c67cfa87e38ffd9a5c41362b"
+  },
+  "src/games/index.ts": {
+    "mtime": 1785763497.5190492,
+    "ast_hash": "ffe886f7d18cb16c2361503ceba1fcc4",
+    "semantic_hash": "ffe886f7d18cb16c2361503ceba1fcc4"
+  },
+  "src/games/last-train-home/engine.test.ts": {
+    "mtime": 1785492290.02176,
+    "ast_hash": "d5c3ee86ec0cc880cdce4d70cacd6a0b",
+    "semantic_hash": "d5c3ee86ec0cc880cdce4d70cacd6a0b"
+  },
+  "src/games/last-train-home/engine.ts": {
+    "mtime": 1785492191.249467,
+    "ast_hash": "401e53fc30827c0902718f82f8627224",
+    "semantic_hash": "401e53fc30827c0902718f82f8627224"
+  },
+  "src/games/last-train-home/index.ts": {
+    "mtime": 1785649616.555001,
+    "ast_hash": "ab74afb6ac85c71aeb4e41b2974be19d",
+    "semantic_hash": "ab74afb6ac85c71aeb4e41b2974be19d"
+  },
+  "src/games/last-train-home/render.ts": {
+    "mtime": 1785511610.8448334,
+    "ast_hash": "5223ed4a16950cee20646d26b9f1f3ea",
+    "semantic_hash": "5223ed4a16950cee20646d26b9f1f3ea"
+  },
+  "src/games/last-train-home/scenarios.ts": {
+    "mtime": 1785492192.2371721,
+    "ast_hash": "95d09db3426796beeddc11b124997112",
+    "semantic_hash": "95d09db3426796beeddc11b124997112"
+  },
+  "src/games/last-train-home/seed.ts": {
+    "mtime": 1785492084.2767766,
+    "ast_hash": "e5943f64256ff867e93f94e1de436ed2",
+    "semantic_hash": "e5943f64256ff867e93f94e1de436ed2"
+  },
+  "src/games/last-train-home/types.ts": {
+    "mtime": 1785492161.040556,
+    "ast_hash": "e49bcc6b43cb4d539e5efc1715b7f987",
+    "semantic_hash": "e49bcc6b43cb4d539e5efc1715b7f987"
+  },
+  "src/games/market-of-mirrors/engine.test.ts": {
+    "mtime": 1785603954.1228101,
+    "ast_hash": "4a7efea73cf8dadd424381dfade82d64",
+    "semantic_hash": "4a7efea73cf8dadd424381dfade82d64"
+  },
+  "src/games/market-of-mirrors/engine.ts": {
+    "mtime": 1785604057.187137,
+    "ast_hash": "123c32532e1c3f86b113551d383dc10b",
+    "semantic_hash": "123c32532e1c3f86b113551d383dc10b"
+  },
+  "src/games/market-of-mirrors/index.ts": {
+    "mtime": 1785649621.771873,
+    "ast_hash": "0c30c5d7f48a18bb44ab63ce7ca0e538",
+    "semantic_hash": "0c30c5d7f48a18bb44ab63ce7ca0e538"
+  },
+  "src/games/minesweeper/index.ts": {
+    "mtime": 1785649845.1507628,
+    "ast_hash": "0207028454c066e2ffaa27374f48a976",
+    "semantic_hash": "0207028454c066e2ffaa27374f48a976"
+  },
+  "src/games/night-frequency/content.test.ts": {
+    "mtime": 1785614734.8170402,
+    "ast_hash": "ae2f507f37e5330b43e2086349ca98fb",
+    "semantic_hash": "ae2f507f37e5330b43e2086349ca98fb"
+  },
+  "src/games/night-frequency/content.ts": {
+    "mtime": 1785614733.8660872,
+    "ast_hash": "8b4c3eb00362dd2dbfffc5144f3c5592",
+    "semantic_hash": "8b4c3eb00362dd2dbfffc5144f3c5592"
+  },
+  "src/games/night-frequency/engine.test.ts": {
+    "mtime": 1785614651.2729006,
+    "ast_hash": "03d63b4bb8e18ea648a7db80e43c881c",
+    "semantic_hash": "03d63b4bb8e18ea648a7db80e43c881c"
+  },
+  "src/games/night-frequency/engine.ts": {
+    "mtime": 1785614595.7247982,
+    "ast_hash": "4aa008863142a2a38ffc4299803e3f4a",
+    "semantic_hash": "4aa008863142a2a38ffc4299803e3f4a"
+  },
+  "src/games/night-frequency/index.ts": {
+    "mtime": 1785649623.472003,
+    "ast_hash": "4534a2deefcfddc006848c14060dbb5c",
+    "semantic_hash": "4534a2deefcfddc006848c14060dbb5c"
+  },
+  "src/games/night-frequency/render.test.ts": {
+    "mtime": 1785614779.175737,
+    "ast_hash": "76b295c367ace288641742d212d9c893",
+    "semantic_hash": "76b295c367ace288641742d212d9c893"
+  },
+  "src/games/night-frequency/render.ts": {
+    "mtime": 1785614596.6993852,
+    "ast_hash": "84a6bed412cccaadb70b2ba77e14aff9",
+    "semantic_hash": "84a6bed412cccaadb70b2ba77e14aff9"
+  },
+  "src/games/night-frequency/types.ts": {
+    "mtime": 1785614187.2114868,
+    "ast_hash": "b21677ef060bcd7bca3b2bd73db9c9c1",
+    "semantic_hash": "b21677ef060bcd7bca3b2bd73db9c9c1"
+  },
+  "src/games/night-frequency/validate.ts": {
+    "mtime": 1785614731.7713199,
+    "ast_hash": "3f29f43cbf0d7b4de08b81554e68f589",
+    "semantic_hash": "3f29f43cbf0d7b4de08b81554e68f589"
+  },
+  "src/games/orbital-post/content.ts": {
+    "mtime": 1785580360.895463,
+    "ast_hash": "a00087a83e0b0db21738524d6fabaf74",
+    "semantic_hash": "a00087a83e0b0db21738524d6fabaf74"
+  },
+  "src/games/orbital-post/engine.test.ts": {
+    "mtime": 1785580231.622045,
+    "ast_hash": "5e906556aa8544121a7de67945dd47f1",
+    "semantic_hash": "5e906556aa8544121a7de67945dd47f1"
+  },
+  "src/games/orbital-post/engine.ts": {
+    "mtime": 1785580456.8934467,
+    "ast_hash": "cce4a04adaf9c029b81adbdb38108c0a",
+    "semantic_hash": "cce4a04adaf9c029b81adbdb38108c0a"
+  },
+  "src/games/orbital-post/index.ts": {
+    "mtime": 1785649622.6195862,
+    "ast_hash": "c927e0b9d104018816c619628d961cac",
+    "semantic_hash": "c927e0b9d104018816c619628d961cac"
+  },
+  "src/games/orbital-post/render.ts": {
+    "mtime": 1785580413.8332093,
+    "ast_hash": "08c1ffc6e58dca0cfed55f9fe6a6100b",
+    "semantic_hash": "08c1ffc6e58dca0cfed55f9fe6a6100b"
+  },
+  "src/games/orbital-post/types.ts": {
+    "mtime": 1785579757.0084581,
+    "ast_hash": "4573a26dc64647ed90067a8c3aa1fcd8",
+    "semantic_hash": "4573a26dc64647ed90067a8c3aa1fcd8"
+  },
+  "src/games/packet-panic/engine.test.ts": {
+    "mtime": 1785764645.7226472,
+    "ast_hash": "47a88e839e9049988b714cf469780b32",
+    "semantic_hash": "47a88e839e9049988b714cf469780b32"
+  },
+  "src/games/packet-panic/engine.ts": {
+    "mtime": 1785764678.9307559,
+    "ast_hash": "7e680ae072d45358689c42f20532f82b",
+    "semantic_hash": "7e680ae072d45358689c42f20532f82b"
+  },
+  "src/games/packet-panic/index.test.ts": {
+    "mtime": 1785764664.436721,
+    "ast_hash": "bb3c26c4c38a7494b4708f40bb4cacfd",
+    "semantic_hash": "bb3c26c4c38a7494b4708f40bb4cacfd"
+  },
+  "src/games/packet-panic/index.ts": {
+    "mtime": 1785764591.5347784,
+    "ast_hash": "cfe984851a1413cd0ed5a75244c51723",
+    "semantic_hash": "cfe984851a1413cd0ed5a75244c51723"
+  },
+  "src/games/packet-panic/render.test.ts": {
+    "mtime": 1785764625.1409109,
+    "ast_hash": "76c0ec4b19ee52ff7ab37c835a8d088f",
+    "semantic_hash": "76c0ec4b19ee52ff7ab37c835a8d088f"
+  },
+  "src/games/packet-panic/render.ts": {
+    "mtime": 1785764460.6447363,
+    "ast_hash": "75a43424f0b431d7f55a7d6da1d91ecd",
+    "semantic_hash": "75a43424f0b431d7f55a7d6da1d91ecd"
+  },
+  "src/games/packet-panic/types.ts": {
+    "mtime": 1785313047.705496,
+    "ast_hash": "d60ac822806042d03322eb4be84ac12f",
+    "semantic_hash": "d60ac822806042d03322eb4be84ac12f"
+  },
+  "src/games/pong/index.ts": {
+    "mtime": 1785649723.6942601,
+    "ast_hash": "a06194046415986b47353f7ebc50dff9",
+    "semantic_hash": "a06194046415986b47353f7ebc50dff9"
+  },
+  "src/games/rogue-ledger/engine.test.ts": {
+    "mtime": 1785493209.2428176,
+    "ast_hash": "e9e78dc70abfea4f93a5fd6c034ade5a",
+    "semantic_hash": "e9e78dc70abfea4f93a5fd6c034ade5a"
+  },
+  "src/games/rogue-ledger/engine.ts": {
+    "mtime": 1785493086.9439871,
+    "ast_hash": "bf43b166b5f39833065fb314c61362f3",
+    "semantic_hash": "bf43b166b5f39833065fb314c61362f3"
+  },
+  "src/games/rogue-ledger/index.ts": {
+    "mtime": 1785649624.3553505,
+    "ast_hash": "6293b58e5f7c01f7a4c51b33afb2ab56",
+    "semantic_hash": "6293b58e5f7c01f7a4c51b33afb2ab56"
+  },
+  "src/games/runner/index.ts": {
+    "mtime": 1785649722.8001418,
+    "ast_hash": "ad3286040cc86e3e6d085ec54c92bf68",
+    "semantic_hash": "ad3286040cc86e3e6d085ec54c92bf68"
+  },
+  "src/games/shared/effects.ts": {
+    "mtime": 1785309977.9988732,
+    "ast_hash": "c36f02652414cf42874c0a5cc1d6ec7b",
+    "semantic_hash": "c36f02652414cf42874c0a5cc1d6ec7b"
+  },
+  "src/games/shared/index.ts": {
+    "mtime": 1785309978.01466,
+    "ast_hash": "de77bf16bb120a20c6565ba7d4b477b0",
+    "semantic_hash": "de77bf16bb120a20c6565ba7d4b477b0"
+  },
+  "src/games/shared/menu.test.ts": {
+    "mtime": 1785309978.0295377,
+    "ast_hash": "4bc932201b1c47c32bb7dfb2255f5b46",
+    "semantic_hash": "4bc932201b1c47c32bb7dfb2255f5b46"
+  },
+  "src/games/shared/menu.ts": {
+    "mtime": 1785309978.0400805,
+    "ast_hash": "88b596f084a8be83a89d10a937b29658",
+    "semantic_hash": "88b596f084a8be83a89d10a937b29658"
+  },
+  "src/games/signal-noise/content.ts": {
+    "mtime": 1785485899.8440433,
+    "ast_hash": "f1aeb6c62291206b2222dd0caa41f455",
+    "semantic_hash": "f1aeb6c62291206b2222dd0caa41f455"
+  },
+  "src/games/signal-noise/engine.test.ts": {
+    "mtime": 1785486199.9666107,
+    "ast_hash": "c1631627167f22c8c95a136028a5fcda",
+    "semantic_hash": "c1631627167f22c8c95a136028a5fcda"
+  },
+  "src/games/signal-noise/engine.ts": {
+    "mtime": 1785486178.8504333,
+    "ast_hash": "6094070f5f7fd9c5f4bcd107cd745dff",
+    "semantic_hash": "6094070f5f7fd9c5f4bcd107cd745dff"
+  },
+  "src/games/signal-noise/index.ts": {
+    "mtime": 1785649625.1929593,
+    "ast_hash": "3a8c73075010b04460e58a25d67080d4",
+    "semantic_hash": "3a8c73075010b04460e58a25d67080d4"
+  },
+  "src/games/signal-noise/render.ts": {
+    "mtime": 1785486120.3725076,
+    "ast_hash": "41b57344e07ca8e9a18fbacd1a4bbaea",
+    "semantic_hash": "41b57344e07ca8e9a18fbacd1a4bbaea"
+  },
+  "src/games/signal-noise/spectrum.ts": {
+    "mtime": 1785485935.679224,
+    "ast_hash": "7cf3b68933f4995210636ecbc9a98112",
+    "semantic_hash": "7cf3b68933f4995210636ecbc9a98112"
+  },
+  "src/games/signal-noise/triangulation.ts": {
+    "mtime": 1785486177.925437,
+    "ast_hash": "21da5512d6dc8f3f5e6494cba4bf7ce1",
+    "semantic_hash": "21da5512d6dc8f3f5e6494cba4bf7ce1"
+  },
+  "src/games/signal-noise/types.ts": {
+    "mtime": 1785486176.993315,
+    "ast_hash": "a34617dbc7e049dd257c677d6a5dc1fe",
+    "semantic_hash": "a34617dbc7e049dd257c677d6a5dc1fe"
+  },
+  "src/games/simon/index.ts": {
+    "mtime": 1785649846.9863427,
+    "ast_hash": "7e42f0bbcb7821e134dedf692f8e7acf",
+    "semantic_hash": "7e42f0bbcb7821e134dedf692f8e7acf"
+  },
+  "src/games/snake/index.ts": {
+    "mtime": 1785649725.636581,
+    "ast_hash": "12f2d295ae675a19d916f3da12f817a3",
+    "semantic_hash": "12f2d295ae675a19d916f3da12f817a3"
+  },
+  "src/games/spaceinvaders/index.ts": {
+    "mtime": 1785649724.677382,
+    "ast_hash": "dccdd4f8824106f0a5c59ff9887d0bd5",
+    "semantic_hash": "dccdd4f8824106f0a5c59ff9887d0bd5"
+  },
+  "src/games/stack-trace/content.ts": {
+    "mtime": 1785496381.5341046,
+    "ast_hash": "783949359575c4b6b49253c25ab1db6f",
+    "semantic_hash": "783949359575c4b6b49253c25ab1db6f"
+  },
+  "src/games/stack-trace/daily.ts": {
+    "mtime": 1785496742.5542867,
+    "ast_hash": "493c5644f91f74fca936c27a2b7e568b",
+    "semantic_hash": "493c5644f91f74fca936c27a2b7e568b"
+  },
+  "src/games/stack-trace/engine.test.ts": {
+    "mtime": 1785496675.2949708,
+    "ast_hash": "1a7519ba488d052ccf4d12d8667a1198",
+    "semantic_hash": "1a7519ba488d052ccf4d12d8667a1198"
+  },
+  "src/games/stack-trace/engine.ts": {
+    "mtime": 1785496743.6720748,
+    "ast_hash": "356d01d20f10443373f5eec1adb849e7",
+    "semantic_hash": "356d01d20f10443373f5eec1adb849e7"
+  },
+  "src/games/stack-trace/index.test.ts": {
+    "mtime": 1785763654.552928,
+    "ast_hash": "2e09e923e99b49f9e5054f597d40b141",
+    "semantic_hash": "2e09e923e99b49f9e5054f597d40b141"
+  },
+  "src/games/stack-trace/index.ts": {
+    "mtime": 1785763601.675772,
+    "ast_hash": "49525669a122673010caa7e442b9331e",
+    "semantic_hash": "49525669a122673010caa7e442b9331e"
+  },
+  "src/games/stack-trace/machine.test.ts": {
+    "mtime": 1785496673.977047,
+    "ast_hash": "2a2b90c1c3d7fb6e37d853a16113f7d0",
+    "semantic_hash": "2a2b90c1c3d7fb6e37d853a16113f7d0"
+  },
+  "src/games/stack-trace/machine.ts": {
+    "mtime": 1785496594.7821584,
+    "ast_hash": "da12cd2d908dab4ac8288fcc364b1ae2",
+    "semantic_hash": "da12cd2d908dab4ac8288fcc364b1ae2"
+  },
+  "src/games/stack-trace/render.test.ts": {
+    "mtime": 1785763630.5359066,
+    "ast_hash": "5838a7885d2ca2f111a0271affbcdb8a",
+    "semantic_hash": "5838a7885d2ca2f111a0271affbcdb8a"
+  },
+  "src/games/stack-trace/render.ts": {
+    "mtime": 1785763683.3057673,
+    "ast_hash": "13040c9a2429938140f2cce85ac4adef",
+    "semantic_hash": "13040c9a2429938140f2cce85ac4adef"
+  },
+  "src/games/stack-trace/types.ts": {
+    "mtime": 1785496328.01423,
+    "ast_hash": "41c35e40b51aa0e6c916a4f7418f9de4",
+    "semantic_hash": "41c35e40b51aa0e6c916a4f7418f9de4"
+  },
+  "src/games/tetris/index.ts": {
+    "mtime": 1785649727.4477727,
+    "ast_hash": "e93ab6b8854a891706157354b99d5564",
+    "semantic_hash": "e93ab6b8854a891706157354b99d5564"
+  },
+  "src/games/the-13th-lift/content.ts": {
+    "mtime": 1785617888.4804273,
+    "ast_hash": "37d72a9bdf8a3d1b8a93ba5f3c2beea1",
+    "semantic_hash": "37d72a9bdf8a3d1b8a93ba5f3c2beea1"
+  },
+  "src/games/the-13th-lift/engine.test.ts": {
+    "mtime": 1785618351.6815224,
+    "ast_hash": "65f04a32497dd2ef5f2aa32ff8e57d18",
+    "semantic_hash": "65f04a32497dd2ef5f2aa32ff8e57d18"
+  },
+  "src/games/the-13th-lift/engine.ts": {
+    "mtime": 1785618295.9691584,
+    "ast_hash": "04725a61c01d744dc16387382abe3b61",
+    "semantic_hash": "04725a61c01d744dc16387382abe3b61"
+  },
+  "src/games/the-13th-lift/generator.test.ts": {
+    "mtime": 1785618350.5418873,
+    "ast_hash": "d7cbddc2fc6e6051e39fc065b3f0e829",
+    "semantic_hash": "d7cbddc2fc6e6051e39fc065b3f0e829"
+  },
+  "src/games/the-13th-lift/generator.ts": {
+    "mtime": 1785618010.6444397,
+    "ast_hash": "8cf61f82d1bb43e676e1c222ff04c98b",
+    "semantic_hash": "8cf61f82d1bb43e676e1c222ff04c98b"
+  },
+  "src/games/the-13th-lift/index.ts": {
+    "mtime": 1785618234.9791074,
+    "ast_hash": "98f1d015dbd57d4d48a5ae60b499ad7e",
+    "semantic_hash": "98f1d015dbd57d4d48a5ae60b499ad7e"
+  },
+  "src/games/the-13th-lift/render.test.ts": {
+    "mtime": 1785618352.9726317,
+    "ast_hash": "5fbff114d0996eabcc1d78f3dd768d3a",
+    "semantic_hash": "5fbff114d0996eabcc1d78f3dd768d3a"
+  },
+  "src/games/the-13th-lift/render.ts": {
+    "mtime": 1785618297.160495,
+    "ast_hash": "b2e182f8554ca21eaa9957121a83a2b0",
+    "semantic_hash": "b2e182f8554ca21eaa9957121a83a2b0"
+  },
+  "src/games/the-13th-lift/seed.ts": {
+    "mtime": 1785617845.2748055,
+    "ast_hash": "0b65451b75856fbd6813d66757979953",
+    "semantic_hash": "0b65451b75856fbd6813d66757979953"
+  },
+  "src/games/the-13th-lift/solver.test.ts": {
+    "mtime": 1785618349.319662,
+    "ast_hash": "90548538b2ac26a3b0320d0d3e247f07",
+    "semantic_hash": "90548538b2ac26a3b0320d0d3e247f07"
+  },
+  "src/games/the-13th-lift/solver.ts": {
+    "mtime": 1785618298.3659995,
+    "ast_hash": "8012f89ab882ed3c3c6eecf682dc29a5",
+    "semantic_hash": "8012f89ab882ed3c3c6eecf682dc29a5"
+  },
+  "src/games/the-13th-lift/types.ts": {
+    "mtime": 1785617831.6015642,
+    "ast_hash": "92d26279fca29f170101f0e35416eed8",
+    "semantic_hash": "92d26279fca29f170101f0e35416eed8"
+  },
+  "src/games/the-quiet-heist/engine.test.ts": {
+    "mtime": 1785504601.046417,
+    "ast_hash": "75e23a8da0efa889820c853531c0ca13",
+    "semantic_hash": "75e23a8da0efa889820c853531c0ca13"
+  },
+  "src/games/the-quiet-heist/engine.ts": {
+    "mtime": 1785504561.4217918,
+    "ast_hash": "9fee6b403ec060d8abfef378604e3081",
+    "semantic_hash": "9fee6b403ec060d8abfef378604e3081"
+  },
+  "src/games/the-quiet-heist/index.ts": {
+    "mtime": 1785649626.8878763,
+    "ast_hash": "7f601bc9014de9d255772e41ef5b66b8",
+    "semantic_hash": "7f601bc9014de9d255772e41ef5b66b8"
+  },
+  "src/games/the-quiet-heist/render.ts": {
+    "mtime": 1785504637.3590205,
+    "ast_hash": "dd2746cc020f0c448fa6ed547c69289b",
+    "semantic_hash": "dd2746cc020f0c448fa6ed547c69289b"
+  },
+  "src/games/the-quiet-heist/types.ts": {
+    "mtime": 1785504264.4498987,
+    "ast_hash": "0a7d2732150257f6e907be27f4f9504b",
+    "semantic_hash": "0a7d2732150257f6e907be27f4f9504b"
+  },
+  "src/games/time-capsule/content.ts": {
+    "mtime": 1785588999.376748,
+    "ast_hash": "995eb9e3ecbe8cc3d50ab6225202106f",
+    "semantic_hash": "995eb9e3ecbe8cc3d50ab6225202106f"
+  },
+  "src/games/time-capsule/engine.test.ts": {
+    "mtime": 1785589220.459237,
+    "ast_hash": "a63f3371ddcd07562cdf7fea63782803",
+    "semantic_hash": "a63f3371ddcd07562cdf7fea63782803"
+  },
+  "src/games/time-capsule/engine.ts": {
+    "mtime": 1785589044.3251064,
+    "ast_hash": "599550abc49c4558854762af269130be",
+    "semantic_hash": "599550abc49c4558854762af269130be"
+  },
+  "src/games/time-capsule/index.ts": {
+    "mtime": 1785649627.7888122,
+    "ast_hash": "4a66a909eb9e44ba3854acaf5dd5c957",
+    "semantic_hash": "4a66a909eb9e44ba3854acaf5dd5c957"
+  },
+  "src/games/time-capsule/render.ts": {
+    "mtime": 1785589054.5869844,
+    "ast_hash": "93a6dacc44fc46e67ce59c0188ff64f0",
+    "semantic_hash": "93a6dacc44fc46e67ce59c0188ff64f0"
+  },
+  "src/games/time-capsule/types.ts": {
+    "mtime": 1785588501.9245663,
+    "ast_hash": "64f631f5e11e0af386151b56cc7a8241",
+    "semantic_hash": "64f631f5e11e0af386151b56cc7a8241"
+  },
+  "src/games/time-capsule/validate.test.ts": {
+    "mtime": 1785589306.7338338,
+    "ast_hash": "e212898184bfb39580206c2029b3b08b",
+    "semantic_hash": "e212898184bfb39580206c2029b3b08b"
+  },
+  "src/games/time-capsule/validate.ts": {
+    "mtime": 1785589314.1195667,
+    "ast_hash": "dc479ce072732abeb52f5b8e32f2fa62",
+    "semantic_hash": "dc479ce072732abeb52f5b8e32f2fa62"
+  },
+  "src/games/tiny-fleet/ai.ts": {
+    "mtime": 1785600292.286575,
+    "ast_hash": "94346f05dbb26dd1532f8b47601d3d3f",
+    "semantic_hash": "94346f05dbb26dd1532f8b47601d3d3f"
+  },
+  "src/games/tiny-fleet/content.ts": {
+    "mtime": 1785600843.0201297,
+    "ast_hash": "032a27a1c5e0815747539343a7056880",
+    "semantic_hash": "032a27a1c5e0815747539343a7056880"
+  },
+  "src/games/tiny-fleet/engine.test.ts": {
+    "mtime": 1785600874.2442331,
+    "ast_hash": "280fea4e3a9d1b9db077a2f61c717a3f",
+    "semantic_hash": "280fea4e3a9d1b9db077a2f61c717a3f"
+  },
+  "src/games/tiny-fleet/engine.ts": {
+    "mtime": 1785600797.2952714,
+    "ast_hash": "7914b57f45b1fb9501dfaf7c6e4535f4",
+    "semantic_hash": "7914b57f45b1fb9501dfaf7c6e4535f4"
+  },
+  "src/games/tiny-fleet/grid.test.ts": {
+    "mtime": 1785600672.091521,
+    "ast_hash": "3b55ece909d2b789449ec5a9028d8a9e",
+    "semantic_hash": "3b55ece909d2b789449ec5a9028d8a9e"
+  },
+  "src/games/tiny-fleet/grid.ts": {
+    "mtime": 1785600698.397624,
+    "ast_hash": "704198cc9ec1aeee46c620a3d790f6c8",
+    "semantic_hash": "704198cc9ec1aeee46c620a3d790f6c8"
+  },
+  "src/games/tiny-fleet/index.ts": {
+    "mtime": 1785649628.6398468,
+    "ast_hash": "47acabaae57dca63190fd1bf43cc3fdc",
+    "semantic_hash": "47acabaae57dca63190fd1bf43cc3fdc"
+  },
+  "src/games/tiny-fleet/render.ts": {
+    "mtime": 1785600845.3885062,
+    "ast_hash": "d97c9c675c09d231952f0057ec8b71b2",
+    "semantic_hash": "d97c9c675c09d231952f0057ec8b71b2"
+  },
+  "src/games/tiny-fleet/seed.ts": {
+    "mtime": 1785600171.2808318,
+    "ast_hash": "eaeaf1539f3fc7f791fcbe4d1148f06a",
+    "semantic_hash": "eaeaf1539f3fc7f791fcbe4d1148f06a"
+  },
+  "src/games/tiny-fleet/types.ts": {
+    "mtime": 1785600163.3207343,
+    "ast_hash": "0ed4dba75aa1a10f805f3378c0af02d0",
+    "semantic_hash": "0ed4dba75aa1a10f805f3378c0af02d0"
+  },
+  "src/games/tower/index.ts": {
+    "mtime": 1785309978.1092978,
+    "ast_hash": "e384d40fc4d42414d3f892a1be90881d",
+    "semantic_hash": "e384d40fc4d42414d3f892a1be90881d"
+  },
+  "src/games/tron/index.ts": {
+    "mtime": 1785649728.3664153,
+    "ast_hash": "e7117fbe8294fae3742fa76f1b13280d",
+    "semantic_hash": "e7117fbe8294fae3742fa76f1b13280d"
+  },
+  "src/games/typingtest/index.ts": {
+    "mtime": 1785649726.5765436,
+    "ast_hash": "ebfdc079fae8d988399cd32e6320b2eb",
+    "semantic_hash": "ebfdc079fae8d988399cd32e6320b2eb"
+  },
+  "src/games/utils.test.ts": {
+    "mtime": 1785658295.4656658,
+    "ast_hash": "ae1bf132fc5482bd054c9debbd3954b1",
+    "semantic_hash": "ae1bf132fc5482bd054c9debbd3954b1"
+  },
+  "src/games/utils.ts": {
+    "mtime": 1785763469.0061445,
+    "ast_hash": "e693fb5f08900e88c35cbadecea5f35a",
+    "semantic_hash": "e693fb5f08900e88c35cbadecea5f35a"
+  },
+  "src/games/wordle/index.ts": {
+    "mtime": 1785649846.1201856,
+    "ast_hash": "ba6799cd2db7cfb559f7e2d9afd94a1c",
+    "semantic_hash": "ba6799cd2db7cfb559f7e2d9afd94a1c"
+  },
+  "src/index.ts": {
+    "mtime": 1785763505.3206823,
+    "ast_hash": "a32cec969ec926450c16a6a8f01fd8fc",
+    "semantic_hash": "a32cec969ec926450c16a6a8f01fd8fc"
+  },
+  "src/playtest/determinism.ts": {
+    "mtime": 1785771646.5616288,
+    "ast_hash": "27f0db61017b6a6af870513fa9391b4c",
+    "semantic_hash": "27f0db61017b6a6af870513fa9391b4c"
+  },
+  "src/playtest/index.ts": {
+    "mtime": 1785774069.5143895,
+    "ast_hash": "553719a7bbb6c17bb0b12c0ce448712e",
+    "semantic_hash": "553719a7bbb6c17bb0b12c0ce448712e"
+  },
+  "src/playtest/playtest.test.ts": {
+    "mtime": 1785774193.6971235,
+    "ast_hash": "0260e43603b69a999d0a9d42f5a388db",
+    "semantic_hash": "0260e43603b69a999d0a9d42f5a388db"
+  },
+  "src/playtest/runner.ts": {
+    "mtime": 1785773384.8743207,
+    "ast_hash": "56064b8546376bd9e4b305b672b461bc",
+    "semantic_hash": "56064b8546376bd9e4b305b672b461bc"
+  },
+  "src/playtest/screen.ts": {
+    "mtime": 1785771523.7849348,
+    "ast_hash": "d291ea39d6a53a0c90f655e60c5a7cbf",
+    "semantic_hash": "d291ea39d6a53a0c90f655e60c5a7cbf"
+  },
+  "src/playtest/specs.ts": {
+    "mtime": 1785774192.5229905,
+    "ast_hash": "68252ab63d97245479a0bfac38dc46e5",
+    "semantic_hash": "68252ab63d97245479a0bfac38dc46e5"
+  },
+  "src/playtest/terminal.ts": {
+    "mtime": 1785771456.9855833,
+    "ast_hash": "8e40a8ed4cb84440be56537b3b4f0c04",
+    "semantic_hash": "8e40a8ed4cb84440be56537b3b4f0c04"
+  },
+  "src/playtest/types.ts": {
+    "mtime": 1785773323.500355,
+    "ast_hash": "d1d4f4e9c98b770d16c6f940c361faf0",
+    "semantic_hash": "d1d4f4e9c98b770d16c6f940c361faf0"
+  },
+  "src/themes/index.test.ts": {
+    "mtime": 1785761786.3449793,
+    "ast_hash": "0353e778175a10e0db2b8b817348d496",
+    "semantic_hash": "0353e778175a10e0db2b8b817348d496"
+  },
+  "src/themes/index.ts": {
+    "mtime": 1785761560.192769,
+    "ast_hash": "0eacf706ef03c5e5fe69005ddc2023e6",
+    "semantic_hash": "0eacf706ef03c5e5fe69005ddc2023e6"
+  },
+  "src/ui/terminal.test.ts": {
+    "mtime": 1785761785.3133934,
+    "ast_hash": "c77405dfeb193402dc5f8737840bd22d",
+    "semantic_hash": "c77405dfeb193402dc5f8737840bd22d"
+  },
+  "src/ui/terminal.ts": {
+    "mtime": 1785761596.0001636,
+    "ast_hash": "700bb5b2958c8a6105cf731b75c0e447",
+    "semantic_hash": "700bb5b2958c8a6105cf731b75c0e447"
+  },
+  "src/update-check.test.ts": {
+    "mtime": 1785658389.2726097,
+    "ast_hash": "23cf357e3e84922a2fc73f34a0d9ac78",
+    "semantic_hash": "23cf357e3e84922a2fc73f34a0d9ac78"
+  },
+  "src/update-check.ts": {
+    "mtime": 1785658388.2322042,
+    "ast_hash": "4e66f0efc40a364931c7fb2f3821a156",
+    "semantic_hash": "4e66f0efc40a364931c7fb2f3821a156"
+  },
+  "tsconfig.json": {
+    "mtime": 1785309977.4648533,
+    "ast_hash": "40fc4ce4997f9e047c4bea1660efe28a",
+    "semantic_hash": "40fc4ce4997f9e047c4bea1660efe28a"
+  },
+  "tsup.config.ts": {
+    "mtime": 1785771654.525296,
+    "ast_hash": "d0d426cfb3a89ed8a932958e22761c57",
+    "semantic_hash": "d0d426cfb3a89ed8a932958e22761c57"
+  }
+}

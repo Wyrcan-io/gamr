@@ -6,6 +6,14 @@ export type PacketClass = 'distress' | 'relay' | 'quarantine' | 'challenge' | 'm
 export type BroadcastAction = 'ack-hold' | 'ack-relay' | 'silence' | 'jam-mark';
 export type Phase = 'start' | 'brief' | 'listening' | 'broadcast' | 'debrief' | 'gameOver' | 'ending';
 export type Direction = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+export type DiagnosticDimension = 'station' | 'centre' | 'bandwidth' | 'modulation' | 'gain' | 'noise';
+
+export interface LockDiagnostic {
+  dimension: DiagnosticDimension;
+  status: 'blocked' | 'low' | 'high' | 'mismatch';
+  evidence: string;
+  nextAction: string;
+}
 
 export interface Position { x: number; y: number; }
 export interface Tuner { centre: number; bandwidth: 1 | 3 | 5; modulation: Modulation; gain: 1 | 2 | 3 | 4 | 5; }
@@ -79,6 +87,8 @@ export interface CaseState {
   candidateZones: Position[];
   selectedBroadcast: BroadcastAction | null;
   lastResult: 'correct' | 'wrong' | 'expired' | null;
+  lastDiagnostic: LockDiagnostic | null;
+  tutorialStep: number | null;
   score: number;
   notice: string;
   appliedEvents: string[];

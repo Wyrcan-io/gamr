@@ -1,6 +1,6 @@
 import { mixSeed } from './seed';
 import { scenarios } from './scenarios';
-import type { Command, CommandResult, Direction, GameState, LogEntry, Point, Scenario, Tile, Train, TurnResolution } from './types';
+import type { Command, CommandResult, Direction, GameState, LogEntry, Point, Scenario, Tile, Train, TurnProjection, TurnResolution } from './types';
 
 const DELTAS: Record<Direction, Point> = { N: { x: 0, y: -1 }, E: { x: 1, y: 0 }, S: { x: 0, y: 1 }, W: { x: -1, y: 0 } };
 const OPPOSITE: Record<Direction, Direction> = { N: 'S', E: 'W', S: 'N', W: 'E' };
@@ -21,7 +21,7 @@ function freshScenario(seed: number, index: number): Scenario { return cloneScen
 export function createState(seed = Date.now(), scenarioIndex = 0, tutorial = false): GameState {
   const scenario = freshScenario(seed >>> 0, scenarioIndex);
   const trains = Object.fromEntries(scenario.trains.map(train => [train.id, train]));
-  return { version: 1, seed: seed >>> 0, phase: 'start', scenarioIndex, scenario, turn: 1, maxTurns: scenario.maxTurns, actionPoints: 2, repairUsedThisTurn: false, trains, selected: { kind: 'tile', point: { x: 3, y: 5 } }, forecast: scenario.hazards, resolvedEvents: [], evacuatedPeople: 0, evacuatedSupplies: 0, targetPeople: scenario.targetPeople, targetSupplies: scenario.targetSupplies, eventLog: [], lastResolution: null, tutorialStep: tutorial ? 0 : null, helpOpen: false };
+  return { version: 1, seed: seed >>> 0, mode: tutorial ? 'tutorial' : 'campaign', phase: 'start', scenarioIndex, scenario, turn: 1, maxTurns: scenario.maxTurns, actionPoints: 2, repairUsedThisTurn: false, trains, selected: { kind: 'tile', point: { x: 3, y: 5 } }, forecast: scenario.hazards, resolvedEvents: [], evacuatedPeople: 0, evacuatedSupplies: 0, targetPeople: scenario.targetPeople, targetSupplies: scenario.targetSupplies, eventLog: [], lastResolution: null, tutorialStep: tutorial ? 0 : null, helpOpen: false };
 }
 
 function moveSelection(state: GameState, dx: number, dy: number): void {
@@ -62,17 +62,11 @@ function clearObstruction(state: GameState): void {
   if (!selected?.tile.obstruction) { addEvent(state, log(state.turn, 'SELECT AN OBSTRUCTED TRACK TILE.', 'warn')); return; }
   if (!spend(state)) return; selected.tile.obstruction = false; addEvent(state, log(state.turn, 'OBSTRUCTION CLEARED.'));
 }
-function setRoute(state: GameState, exit: Direction): void {
-  const train = selectedTrain(state); if (!train) { addEvent(state, log(state.turn, 'SELECT A TRAIN TO ROUTE.', 'warn')); return; }
-  const tile = tileAt(state, train.position); if (tile?.kind !== 'junction' || !tile.switchExits?.includes(exit)) { addEvent(state, log(state.turn, 'THAT EXIT IS NOT AVAILABLE AT THE NEXT JUNCTION.', 'warn')); return; }
-  train.plannedExit = exit; addEvent(state, log(state.turn, `TRAIN ${train.id} ROUTED ${exit}.`));
-}
-
 function movementIntent(state: GameState, train: Train): { train: Train; to: Point; heading: Direction } | null {
   if (train.status === 'evacuated' || train.status === 'held' || train.holdUntilTurn === state.turn) return null;
   const current = tileAt(state, train.position); if (!current) return null;
   let heading = train.heading;
-  if (current.kind === 'junction' && current.switchExits?.length) heading = train.plannedExit ?? current.activeExit ?? current.switchExits[0];
+  if (current.kind === 'junction' && current.switchExits?.length) heading = current.activeExit ?? current.switchExits[0];
   const delta = DELTAS[heading]; const to = { x: train.position.x + delta.x, y: train.position.y + delta.y };
   return { train, to, heading };
 }
@@ -87,7 +81,7 @@ function resolveTurn(state: GameState): TurnResolution {
   for (const intent of intents) {
     const key = pointKey(intent.to); const occupied = trainAt(state, intent.to); const allowed = canEnter(state, intent.train.position, intent.to, intent.heading) && !claimed.has(key) && (!occupied || occupied.id === intent.train.id);
     if (!allowed) { intent.train.status = 'blocked'; result.blocked.push(intent.train.id); result.events.push(log(state.turn, `TRAIN ${intent.train.id} WAITING — LINE BLOCKED.`, 'warn')); continue; }
-    intent.train.position = intent.to; intent.train.heading = intent.heading; intent.train.plannedExit = null; intent.train.status = 'moving'; claimed.add(key); result.moved.push(intent.train.id);
+    intent.train.position = intent.to; intent.train.heading = intent.heading; intent.train.status = 'moving'; claimed.add(key); result.moved.push(intent.train.id);
   }
   for (const train of Object.values(state.trains)) {
     if (train.status === 'held') continue;
@@ -104,10 +98,33 @@ function resolveTurn(state: GameState): TurnResolution {
   }
   for (const train of Object.values(state.trains)) if (train.status === 'held') { train.status = 'moving'; train.holdUntilTurn = null; }
   state.turn++; state.actionPoints = 2; state.repairUsedThisTurn = false; state.forecast = state.scenario.hazards.filter(event => !event.resolved && event.turn >= state.turn && event.turn <= state.turn + 2); state.lastResolution = result; result.events.forEach(event => addEvent(state, event));
-  if (state.evacuatedPeople >= state.targetPeople && state.evacuatedSupplies >= state.targetSupplies) state.phase = 'ending';
+  if (state.mode === 'tutorial' && state.tutorialStep !== null && state.tutorialStep >= 3) state.phase = 'ending';
+  else if (state.evacuatedPeople >= state.targetPeople && state.evacuatedSupplies >= state.targetSupplies) state.phase = 'ending';
   else if (state.turn > state.maxTurns || Object.values(state.trains).some(train => train.status === 'stranded' || train.status === 'derailed')) state.phase = 'gameOver';
   else state.phase = 'turnReport';
   return result;
+}
+
+function cloneState(state: GameState): GameState { return JSON.parse(JSON.stringify(state)) as GameState; }
+
+export function projectTurn(state: GameState): TurnProjection {
+  const before = cloneState(state);
+  const projected = cloneState(state);
+  const resolution = resolveTurn(projected);
+  const trains = Object.values(before.trains).map(train => {
+    const after = projected.trains[train.id]!;
+    const outcome: TurnProjection['trains'][number]['outcome'] = resolution.evacuated.includes(train.id) ? 'arrive' : resolution.blocked.includes(train.id) ? 'block' : train.status === 'held' ? 'hold' : 'move';
+    return { id: train.id, from: { ...train.position }, to: outcome === 'move' || outcome === 'arrive' ? { ...after.position } : undefined, outcome };
+  });
+  const hazards = before.scenario.hazards.filter(event => !event.resolved && event.turn === before.turn).map(event => ({ id: event.id, target: { ...event.target }, outcome: projected.scenario.tiles[event.target.y]?.[event.target.x]?.reinforced ? 'resolved' as const : 'hit' as const }));
+  return { trains, hazards, warnings: resolution.events.slice(0, 3).map(event => event.text) };
+}
+
+function advanceTutorial(state: GameState, command: Command['type']): void {
+  if (state.tutorialStep === null) return;
+  if (state.tutorialStep === 0 && command === 'switchJunction' && state.selected.kind === 'tile' && state.scenario.tiles[state.selected.point.y]?.[state.selected.point.x]?.activeExit) state.tutorialStep = 1;
+  else if (state.tutorialStep === 1 && command === 'holdTrain' && state.selected.kind === 'train' && state.trains[state.selected.trainId]?.status === 'held') state.tutorialStep = 2;
+  else if (state.tutorialStep === 2 && command === 'repair' && state.repairUsedThisTurn) state.tutorialStep = 3;
 }
 
 export function applyCommand(state: GameState, command: Command): CommandResult {
@@ -123,12 +140,12 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     case 'holdTrain': if (state.phase === 'planning') holdTrain(state); break;
     case 'repair': if (state.phase === 'planning') repair(state); break;
     case 'clear': if (state.phase === 'planning') clearObstruction(state); break;
-    case 'setRoute': if (state.phase === 'planning') setRoute(state, command.exit); break;
     case 'commitTurn': if (state.phase === 'planning') { const resolution = resolveTurn(state); return { state, events: resolution.events }; } break;
     case 'dismissReport': if (state.phase === 'turnReport') state.phase = 'planning'; break;
     case 'toggleHelp': state.helpOpen = !state.helpOpen; break;
     default: break;
   }
+  advanceTutorial(state, command.type);
   return { state, events };
 }
 

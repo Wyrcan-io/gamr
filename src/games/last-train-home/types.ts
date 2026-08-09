@@ -21,7 +21,6 @@ export interface Train {
   kind: TrainKind;
   position: Point;
   heading: Direction;
-  plannedExit: Direction | null;
   people: number;
   supplies: number;
   priority: 1 | 2 | 3;
@@ -53,10 +52,16 @@ export interface Scenario {
 }
 export interface LogEntry { turn: number; text: string; tone?: 'normal' | 'good' | 'warn' | 'bad'; }
 export interface TurnResolution { events: LogEntry[]; moved: string[]; blocked: string[]; evacuated: string[]; closed: Point[]; }
+export interface TurnProjection {
+  trains: Array<{ id: string; from: Point; to?: Point; outcome: 'move' | 'hold' | 'block' | 'arrive' }>;
+  hazards: Array<{ id: string; target: Point; outcome: 'hit' | 'reinforced' | 'resolved' }>;
+  warnings: string[];
+}
 export type Selection = { kind: 'tile'; point: Point } | { kind: 'train'; trainId: string };
 export interface GameState {
   version: 1;
   seed: number;
+  mode: 'tutorial' | 'campaign';
   phase: Phase;
   scenarioIndex: number;
   scenario: Scenario;
@@ -87,7 +92,6 @@ export type Command =
   | { type: 'holdTrain' }
   | { type: 'repair' }
   | { type: 'clear' }
-  | { type: 'setRoute'; exit: Direction }
   | { type: 'commitTurn' }
   | { type: 'dismissReport' }
   | { type: 'toggleHelp' }

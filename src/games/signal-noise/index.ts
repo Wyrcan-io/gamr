@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, createState } from './engine';
 import { renderFrame } from './render';
@@ -12,7 +12,7 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   let running = true;
   let paused = false;
   let pauseSelection = 0;
-  let frame = 0;
+  let helpOpen = false;
   let state = createState(Date.now());
   let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
@@ -45,6 +45,8 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   function handleKey(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
     event.preventDefault(); event.stopPropagation();
+    if (key === '?' || key === 'h') { helpOpen = !helpOpen; return; }
+    if (helpOpen) { if (key === 'escape' || key === 'backspace' || key === 'enter') helpOpen = false; return; }
     if (key === 'escape' && !['start', 'ending', 'gameOver'].includes(state.caseState.phase)) { paused = !paused; pauseSelection = 0; return; }
     if (handlePause(key, event)) return;
     const phase = state.caseState.phase;
@@ -52,7 +54,6 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
     if (phase === 'brief') { if (key === 'enter' || key === ' ') run({ type: 'continueBrief' }); return; }
     if (phase === 'debrief') { if (key === 'enter' || key === ' ') run({ type: 'continueDebrief' }); return; }
     if (phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
-    if (key === 'q') { quit(); return; }
     if (event.key === 'ArrowLeft' || key === 'a') run({ type: 'changeCentre', delta: -1 });
     else if (event.key === 'ArrowRight' || key === 'd') run({ type: 'changeCentre', delta: 1 });
     else if (event.key === 'ArrowUp' || key === 'w') run({ type: 'changeBandwidth', delta: 1 });
@@ -75,8 +76,8 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   }
 
   function render(): void {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), frame++);
-    if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { helpOpen, paused });
+    if (paused && !helpOpen && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   }
 

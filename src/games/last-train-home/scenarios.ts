@@ -18,9 +18,9 @@ function riverLine(): Scenario {
   setTrack(tiles, 11, 5, dirs('W', 'E'), 'track', 'MARSH'); setTrack(tiles, 12, 5, dirs('W', 'E')); setTrack(tiles, 13, 5, dirs('W', 'E')); setTrack(tiles, 14, 5, dirs('W'), 'station', 'HARBOR', true);
   setTrack(tiles, 3, 6, dirs('N', 'S'), 'bridge'); setTrack(tiles, 3, 7, dirs('N', 'S')); setTrack(tiles, 3, 8, dirs('N', 'E')); setTrack(tiles, 4, 8, dirs('W', 'E')); setTrack(tiles, 5, 8, dirs('W'), 'station', 'SOUTH LOOP');
   const initial = trains([
-    { id: 'A', name: 'Eastbank School', kind: 'passenger', position: { x: 1, y: 5 }, heading: 'E', plannedExit: null, people: 46, supplies: 0, priority: 1, status: 'moving', holdUntilTurn: null },
-    { id: 'B', name: 'Morrow Clinic', kind: 'medical', position: { x: 5, y: 5 }, heading: 'E', plannedExit: null, people: 28, supplies: 4, priority: 1, status: 'moving', holdUntilTurn: null },
-    { id: 'C', name: 'Water & Generators', kind: 'supply', position: { x: 3, y: 8 }, heading: 'E', plannedExit: null, people: 0, supplies: 12, priority: 2, status: 'moving', holdUntilTurn: null },
+    { id: 'A', name: 'Eastbank School', kind: 'passenger', position: { x: 1, y: 5 }, heading: 'E', people: 46, supplies: 0, priority: 1, status: 'moving', holdUntilTurn: null },
+    { id: 'B', name: 'Morrow Clinic', kind: 'medical', position: { x: 5, y: 5 }, heading: 'E', people: 28, supplies: 4, priority: 1, status: 'moving', holdUntilTurn: null },
+    { id: 'C', name: 'Water & Generators', kind: 'supply', position: { x: 3, y: 8 }, heading: 'E', people: 0, supplies: 12, priority: 2, status: 'moving', holdUntilTurn: null },
   ]);
   return { id: 'river-line', name: 'River Line', width, height, tiles, trains: initial, hazards: [hazard('marsh-rise', 3, 11, 5, 'flood', 'close-track'), hazard('bridge-scour', 5, 3, 6, 'flood', 'close-track'), hazard('signal-fire', 7, 7, 5, 'fire', 'block-junction')], maxTurns: 10, targetPeople: 60, targetSupplies: 8, briefing: ['Two passenger trains are moving east toward Harbor.', 'Marsh bridge closes after turn 3 unless repaired.', 'Get at least 60 people and 8 supply units home.'] };
 }

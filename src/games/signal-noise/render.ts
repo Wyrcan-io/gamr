@@ -1,116 +1,156 @@
+import { displayWidth, padToWidth, clipToWidth } from '../../ui/terminal';
+import { getThemePalette, type TerminalThemePalette } from '../utils';
 import { calculateSpectrum, evaluateLock, waveform } from './spectrum';
 import { directionGlyph } from './triangulation';
-import { STATIONS, type GameState, type Lock, type Position } from './types';
+import { BROADCAST_LABELS, STATIONS, type BroadcastAction, type GameState, type Lock, type Position } from './types';
 import { currentPacket, stationLabel } from './engine';
 
 const RESET = '\x1b[0m';
-const DIM = '\x1b[2m';
-const CYAN = '\x1b[96m';
-const GREEN = '\x1b[92m';
-const YELLOW = '\x1b[93m';
-const RED = '\x1b[91m';
-const MAGENTA = '\x1b[95m';
+const BOLD = '\x1b[1m';
+const MIN_COLS = 80;
+const MIN_ROWS = 28;
 
 function put(out: string[], x: number, y: number, value: string): void { out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${value}`); }
-function center(out: string[], cols: number, y: number, text: string, color: string): void { put(out, Math.max(1, Math.floor((cols - text.length) / 2) + 1), y, color + text + RESET); }
-function bar(value: number, max: number, width: number): string { const filled = Math.min(width, Math.max(0, Math.round(value / Math.max(1, max) * width))); return '█'.repeat(filled) + '░'.repeat(width - filled); }
-export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame: number): string {
+function line(value: string, width: number, color = ''): string { return `${color}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
+function centred(out: string[], cols: number, y: number, value: string, color: string): void {
+  const x = Math.max(1, Math.floor((cols - displayWidth(value)) / 2) + 1);
+  put(out, x, y, `${color}${value}${RESET}`);
+}
+function bar(value: number, max: number, width: number): string {
+  const filled = Math.max(0, Math.min(width, Math.round((value / Math.max(1, max)) * width)));
+  return `[${'+'.repeat(filled)}${'.'.repeat(width - filled)}]`;
+}
+function marker(action: BroadcastAction, selected: BroadcastAction | null): string { return `${selected === action ? '>' : ' '}[${action === 'ack-hold' ? '1' : action === 'ack-relay' ? '2' : action === 'silence' ? '3' : '4'}] ${BROADCAST_LABELS[action]}`; }
+
+export interface SignalRenderOptions { helpOpen?: boolean; paused?: boolean; }
+
+export function renderFrame(state: GameState, cols: number, rows: number, palette = getThemePalette(), options: SignalRenderOptions = {}): string {
   const out: string[] = ['\x1b[2J\x1b[H'];
-  if (cols < 80 || rows < 28) { center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', RED + '\x1b[1m'); center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED 80x28  HAVE ${cols}x${rows}`, DIM + theme); return out.join(''); }
-  const caseState = state.caseState;
-  const title = 'SIGNAL//NOISE';
-  const offset = frame % 60 >= 57 ? frame % 3 - 1 : 0;
-  put(out, Math.max(1, Math.floor((cols - title.length) / 2) + 1 + offset), 1, theme + '\x1b[1m' + title + RESET);
-  put(out, 3, 3, `${theme}CASE ${String(Math.min(state.caseIndex + 1, 6)).padStart(2, '0')}/06  OPS ${String(caseState.operationsUsed).padStart(2, '0')}/${String(caseState.definition.operationLimit).padStart(2, '0')}  FILTERS ${'◈'.repeat(caseState.filtersRemaining) || '—'}  SCORE ${String(state.totalScore).padStart(5, '0')}${RESET}`);
-  if (caseState.phase === 'start') return renderStart(out, cols, theme);
-  if (caseState.phase === 'brief') return renderBrief(out, cols, caseState.definition.title, caseState.definition.briefing, theme);
-  if (caseState.phase === 'ending') return renderEnding(out, cols, state, theme);
-  if (caseState.phase === 'debrief') return renderDebrief(out, cols, state, theme);
-  renderAnalyzer(out, cols, state, theme);
+  if (cols < MIN_COLS || rows < MIN_ROWS) {
+    centred(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'RECEIVER NEEDS MORE ROOM', `${palette.danger}${BOLD}`);
+    centred(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, palette.muted);
+    return out.join('');
+  }
+  const title = `g/ SIGNAL//NOISE   CASE ${String(Math.min(6, state.caseIndex + 1)).padStart(2, '0')}/06`;
+  put(out, 3, 1, `${palette.focus}${BOLD}${padToWidth(title, Math.min(58, cols - 6))}${RESET}`);
+  put(out, Math.max(3, cols - 31), 1, line(`${state.correctReplies} CORRECT  ${state.failedCases} FAILED`, 28, palette.muted));
+  if (state.caseState.phase === 'start') return startFrame(out, cols, palette);
+  if (state.caseState.phase === 'brief') return briefFrame(out, cols, state, palette);
+  if (state.caseState.phase === 'ending') return endingFrame(out, cols, state, palette);
+  if (state.caseState.phase === 'debrief') return debriefFrame(out, cols, state, palette);
+  listeningFrame(out, cols, state, palette);
+  if (options.helpOpen) helpFrame(out, cols, palette);
+  if (options.paused) put(out, Math.floor(cols / 2) - 7, 12, `${palette.warning}${BOLD}PAUSED${RESET}`);
   return out.join('');
 }
 
-function renderStart(out: string[], cols: number, theme: string): string {
-  center(out, cols, 9, '◌ ISOLATE TRANSMISSIONS. FIND THE SOURCE. ◌', CYAN + '\x1b[1m');
-  center(out, cols, 12, 'P: NIGHT SHIFT    T: INDUCTION    Q: QUIT', DIM + theme);
-  center(out, cols, 15, 'Tune carefully. Every answer is in the instrument panel.', DIM + theme);
+function startFrame(out: string[], cols: number, palette: TerminalThemePalette): string {
+  centred(out, cols, 8, 'A FIELD RECEIVER FOR QUIET EMERGENCIES', `${palette.focus}${BOLD}`);
+  centred(out, cols, 11, 'Find the carrier. Take two bearings. Answer only what the packet proves.', palette.ink);
+  centred(out, cols, 15, '[P] NIGHT SHIFT    [T] INDUCTION    [Q] QUIT', palette.muted);
+  centred(out, cols, 19, 'The instrument teaches one useful adjustment at a time.', palette.muted);
   return out.join('');
 }
 
-function renderBrief(out: string[], cols: number, title: string, briefing: string[], theme: string): string {
-  center(out, cols, 8, `CASE FILE // ${title}`, YELLOW + '\x1b[1m');
-  briefing.forEach((line, index) => center(out, cols, 11 + index * 2, line, theme));
-  center(out, cols, 19, 'INSTRUMENT RULE: TWO CLEAN BEARINGS IDENTIFY A SOURCE.', CYAN);
-  center(out, cols, 23, 'ENTER: OPEN LISTENING POST', DIM + theme);
+function briefFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): string {
+  const width = Math.min(70, cols - 10);
+  put(out, 5, 6, `${palette.line}${'─'.repeat(width)}${RESET}`);
+  centred(out, cols, 8, `CASE FILE // ${state.caseState.definition.title}`, `${palette.focus}${BOLD}`);
+  state.caseState.definition.briefing.slice(0, 4).forEach((text, i) => centred(out, cols, 11 + i * 2, text, palette.ink));
+  centred(out, cols, 21, state.mode === 'tutorial' ? inductionObjective(state.caseState.tutorialStep ?? 0) : 'ENTER  OPEN LISTENING POST', `${palette.good}${BOLD}`);
   return out.join('');
 }
 
-function renderAnalyzer(out: string[], cols: number, state: GameState, theme: string): void {
-  const caseState = state.caseState;
-  const station = caseState.selectedStation;
-  const spectrum = calculateSpectrum(caseState, station);
-  const quality = evaluateLock(caseState, station);
+function inductionObjective(step: number): string {
+  return ['INDUCTION 1/6  Capture the visible carrier at WEST.', 'INDUCTION 2/6  TAB to another station.', 'INDUCTION 3/6  Capture a second bearing.', 'INDUCTION 4/6  Read the intersection and packet.', 'INDUCTION 5/6  Select the response supported by the packet.', 'INDUCTION COMPLETE  ENTER  continue.'][Math.min(5, step)]!;
+}
+
+function listeningFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): void {
+  const c = state.caseState;
+  const left = 42;
+  const right = Math.max(28, Math.min(34, cols - left - 8));
+  const xRight = left + 5;
+  const spectrum = calculateSpectrum(c, c.selectedStation);
+  const evaluation = evaluateLock(c, c.selectedStation);
   const packet = currentPacket(state);
-  put(out, 3, 5, `${theme}\x1b[1mSPECTRUM // ${stationLabel(station)}${RESET}`);
-  const start = Math.max(0, Math.min(10, caseState.tuner.centre - 6));
-  const channels = spectrum.energy.slice(start, start + 14);
-  put(out, 3, 7, `${DIM}${theme}${channels.map((_, index) => String(start + index).padStart(2, '0')).join(' ')}${RESET}`);
-  put(out, 3, 8, channels.map(energy => energy === 0 ? ' .' : ' ' + '▁▂▃▄▅▆▇█'[Math.min(7, energy)]).join(''));
-  put(out, 3, 10, `${CYAN}TUNE ${String(caseState.tuner.centre).padStart(2, '0')} / BW ${caseState.tuner.bandwidth} / ${caseState.tuner.modulation.toUpperCase()} / GAIN ${caseState.tuner.gain}${RESET}`);
-  put(out, 3, 12, `${theme}SIGNAL ${bar(quality.signal, 9, 10)}  NOISE ${bar(quality.noise, 12, 10)}  PURITY ${Math.round(quality.purity * 100)}%${RESET}`);
-  put(out, 3, 14, `${quality.quality === 'none' ? RED : quality.quality === 'rough' ? YELLOW : GREEN}\x1b[1mLOCK: ${quality.quality.toUpperCase()}${RESET} ${DIM}${quality.reason}${RESET}`);
-  put(out, 3, 16, `${MAGENTA}SCOPE ${waveform(caseState.tuner.modulation)}${RESET}`);
-  if (spectrum.markers.length) put(out, 3, 18, `${YELLOW}MARKERS: ${spectrum.markers.join('  ')}${RESET}`);
-  renderMap(out, cols >= 94 ? 55 : 47, 5, caseState.candidateZones, Object.values(caseState.locks) as Lock[], theme);
-  renderDecoder(out, cols >= 94 ? 55 : 47, 16, packet, Object.values(caseState.locks) as Lock[], theme);
-  put(out, 3, 23, `${YELLOW}${caseState.notice.slice(0, cols - 6)}${RESET}`);
-  put(out, 3, 26, `${DIM}${theme}←→ TUNE  ↑↓ BW  M MOD  G GAIN  TAB STATION  S SWEEP  ENTER CAPTURE  N NOTCH  P PHASE  1-4 REPLY  ESC PAUSE${RESET}`);
-  if (caseState.phase === 'broadcast') {
-    put(out, 3, 21, `${GREEN}\x1b[1mSOURCE RESOLVED. SELECT RESPONSE: [1] ACK/HOLD [2] ACK/RELAY [3] SILENCE [4] JAM/MARK${RESET}`);
-  }
+  const channels = spectrum.energy.slice(Math.max(0, Math.min(10, c.tuner.centre - 6)), Math.max(0, Math.min(10, c.tuner.centre - 6)) + 14);
+  put(out, 3, 3, line(`OPS ${String(c.operationsUsed).padStart(2, '0')}/${String(c.definition.operationLimit).padStart(2, '0')}  FILTERS ${c.filtersRemaining}  PHASE-LOCK ${c.phaseLocksRemaining}  ${c.phase.toUpperCase()}`, cols - 6, palette.muted));
+  put(out, 3, 5, `${palette.focus}${BOLD}RECEIVER SCALE // ${stationLabel(c.selectedStation)}${RESET}`);
+  put(out, 3, 7, line(channels.map((_, i) => String(i).padStart(2, '0')).join(' '), left, palette.muted));
+  put(out, 3, 8, line(channels.map(value => value === 0 ? ' .' : ` ${'._:-=+*#'[Math.min(7, value)]}`).join(''), left, palette.data[0]));
+  put(out, 3, 10, line(`CENTRE ${String(c.tuner.centre).padStart(2, '0')}  BANDWIDTH ${c.tuner.bandwidth}  MOD ${c.tuner.modulation.toUpperCase()}  GAIN ${c.tuner.gain}`, left, palette.ink));
+  put(out, 3, 12, line(`SIGNAL ${bar(evaluation.signal, 9, 8)}  NOISE ${bar(evaluation.noise, 12, 8)}  PURITY ${Math.round(evaluation.purity * 100)}%`, left, palette.ink));
+  put(out, 3, 14, line(`LOCK ${evaluation.quality.toUpperCase()}  ${evaluation.reason}`, left, evaluation.quality === 'none' ? palette.warning : palette.good));
+  put(out, 3, 16, line(`SCOPE ${waveform(c.tuner.modulation)}`, left, palette.data[1]));
+  put(out, 3, 18, line(`LAST ${c.notice}`, left, palette.muted));
+  put(out, 3, 20, line(c.lastDiagnostic ? `NEXT ${c.lastDiagnostic.nextAction}` : 'NEXT Capture two clean bearings to resolve the source.', left, palette.focus));
+  stationStrip(out, xRight, 5, c, palette);
+  bearingPlot(out, xRight, 10, c.candidateZones, Object.values(c.locks) as Lock[], palette);
+  decoder(out, xRight, 20, packet, Object.values(c.locks) as Lock[], palette);
+  const footer = c.phase === 'broadcast' ? '1-4 SELECT RESPONSE  ENTER CONFIRM  ? HELP  ESC PAUSE' : '←→ TUNE  ↑↓ BW  TAB STATION  S SWEEP  ENTER CAPTURE  ? HELP  ESC PAUSE';
+  put(out, 3, 26, line(footer, cols - 6, palette.muted));
+  if (state.mode === 'tutorial' && c.tutorialStep !== null) put(out, 3, 24, line(inductionObjective(c.tutorialStep), cols - 6, palette.focus));
+  if (c.phase === 'broadcast') responseFrame(out, 3, 22, c.selectedBroadcast, palette, left + right + 5);
 }
 
-function renderMap(out: string[], x: number, y: number, candidates: Position[], locks: Lock[], theme: string): void {
-  put(out, x, y, `${theme}\x1b[1mREGIONAL FIX${RESET}`);
+function stationStrip(out: string[], x: number, y: number, state: GameState['caseState'], palette: TerminalThemePalette): void {
+  put(out, x, y, `${palette.focus}${BOLD}STATION STRIP${RESET}`);
+  (['west', 'east', 'south'] as const).forEach((id, i) => {
+    const selected = state.selectedStation === id;
+    const locked = state.locks[id];
+    const status = state.disabledStations.includes(id) ? 'OFFLINE' : locked ? `LOCK ${locked.quality.toUpperCase()}` : 'READY';
+    put(out, x, y + 2 + i, line(`${selected ? '>' : ' '} ${id.toUpperCase().padEnd(5)} ${status}`, 30, selected ? palette.focus : locked ? palette.good : palette.ink));
+  });
+}
+
+function bearingPlot(out: string[], x: number, y: number, candidates: Position[], locks: Lock[], palette: TerminalThemePalette): void {
+  put(out, x, y, `${palette.focus}${BOLD}BEARING PLOT${RESET}`);
   for (let row = 0; row < 7; row++) {
-    let line = '';
+    let value = '';
     for (let col = 0; col < 9; col++) {
-      const station = Object.entries(STATIONS).find(([, position]) => position.x === col && position.y === row)?.[0];
-      const candidate = candidates.some(position => position.x === col && position.y === row);
-      line += station ? station === 'west' ? ' W' : station === 'east' ? ' E' : ' S' : candidate ? ' X' : ' .';
+      const station = Object.entries(STATIONS).find(([, p]) => p.x === col && p.y === row)?.[0];
+      value += station ? ` ${station[0].toUpperCase()}` : candidates.some(p => p.x === col && p.y === row) ? ' X' : ' .';
     }
-    put(out, x, y + 2 + row, theme + line + RESET);
+    put(out, x, y + 2 + row, line(value, 24, palette.ink));
   }
-  const lockText = locks.length ? locks.map(lock => `${lock.stationId[0].toUpperCase()}:${lock.quality[0].toUpperCase()}${directionGlyph(lock.allowedBearings[lock.allowedBearings.length === 1 ? 0 : 1])}`).join(' ') : 'NONE';
-  put(out, x, y + 10, `${CYAN}LOCKS ${lockText}${RESET}`);
-  put(out, x, y + 11, `${YELLOW}CANDIDATES: ${candidates.length || '—'}${RESET}`);
+  const locksText = locks.length ? locks.map(lock => `${lock.stationId[0]!.toUpperCase()}:${lock.quality[0]!.toUpperCase()}${directionGlyph(lock.allowedBearings[0]!)}`).join(' ') : 'NONE';
+  put(out, x, y + 10, line(`LOCKS ${locksText}`, 30, palette.data[0]));
+  put(out, x, y + 11, line(`CANDIDATES ${candidates.length || 0}`, 30, palette.warning));
 }
 
-function renderDecoder(out: string[], x: number, y: number, packet: ReturnType<typeof currentPacket>, locks: Lock[], theme: string): void {
-  put(out, x, y, `${theme}\x1b[1mDECODER${RESET}`);
-  if (!packet || !locks.length) { put(out, x, y + 2, DIM + 'Capture a transmission to decode.' + RESET); return; }
-  const fragments = Math.max(...locks.map(lock => lock.fragments));
-  put(out, x, y + 2, `${CYAN}CALL: ${packet.callSign}${RESET}`);
-  put(out, x, y + 3, `${theme}${packet.fragments[0]}${RESET}`);
-  if (fragments >= 2) put(out, x, y + 4, `${theme}${packet.fragments[1]}${RESET}`);
-  if (fragments >= 3) put(out, x, y + 5, `${GREEN}${packet.fragments[2]}${RESET}`);
+function decoder(out: string[], x: number, y: number, packet: ReturnType<typeof currentPacket>, locks: Lock[], palette: TerminalThemePalette): void {
+  put(out, x, y, `${palette.focus}${BOLD}DECODER${RESET}`);
+  if (!packet || !locks.length) { put(out, x, y + 2, line('Capture a bearing to expose packet text.', 30, palette.muted)); return; }
+  put(out, x, y + 2, line(`CALL ${packet.callSign}`, 30, palette.good));
+  packet.fragments.slice(0, Math.min(3, Math.max(...locks.map(lock => lock.fragments)))).forEach((fragment, i) => put(out, x, y + 3 + i, line(fragment, 30, palette.ink)));
 }
 
-function renderDebrief(out: string[], cols: number, state: GameState, theme: string): string {
+function responseFrame(out: string[], x: number, y: number, selected: BroadcastAction | null, palette: TerminalThemePalette, width: number): void {
+  put(out, x, y, `${palette.good}${BOLD}SOURCE RESOLVED  RESPONSE EVIDENCE${RESET}`);
+  (['ack-hold', 'ack-relay', 'silence', 'jam-mark'] as BroadcastAction[]).forEach((action, i) => put(out, x, y + 1 + i, line(marker(action, selected), width, selected === action ? palette.focus : palette.ink)));
+}
+
+function debriefFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): string {
   const result = state.caseState.lastResult;
-  const good = result === 'correct';
-  center(out, cols, 8, good ? '✓ CHANNEL STABLE' : result === 'expired' ? '⚠ SIGNAL LOST' : '⚠ RESPONSE REJECTED', (good ? GREEN : RED) + '\x1b[1m');
-  center(out, cols, 12, state.caseState.notice, theme);
-  center(out, cols, 15, `CASE SCORE ${state.caseState.score}   CORRECT ${state.correctReplies}   FAILED ${state.failedCases}`, YELLOW);
-  center(out, cols, 20, state.mode === 'tutorial' ? 'ENTER: COMPLETE INDUCTION' : 'ENTER: NEXT CASE', DIM + theme);
+  centred(out, cols, 8, result === 'correct' ? '[+] CHANNEL STABLE' : result === 'expired' ? '[!] SIGNAL LOST' : '[x] RESPONSE REJECTED', `${result === 'correct' ? palette.good : palette.danger}${BOLD}`);
+  centred(out, cols, 11, state.caseState.notice, palette.ink);
+  centred(out, cols, 14, `CASE SCORE ${state.caseState.score}  CORRECT ${state.correctReplies}  FAILED ${state.failedCases}`, palette.data[0]);
+  centred(out, cols, 19, state.mode === 'tutorial' ? 'ENTER  COMPLETE INDUCTION' : 'ENTER  NEXT CASE', palette.muted);
   return out.join('');
 }
 
-function renderEnding(out: string[], cols: number, state: GameState, theme: string): string {
-  const title = state.mode === 'tutorial' ? '✓ INDUCTION COMPLETE' : '✓ NIGHT SHIFT COMPLETE';
-  center(out, cols, 8, title, GREEN + '\x1b[1m');
-  center(out, cols, 12, `CORRECT REPLIES ${state.correctReplies}/6    SCORE ${state.totalScore}    SEED ${state.seed}`, theme);
-  center(out, cols, 15, state.correctReplies >= 5 ? 'RANK: RELIABLE HAND' : 'RANK: FIELD OPERATOR', YELLOW);
-  center(out, cols, 21, 'R: REPLAY   N: NEXT GAME   Q: QUIT', DIM + theme);
+function endingFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): string {
+  centred(out, cols, 8, state.mode === 'tutorial' ? '[+] INDUCTION COMPLETE' : '[+] NIGHT SHIFT COMPLETE', `${palette.good}${BOLD}`);
+  centred(out, cols, 12, `CORRECT ${state.correctReplies}/06  SCORE ${state.totalScore}  SEED ${state.seed}`, palette.ink);
+  centred(out, cols, 16, state.correctReplies >= 5 ? 'RANK  RELIABLE HAND' : 'RANK  FIELD OPERATOR', palette.data[0]);
+  centred(out, cols, 21, 'R REPLAY   N NEXT GAME   Q QUIT', palette.muted);
   return out.join('');
+}
+
+function helpFrame(out: string[], cols: number, palette: TerminalThemePalette): void {
+  const width = Math.min(68, cols - 10);
+  const x = Math.floor((cols - width) / 2) + 1;
+  put(out, x, 6, `${palette.focus}${BOLD}g/ SIGNAL//NOISE / INSTRUMENT CARD${RESET}`);
+  ['Tune until the scale and waveform agree, then capture.', 'Two clean bearings intersect in the plot.', 'A failed lock names the dimension worth changing next.', 'S sweeps; N removes a discovered blocker; P uses phase-lock.', 'Response text is evidence. Choose before Enter confirms.', 'Escape closes this card or opens the shared pause menu.'].forEach((text, i) => put(out, x, 9 + i, line(text, width, palette.ink)));
+  put(out, x, 17, line('Press ? to close.', width, palette.muted));
 }

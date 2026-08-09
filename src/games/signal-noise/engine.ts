@@ -7,13 +7,13 @@ export interface CommandResult { state: GameState; events: string[]; }
 
 function cloneDefinition(definition: CaseDefinition): CaseDefinition { return JSON.parse(JSON.stringify(definition)) as CaseDefinition; }
 
-function newCase(definition: CaseDefinition): CaseState {
+function newCase(definition: CaseDefinition, tutorial = false): CaseState {
   const copy = cloneDefinition(definition);
   return {
     definition: copy, phase: 'start', operationsUsed: 0, filtersRemaining: copy.filters, phaseLocksRemaining: copy.phaseLocks,
     selectedStation: 'west', disabledStations: [], tuner: { centre: 10, bandwidth: 1, modulation: 'pulse', gain: 2 },
     transmitters: [{ ...copy.target, discovered: false, notched: false }, ...copy.interference.map(transmitter => ({ ...transmitter, discovered: false, notched: false }))],
-    locks: {}, candidateZones: [], selectedBroadcast: null, lastResult: null, score: 0, notice: 'READ THE TASKING. INSTRUMENTS STANDBY.', appliedEvents: [],
+    locks: {}, candidateZones: [], selectedBroadcast: null, lastResult: null, lastDiagnostic: null, tutorialStep: tutorial ? 0 : null, score: 0, notice: 'READ THE TASKING. INSTRUMENTS STANDBY.', appliedEvents: [],
   };
 }
 
@@ -63,6 +63,7 @@ function capture(caseState: CaseState): string {
     const overlap = Math.abs(transmitter.centre - caseState.tuner.centre) <= Math.floor((transmitter.bandwidth + caseState.tuner.bandwidth) / 2);
     if (overlap) transmitter.discovered = true;
   }
+  caseState.lastDiagnostic = evaluation.diagnostic;
   if (evaluation.quality === 'none') { caseState.notice = 'NO LOCK: ' + evaluation.reason; maybeExpire(caseState); return 'no-lock'; }
   const rough = evaluation.quality === 'rough';
   const fragments = evaluation.quality === 'rough' ? 1 : evaluation.quality === 'clean' ? 2 : 3;
@@ -72,6 +73,15 @@ function capture(caseState: CaseState): string {
   updateCandidates(caseState);
   maybeExpire(caseState);
   return evaluation.quality + '-lock';
+}
+
+function advanceTutorial(caseState: CaseState, action: Command['type'], result?: string): void {
+  if (caseState.tutorialStep === null) return;
+  if (caseState.tutorialStep === 0 && action === 'capture' && result && result !== 'no-lock' && result !== 'expired') caseState.tutorialStep = 1;
+  else if (caseState.tutorialStep === 1 && action === 'changeStation' && caseState.selectedStation !== 'west') caseState.tutorialStep = 2;
+  else if (caseState.tutorialStep === 2 && action === 'capture' && result && result !== 'no-lock' && result !== 'expired') caseState.tutorialStep = 3;
+  else if (caseState.tutorialStep === 3 && action === 'selectBroadcast') caseState.tutorialStep = 4;
+  else if (caseState.tutorialStep === 4 && action === 'confirmBroadcast') caseState.tutorialStep = 5;
 }
 
 function installNotch(caseState: CaseState): string {
@@ -118,13 +128,13 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     const fresh = createState(state.seed);
     fresh.mode = command.mode;
     fresh.caseIndex = 0;
-    fresh.caseState = newCase(CASES[0]);
+    fresh.caseState = newCase(CASES[0], command.mode === 'tutorial');
     fresh.caseState.phase = 'brief';
     fresh.caseState.notice = command.mode === 'tutorial' ? 'INDUCTION: FIND MERCY-2 AND KEEP THEM ON CHANNEL.' : 'CASE 01: READ THE TASKING.';
     return { state: fresh, events: ['start'] };
   }
   if (command.type === 'restart') {
-    state.caseState = newCase(CASES[state.caseIndex]); state.caseState.phase = 'brief'; return { state, events: ['restart'] };
+    state.caseState = newCase(CASES[state.caseIndex], state.mode === 'tutorial'); state.caseState.phase = 'brief'; return { state, events: ['restart'] };
   }
   if (command.type === 'continueBrief' && caseState.phase === 'brief') { caseState.phase = 'listening'; caseState.notice = 'SWEEP OR TUNE THE SELECTED STATION.'; return { state, events: ['listen'] }; }
   if (command.type === 'continueDebrief' && caseState.phase === 'debrief') {
@@ -159,6 +169,7 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     }
     default: break;
   }
+  advanceTutorial(caseState, command.type, events[events.length - 1]);
   return { state, events };
 }
 

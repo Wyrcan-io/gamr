@@ -7,6 +7,22 @@
 **Arcade Archive:** The 19 legacy compatibility games remain separate, launchable, and unchanged  
 **Primary outcome:** Four Featured games that can support an evidence-backed release candidate
 
+## Implementation status (2026-08-09)
+
+The automated hardening slice is implemented in the shared catalog and the four Featured controllers:
+
+- `placement` and `readiness` metadata now have runtime fields, while `maturity` remains a compatibility alias;
+- Stack Trace, Five-Minute Kingdom, and Dead Letter Department render on state changes instead of polling intervals;
+- all four controllers restore cursor/ANSI/alternate-buffer state idempotently;
+- Stack Trace now treats `S` as movement outside the test panel, includes the UTC daily case label, and refreshes overlays immediately;
+- Five-Minute Kingdom has an explicit preview-cancel path and immediate ledger/pause/help updates;
+- Packet Panic has explicit Standard/Tutorial modes, same-seed retries, injectable time, and reduced-motion rendering;
+- deterministic engine coverage and the Featured Four lifecycle suites pass.
+
+Verification at this checkpoint: `npm.cmd test` (58 files / 271 tests), `npm.cmd run typecheck`, production `npm.cmd run build`, `npm.cmd pack --dry-run`, `node dist/cli.js --help`, and `git diff --check` all pass.
+
+The remaining checklist items are intentionally release gates rather than code-only work: first-time-player sessions, cross-terminal/package verification, full-path human playtests, evidence packets, and readiness promotion. The Graphify CLI was attempted after implementation but is unavailable in this environment; that limitation is recorded for release evidence.
+
 ## 1. Decision: there is no fifth migration batch
 
 The active migration queue ended with The Quiet Heist, Tiny Fleet, Dungeon Courier, and The 13th Lift. The next four are not legacy migrations. They are the existing Featured shelf:

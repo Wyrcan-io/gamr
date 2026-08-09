@@ -70,7 +70,7 @@ function header(state: GameState, cols: number, palette: TerminalThemePalette): 
   return [
     line('g/ PACKET PANIC', cols, `${palette.focus}${BOLD}`),
     line('A live topology desk: connect sources, protect Trace, deliver the quota.', cols, palette.muted),
-    line(`SCORE ${String(state.score).padStart(6, '0')}  |  SECTOR ${state.sector}/8  |  TRACE ${bar(state.trace, 100, 18)}  |  MAX ${state.maxTrace}`, cols, palette.ink),
+    line(`SCORE ${String(state.score).padStart(6, '0')}  |  ${state.mode.toUpperCase()}  |  SECTOR ${state.sector}/8  |  TRACE ${bar(state.trace, 100, 18)}  |  MAX ${state.maxTrace}`, cols, palette.ink),
     line('-'.repeat(cols), cols, palette.line),
   ];
 }
@@ -204,7 +204,7 @@ function playingFrame(state: GameState, model: PacketRenderModel, cols: number, 
     line(state.lastEvent && state.eventTicks > 0 ? `[!] ${state.lastEvent}` : 'No new event.', rightWidth, state.eventTicks > 0 ? palette.warning : palette.muted),
     line(model.particles.length ? `Signal burst ${model.particles.length}` : '', rightWidth, palette.muted),
   ];
-  if (state.tutorialStep < 6) panel.push(line(`TUTORIAL ${state.tutorialStep + 1}/6`, rightWidth, `${palette.focus}${BOLD}`));
+  if (state.mode === 'tutorial' && state.tutorialStep < 6) panel.push(line(`TUTORIAL ${state.tutorialStep + 1}/6`, rightWidth, `${palette.focus}${BOLD}`));
   const lines = [
     ...header(state, cols, palette),
     `${padToWidth(line('TOPOLOGY', leftWidth, `${palette.focus}${BOLD}`), leftWidth)}   ${line('OPERATOR PANEL', rightWidth, `${palette.focus}${BOLD}`)}`,
@@ -230,4 +230,3 @@ export function renderFrame(
   if (state.phase === 'gameOver' || state.phase === 'won') return endFrame(state, cols, palette);
   return playingFrame(state, model, cols, palette);
 }
-

@@ -33,12 +33,21 @@ export interface PacketPanicController {
   isRunning: boolean;
 }
 
+export interface PacketPanicOptions {
+  /** Injectable clock for deterministic playtests and replay tooling. */
+  now?: () => number;
+  /** Suppress screen shake while retaining the underlying event feedback. */
+  reducedMotion?: boolean;
+}
+
 const MAP_LEFT = 3;
 const MAP_TOP = 6;
 const CELL_WIDTH = 3;
 const SIMULATION_MS = 250;
 
-export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
+export function runPacketPanicGame(terminal: Terminal, options: PacketPanicOptions = {}): PacketPanicController {
+  const now = options.now ?? (() => Date.now());
+  const reducedMotion = options.reducedMotion ?? false;
   let running = true;
   let gameStarted = false;
   let paused = false;
@@ -46,21 +55,25 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
   let pauseSelection = 0;
   let selectedTool: RouterKind = 'link';
   let previewRotation: 0 | 1 | 2 | 3 = 0;
-  let state = createState(Date.now());
+  let runSeed = now();
+  let runMode: 'tutorial' | 'standard' = 'tutorial';
+  let state = createState(runSeed, 1, [], runMode);
   let choices = upgradeChoices(state);
   let particles: Particle[] = [];
   let popups: ScorePopup[] = [];
   const shake = createShakeState();
   let accumulator = 0;
-  let lastUpdateAt = Date.now();
+  let lastUpdateAt = now();
 
   const controller: PacketPanicController = {
     stop: () => { running = false; },
     get isRunning() { return running; },
   };
 
-  function reset(startImmediately = false): void {
-    state = createState(Date.now());
+  function reset(startImmediately = false, mode: 'tutorial' | 'standard' = runMode, seed = runSeed): void {
+    runMode = mode;
+    runSeed = seed;
+    state = createState(runSeed, 1, [], runMode);
     choices = upgradeChoices(state);
     gameStarted = startImmediately;
     paused = false;
@@ -71,7 +84,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     particles = [];
     popups = [];
     accumulator = 0;
-    lastUpdateAt = Date.now();
+    lastUpdateAt = now();
   }
 
   function quit(): void {
@@ -157,8 +170,10 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     if (!gameStarted) {
       if (key === 'q') { quit(); return; }
       if (key === 'p' || key === 't' || key === 'enter' || key === ' ') {
-        state = createState(Date.now(), 1);
-        state.lastEvent = key === 't' ? 'TUTORIAL: PLACE A LINK, THEN A BEND' : 'STANDARD SHIFT: BUILD THE FIRST ROUTE';
+        runSeed = now();
+        runMode = key === 't' ? 'tutorial' : 'standard';
+        state = createState(runSeed, 1, [], runMode);
+        state.lastEvent = runMode === 'tutorial' ? 'TUTORIAL: PLACE A LINK, THEN A BEND' : 'STANDARD SHIFT: BUILD THE FIRST ROUTE';
         gameStarted = true;
       }
       return;
@@ -176,7 +191,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     }
 
     if (state.phase === 'gameOver' || state.phase === 'won') {
-      if (key === 'r') reset(true);
+      if (key === 'r') reset(true, runMode, runSeed);
       else if (key === 'q') quit();
       else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); }
       return;
@@ -216,6 +231,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
       popups,
       shake,
       helpOpen,
+      reducedMotion,
     }, getCurrentThemePalette());
     let finalOutput = output;
     if (paused && !helpOpen && terminal.cols >= PACKET_MIN_COLS && terminal.rows >= PACKET_MIN_ROWS) {
@@ -243,7 +259,7 @@ export function runPacketPanicGame(terminal: Terminal): PacketPanicController {
     terminal.write('\x1b[?1049h\x1b[?25l');
     renderInterval = setInterval(render, 50);
     updateInterval = setInterval(() => {
-      update(Date.now());
+      update(now());
       updateParticles(particles);
       updatePopups(popups);
     }, 50);

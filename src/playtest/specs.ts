@@ -216,7 +216,7 @@ export function incompletePlaytestSpecs(games: readonly GameInfo[], registry: Re
 
 export function featuredCoverageGaps(games: readonly GameInfo[], registry: ReadonlyMap<string, PlaytestSpec>): string[] {
   return games
-    .filter(game => game.maturity === 'featured')
+    .filter(game => (game.placement ?? (game.maturity === 'featured' ? 'featured' : 'catalog')) === 'featured')
     .filter(game => registry.get(game.id)?.coverage !== 'seeded-completion')
     .map(game => game.id);
 }
@@ -232,10 +232,12 @@ export interface CoverageSummary {
 export function coverageSummary(games: readonly GameInfo[], registry: ReadonlyMap<string, PlaytestSpec>): CoverageSummary[] {
   return games.map(game => {
     const spec = registry.get(game.id);
+    const placement = game.placement ?? (game.maturity === 'featured' ? 'featured' : 'catalog');
+    const readiness = game.readiness ?? (game.maturity === 'workshop' ? 'workshop' : 'preview');
     return {
       gameId: game.id,
       name: game.name,
-      group: game.maturity ?? 'archive',
+      group: placement === 'featured' ? 'featured' : readiness === 'workshop' ? 'workshop' : game.maturity === undefined ? 'archive' : 'beta',
       coverage: spec?.coverage,
       profileVersion: spec?.profileVersion ?? 0,
     };

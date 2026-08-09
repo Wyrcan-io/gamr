@@ -1,4 +1,5 @@
 import { activePuzzle } from './engine';
+import { dailyDate } from './daily';
 import { blockLabel } from './machine';
 import type { StackTraceState, TestResult } from './types';
 import { centerText, clipToWidth, padToWidth } from '../../ui/terminal';
@@ -124,6 +125,7 @@ export function renderFrame(
   lines.push(`${palette.focus}${BOLD}${line('g/ STACK TRACE', cols)}${RESET}`);
   lines.push(line(`CASE ${puzzle.id}  /  ${chapter}  /  ${puzzle.title}`, cols, palette.muted));
   lines.push(line(`CONTRACT  ${puzzle.contract}`, cols, palette.ink));
+  if (state.mode === 'daily') lines.push(line(`DAILY  ${dailyDate()} UTC  /  CASE ${puzzle.id}`, cols, palette.focus));
   lines.push('');
   lines.push(`${sectionLabel('PROGRAM TAPE', left, palette)}   ${sectionLabel('TEST LEDGER', right, palette)}`);
 

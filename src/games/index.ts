@@ -121,6 +121,9 @@ export interface GameInfo {
   id: string;
   name: string;
   description: string;
+  placement?: 'featured' | 'catalog';
+  readiness?: 'workshop' | 'preview' | 'stable';
+  /** @deprecated use placement/readiness; retained for compatibility with integrations. */
   maturity?: 'featured' | 'beta' | 'workshop';
   pace?: 'real-time' | 'turn-based';
   difficulty?: 1 | 2 | 3;
@@ -152,6 +155,14 @@ export const games: GameInfo[] = [
   { id: 'botany-lab', name: 'Botany Lab', description: 'Grow strange plants. Fill the contracts. Hold the glass.', maturity: 'workshop', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runBotanyLabGame },
   { id: 'the-13th-lift', name: 'The 13th Lift', description: 'Read the riders. Program the route. Do not stop at thirteen.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: 'campaign', run: runThe13thLiftGame },
 ];
+
+// Keep the placement/readiness vocabulary authoritative at runtime while the
+// deprecated maturity field remains available to downstream integrations.
+for (const game of games) {
+  game.placement ??= game.maturity === 'featured' ? 'featured' : 'catalog';
+  // Featured is a shelf placement, not proof of production readiness.
+  game.readiness ??= game.maturity === 'workshop' ? 'workshop' : 'preview';
+}
 
 export const allGames: GameInfo[] = [...games, ...archivedGames];
 

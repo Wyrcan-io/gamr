@@ -15,7 +15,6 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
   let paused = false;
   let pauseSelection = 0;
   let state = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
 
   const controller: DeadLetterDepartmentController = {
@@ -35,18 +34,20 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     state.phase = 'briefing';
     paused = false;
     pauseSelection = 0;
+    render();
   }
 
   function runCommand(command: Command): void {
     const result = applyCommand(state, command);
     state = result.state;
+    render();
   }
 
   function handlePause(key: string, domEvent: KeyboardEvent): boolean {
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, domEvent);
     pauseSelection = result.newSelection;
-    if (!result.confirmed) return true;
+    if (!result.confirmed) { render(); return true; }
     switch (pauseSelection) {
       case 0: paused = false; break;
       case 1: restart(); break;
@@ -55,6 +56,7 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
       case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
+    if (running) render();
     return true;
   }
 
@@ -64,10 +66,12 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     domEvent.stopPropagation();
     if (state.helpOpen) {
       if (key === '?' || key === 'h' || key === 'escape') runCommand({ type: 'toggleHelp' });
+      render();
       return;
     }
     if (state.ledgerOpen && (key === 'l' || key === 'escape')) {
       runCommand({ type: 'toggleLedger' });
+      render();
       return;
     }
     if (key === '?' || key === 'h') {
@@ -77,6 +81,7 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
     if (key === 'escape' && state.phase !== 'start' && state.phase !== 'ending' && state.phase !== 'gameOver') {
       paused = !paused;
       pauseSelection = 0;
+      render();
       return;
     }
     if (handlePause(key, domEvent)) return;
@@ -141,16 +146,14 @@ export function runDeadLetterDepartmentGame(terminal: Terminal): DeadLetterDepar
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     keyListener?.dispose();
-    terminal.write('\x1b[?25h\x1b[?1049l');
+    terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     originalStop();
   };
 
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
     render();
   }, 50);

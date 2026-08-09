@@ -8,6 +8,7 @@ export type Protocol = 'C' | 'P' | 'A' | 'G';
 export type RouterKind = 'link' | 'bend' | 'split' | 'firewall';
 export type RouterState = 'healthy' | 'jammed' | 'infected';
 export type Phase = 'tutorial' | 'playing' | 'upgrade' | 'gameOver' | 'won';
+export type RunMode = 'tutorial' | 'standard';
 
 export interface Router {
   id: string;
@@ -71,6 +72,7 @@ export interface Upgrade {
 export interface GameState {
   seed: number;
   sector: number;
+  mode: RunMode;
   tick: number;
   phase: Phase;
   board: Tile[][];
@@ -96,7 +98,7 @@ export interface GameState {
 }
 
 function progressTutorial(state: GameState): void {
-  if (state.sector === 1 && state.tutorialStep < 6) state.tutorialStep++;
+  if (state.mode === 'tutorial' && state.sector === 1 && state.tutorialStep < 6) state.tutorialStep++;
 }
 
 export const UPGRADES: Upgrade[] = [
@@ -155,7 +157,7 @@ function seededValue(seed: number, offset: number): number {
   return ((value ^ (value >>> 16)) >>> 0) / 0x100000000;
 }
 
-export function createState(seed: number = Date.now(), sector: number = 1, upgrades: string[] = []): GameState {
+export function createState(seed: number = Date.now(), sector: number = 1, upgrades: string[] = [], mode: RunMode = sector === 1 ? 'tutorial' : 'standard'): GameState {
   const board = createBoard();
   const sources: Record<string, SourceNode> = {};
   const destinations: Record<string, DestinationNode> = {};
@@ -193,7 +195,7 @@ export function createState(seed: number = Date.now(), sector: number = 1, upgra
   if (upgrades.includes('split')) inventory.split += 1;
 
   return {
-    seed: seed >>> 0, sector, tick: 0, phase: sector === 1 ? 'tutorial' : 'playing',
+    seed: seed >>> 0, sector, mode, tick: 0, phase: mode === 'tutorial' && sector === 1 ? 'tutorial' : 'playing',
     board, sources, destinations, packets: {}, inventory, upgrades: [...upgrades],
     score: 0, streak: 0, trace: 0, maxTrace: 0, deliveredThisSector: 0,
     quota: quotaForSector(sector), focusCharges: 2 + (upgrades.includes('focus') ? 1 : 0),
@@ -510,7 +512,7 @@ export function upgradeChoices(state: GameState): Upgrade[] {
 
 export function chooseUpgrade(state: GameState, upgrade: Upgrade): GameState {
   const upgrades = state.upgrades.includes(upgrade.id) ? state.upgrades : [...state.upgrades, upgrade.id];
-  const next = createState(state.seed + state.sector * 101, state.sector + 1, upgrades);
+  const next = createState(state.seed + state.sector * 101, state.sector + 1, upgrades, 'standard');
   next.score = state.score;
   next.maxTrace = state.maxTrace;
   next.lastEvent = upgrade.name + ' INSTALLED';

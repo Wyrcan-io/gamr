@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Terminal } from '@xterm/xterm';
 import { showGamesMenu } from './gamesMenu';
+import { games } from './index';
 import { stripAnsi } from '../ui/terminal';
 
 function fakeTerminal() {
@@ -55,5 +56,16 @@ describe('Small Machines Index', () => {
     press('x');
     press('Enter');
     expect(onGameSelect).toHaveBeenCalledWith('tetris');
+  });
+
+  it('keeps Featured placement separate from readiness', () => {
+    const featured = games.filter(game => game.placement === 'featured');
+    expect(featured.map(game => game.id)).toEqual([
+      'stack-trace',
+      'five-minute-kingdom',
+      'dead-letter-department',
+      'packet-panic',
+    ]);
+    expect(featured.every(game => game.readiness === 'preview')).toBe(true);
   });
 });

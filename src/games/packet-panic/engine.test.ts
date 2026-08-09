@@ -40,6 +40,16 @@ describe('Packet Panic deterministic simulation', () => {
     expect(first.quota).toBe(second.quota);
   });
 
+  it('keeps the standard shift playable without forcing tutorial steps', () => {
+    const standard = createState(1234, 1, [], 'standard');
+    expect(standard.mode).toBe('standard');
+    expect(standard.phase).toBe('playing');
+    const position = standard.board.flatMap((row, y) => row.map((tile, x) => ({ tile, x, y }))).find(({ tile }) => tile.kind === 'empty');
+    expect(position).toBeDefined();
+    expect(placeRouter(standard, { x: position!.x, y: position!.y }, 'link')).toBe(true);
+    expect(standard.tutorialStep).toBe(0);
+  });
+
   it('routes a packet through a simple L-shaped network', () => {
     const state = createState(7);
     for (let x = 1; x < BOARD_WIDTH; x++) {

@@ -17,7 +17,6 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
   let helpOpen = false;
   let pauseSelection = 0;
   let state: GameState = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
 
   const controller: FiveMinuteKingdomController = {
@@ -32,23 +31,26 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
     showLedger = false;
     helpOpen = false;
     pauseSelection = 0;
+    render();
   };
 
   function handlePause(key: string, event: KeyboardEvent): boolean {
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event);
     pauseSelection = result.newSelection;
-    if (!result.confirmed) return true;
+    if (!result.confirmed) { render(); return true; }
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) restart();
     else if (pauseSelection === 2) quit();
     else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
     else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
+    if (running) render();
     return true;
   }
 
   function run(command: Parameters<typeof applyCommand>[1]): void {
     state = applyCommand(state, command);
+    render();
   }
 
   function handleKey(event: KeyboardEvent): void {
@@ -58,17 +60,20 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
 
     if (helpOpen) {
       if (key === '?' || key === 'escape') helpOpen = false;
+      render();
       return;
     }
     if (showLedger && (key === 'l' || key === 'escape')) {
       showLedger = false;
+      render();
       return;
     }
-    if (key === '?') { helpOpen = true; return; }
-    if (key === 'escape' && state.phase !== 'ending') { paused = !paused; pauseSelection = 0; return; }
+    if (key === '?') { helpOpen = true; render(); return; }
+    if (key === 'escape' && state.phase === 'preview') { run({ type: 'cancelPreview' }); return; }
+    if (key === 'escape' && state.phase !== 'ending') { paused = !paused; pauseSelection = 0; render(); return; }
     if (handlePause(key, event)) return;
     if (key === 'q') { quit(); return; }
-    if (key === 'l' && state.phase !== 'briefing' && state.phase !== 'ending') { showLedger = !showLedger; return; }
+    if (key === 'l' && state.phase !== 'briefing' && state.phase !== 'ending') { showLedger = !showLedger; render(); return; }
 
     if (state.phase === 'briefing') {
       if (key === 'enter' || key === ' ') run({ type: 'dismissBriefing' });
@@ -96,7 +101,7 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
       return;
     }
     if (state.phase === 'finalChronicle') {
-      if (key === 'enter' || key === ' ') state = { ...state, phase: 'ending' };
+      if (key === 'enter' || key === ' ') { state = { ...state, phase: 'ending' }; render(); }
       return;
     }
     if (state.phase === 'ending' && key === 'r') restart();
@@ -120,7 +125,6 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     keyListener?.dispose();
     terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     baseStop();
@@ -129,7 +133,6 @@ export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomC
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
     render();
   }, 50);

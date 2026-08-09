@@ -62,5 +62,19 @@ describe('Packet Panic controller lifecycle', () => {
     expect(terminal.writes.join('')).toContain('g/ PACKET PANIC / HELP');
     controller.stop();
   });
-});
 
+  it('starts a standard shift with an injectable clock', () => {
+    vi.useFakeTimers();
+    const terminal = fakeTerminal();
+    let clock = 10_000;
+    const controller = runPacketPanicGame(terminal as unknown as Terminal, { now: () => clock, reducedMotion: true });
+    vi.advanceTimersByTime(60);
+    terminal.handlers[0]!({ domEvent: key('p') });
+    clock += 250;
+    vi.advanceTimersByTime(60);
+    const output = terminal.writes.join('');
+    expect(output).toContain('STANDARD');
+    expect(output).not.toContain('TUTORIAL 1/6');
+    controller.stop();
+  });
+});

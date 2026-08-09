@@ -64,7 +64,10 @@ function sectionTitle(section: Section): string {
 function statusLabel(entry: MenuEntry): string {
   if (entry.kind === 'theme') return 'EDITION';
   if (entry.kind === 'action') return 'OPEN';
-  return entry.archive ? 'ARCHIVE' : (entry.game.maturity ?? 'ACTIVE').toUpperCase();
+  if (entry.archive) return 'ARCHIVE';
+  const placement = entry.game.placement ?? (entry.game.maturity === 'featured' ? 'featured' : 'catalog');
+  const readiness = entry.game.readiness ?? (entry.game.maturity === 'workshop' ? 'workshop' : 'preview');
+  return `${placement.toUpperCase()} / ${readiness.toUpperCase()}`;
 }
 
 function entryName(entry: MenuEntry): string {
@@ -136,10 +139,10 @@ export function showGamesMenu(
     const archive = archivedGames.map((game) => ({ kind: 'game' as const, game, archive: true }));
 
     if (section === 'all') return active;
-    if (section === 'workshop') return active.filter((entry) => entry.game.maturity === 'workshop');
+    if (section === 'workshop') return active.filter((entry) => (entry.game.readiness ?? (entry.game.maturity === 'workshop' ? 'workshop' : 'preview')) === 'workshop');
     if (section === 'archive') return archive;
 
-    const featured = active.filter((entry) => entry.game.maturity === 'featured');
+    const featured = active.filter((entry) => (entry.game.placement ?? (entry.game.maturity === 'featured' ? 'featured' : 'catalog')) === 'featured');
     return [
       ...featured,
       { kind: 'action' as const, id: 'all', name: 'All games', description: 'Browse the twenty active games.' },

@@ -148,7 +148,7 @@ export type Command =
   | { type: 'restartRun'; seed?: number }
   | { type: 'toggleHelp' }
   | { type: 'toggleLog' }
-  | { type: 'toggleForecast' };
+  ;
 
 export interface PlacementResult { valid: boolean; reason: string; reservations: Reservation[]; }
 export interface CommandResult { state: GameState; events: string[]; }

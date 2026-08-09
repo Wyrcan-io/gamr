@@ -55,6 +55,7 @@ function makeState(jobIndex: number, seed: number): GameState {
 }
 export function createState(seed = Date.now()): GameState { return makeState(0, seed); }
 export function jobsForMenu(): readonly Job[] { return jobs; }
+export function jobLocations(state: GameState): Pick<Job, 'key' | 'display' | 'exits'> { const job = activeJob(state); return { key: { ...job.key }, display: { ...job.display }, exits: { east: { ...job.exits.east }, service: { ...job.exits.service } } }; }
 function snapshot(state: GameState): GameState { const result = clone(state); result.checkpoint = undefined; return result; }
 function withPlanning(state: GameState, action: (next: GameState) => void): GameState {
   const next = clone(state); if (!next.checkpoint) next.checkpoint = snapshot(state); action(next); next.forecast = forecast(next); return next;
@@ -73,8 +74,10 @@ function setAlarm(state: GameState, reason: string): void {
   if (state.alarm >= 3) return; state.alarm = (state.alarm + 1) as GameState['alarm']; addIncident(state, `ALARM ${state.alarm}: ${reason}`, 'warning');
   if (state.alarm >= 2 && state.objective === 'exit-east') { state.objective = 'exit-service'; addIncident(state, 'LOCKDOWN: STREET EXIT SEALED. CONTRACT UPDATED → STAFF EXIT.', 'warning'); }
 }
+function activeJob(state: GameState): Job { return jobs[state.jobIndex % jobs.length]!; }
 function resolveContract(state: GameState): void {
-  if (state.keyTaken && !state.caseOpen && same(state.player, { x: 9, y: 2 })) state.notice = 'KEY READY. PRESS I TO OPEN THE DISPLAY.';
+  const job = activeJob(state);
+  if (state.keyTaken && !state.caseOpen && same(state.player, job.display)) state.notice = 'KEY READY. PRESS I TO OPEN THE DISPLAY.';
   if (state.caseOpen && state.objective === 'case') { state.objective = state.alarm > 0 ? 'exit-service' : 'exit-east'; addIncident(state, state.alarm > 0 ? 'FORCED ACQUISITION: TAKE THE CASE TO THE STAFF EXIT.' : 'QUIET ACQUISITION: STREET EXIT IS CLEAR.', state.alarm > 0 ? 'warning' : 'success'); }
 }
 function commit(state: GameState): GameState {
@@ -97,11 +100,34 @@ export function applyCommand(state: GameState, command: Command): GameState {
   if (command.type === 'move') return withPlanning(state, next => { if (next.ap <= 0) { next.notice = 'NO ACTIONS LEFT. ENTER TO COMMIT.'; return; } const delta = dirs[command.direction]; const target = { x: next.player.x + delta.x, y: next.player.y + delta.y }; next.facing = command.direction; if (!walkable(next, target)) { next.notice = 'BLOCKED: WALL OR CLOSED EDGE.'; return; } if (currentVision(next).some(p => same(p, target))) { next.notice = 'MOVE REFUSED: TILE IS SEEN NOW.'; return; } if (next.guards.some(g => same(g.pos, target))) { next.notice = 'MOVE REFUSED: GUARD OCCUPIES THAT TILE.'; return; } next.player = target; next.ap--; next.pending.push({ label: `WALK → (${target.x + 1},${target.y + 1})`, cost: 1, kind: 'move' }); });
   if (command.type === 'decoy') return withPlanning(state, next => { if (next.ap <= 0 || next.decoys <= 0) { next.notice = next.decoys <= 0 ? 'NO DECOYS REMAIN.' : 'NO ACTIONS LEFT.'; return; } const delta = dirs[next.facing]; const pos = { x: next.player.x + delta.x * 2, y: next.player.y + delta.y * 2 }; if (!walkable(next, pos)) { next.notice = 'NO CLEAR THROW LINE.'; return; } next.noise.unshift({ pos, turns: 3, label: 'DECOY' }); next.decoys--; next.ap--; next.pending.push({ label: `DECOY at (${pos.x + 1},${pos.y + 1})`, cost: 1, kind: 'decoy' }); addIncident(next, `DECOY placed at (${pos.x + 1},${pos.y + 1}); guards will investigate.`); });
   if (command.type === 'jam') return withPlanning(state, next => { if (next.ap <= 0 || next.jammers <= 0) { next.notice = next.jammers <= 0 ? 'JAMMER SPENT.' : 'NO ACTIONS LEFT.'; return; } next.camera.jammed = 2; next.jammers--; next.ap--; next.pending.push({ label: 'CAMERA JAMMED for 2 turns', cost: 1, kind: 'jam' }); addIncident(next, 'CAMERA C1 JAMMED. ITS CONE IS OFFLINE.'); });
-  if (command.type === 'interact') return withPlanning(state, next => { if (next.ap <= 0) { next.notice = 'NO ACTIONS LEFT.'; return; } if (!next.keyTaken && same(next.player, { x: 3, y: 5 })) { next.keyTaken = true; next.objective = 'case'; next.ap--; next.pending.push({ label: 'TAKE BRASS NIGHT KEY', cost: 1, kind: 'interact' }); addIncident(next, 'KEY TAKEN. OBJECTIVE UPDATED → OPEN SAPPHIRE DISPLAY.', 'success'); return; } if (next.keyTaken && !next.caseOpen && same(next.player, { x: 9, y: 2 })) { next.caseOpen = true; next.asset = true; next.objective = next.alarm > 0 ? 'exit-service' : 'exit-east'; next.ap--; next.pending.push({ label: 'OPEN SAPPHIRE DISPLAY', cost: 1, kind: 'interact' }); addIncident(next, next.alarm > 0 ? 'CASE FORCED OPEN. OBJECTIVE UPDATED → STAFF EXIT.' : 'CASE OPENED QUIETLY. OBJECTIVE UPDATED → STREET EXIT.', next.alarm > 0 ? 'warning' : 'success'); return; } const exit = next.objective === 'exit-service' ? { x: 11, y: 0 } : { x: 0, y: 0 }; if (next.asset && same(next.player, exit)) { next.phase = 'ending'; next.score += Math.max(0, 1000 - next.turn * 20 - next.alarm * 100); addIncident(next, 'ASSET SECURED. YOU LEFT NO STORY BEHIND.', 'success'); return; } next.notice = 'NOTHING USEFUL TO INTERACT WITH HERE.'; });
+  if (command.type === 'interact') return withPlanning(state, next => { const job = activeJob(next); if (next.ap <= 0) { next.notice = 'NO ACTIONS LEFT.'; return; } if (!next.keyTaken && same(next.player, job.key)) { next.keyTaken = true; next.objective = 'case'; next.ap--; next.pending.push({ label: 'TAKE BRASS NIGHT KEY', cost: 1, kind: 'interact' }); addIncident(next, 'KEY TAKEN. OBJECTIVE UPDATED → OPEN SAPPHIRE DISPLAY.', 'success'); return; } if (next.keyTaken && !next.caseOpen && same(next.player, job.display)) { next.caseOpen = true; next.asset = true; next.objective = next.alarm > 0 ? 'exit-service' : 'exit-east'; next.ap--; next.pending.push({ label: 'OPEN SAPPHIRE DISPLAY', cost: 1, kind: 'interact' }); addIncident(next, next.alarm > 0 ? 'CASE FORCED OPEN. OBJECTIVE UPDATED → STAFF EXIT.' : 'CASE OPENED QUIETLY. OBJECTIVE UPDATED → STREET EXIT.', next.alarm > 0 ? 'warning' : 'success'); return; } const exit = next.objective === 'exit-service' ? job.exits.service : job.exits.east; if (next.asset && same(next.player, exit)) { next.phase = 'ending'; next.score += Math.max(0, 1000 - next.turn * 20 - next.alarm * 100); addIncident(next, 'ASSET SECURED. YOU LEFT NO STORY BEHIND.', 'success'); return; } next.notice = 'NOTHING USEFUL TO INTERACT WITH HERE.'; });
   return state;
 }
 export function objectiveLabel(state: GameState): string { return objectiveText(state); }
-export function jobTitle(state: GameState): string { return jobs[state.jobIndex]?.title ?? 'THE QUIET HEIST'; }
+export function jobTitle(state: GameState): string { return activeJob(state).title; }
 export function briefing(state: GameState): readonly string[] { return jobs[state.jobIndex]?.brief ?? []; }
 export function nextJob(state: GameState): GameState { return makeState((state.jobIndex + 1) % jobs.length, state.seed + 1); }
 export function visible(state: GameState): Set<string> { const result = new Set(currentVision(state).map(p => `${p.x},${p.y}`)); if (state.camera.jammed === 0) { const c = state.camera.pos; const d = dirs[state.camera.direction]; for (let i = 1; i < 6; i++) { const p = { x: c.x + d.x * i, y: c.y + d.y * i }; if (!walkable(state, p)) break; result.add(`${p.x},${p.y}`); } } return result; }
+
+export interface PlanningComparison {
+  current: GameState;
+  planned: GameState;
+  currentSight: Set<string>;
+  plannedSight: Set<string>;
+  forecastSight: Set<string>;
+  risk: string;
+}
+
+/** Pure view model for the renderer: checkpoint is NOW, state is PLAN. */
+export function planningComparison(state: GameState): PlanningComparison {
+  const current = state.checkpoint ? clone(state.checkpoint) : clone(state);
+  current.checkpoint = undefined;
+  const planned = clone(state);
+  planned.checkpoint = undefined;
+  const currentSight = visible(current);
+  const plannedSight = visible(planned);
+  const forecastSight = new Set(state.forecast.flatMap(intent => intent.vision).map(point => `${point.x},${point.y}`));
+  const playerKey = `${planned.player.x},${planned.player.y}`;
+  const risk = currentSight.has(playerKey) ? 'EXPOSED NOW' : plannedSight.has(playerKey) ? 'EXPOSED AFTER PLAN' : forecastSight.has(playerKey) ? 'GUARD VISION AFTER COMMIT' : 'CLEAR THROUGH COMMIT';
+  return { current, planned, currentSight, plannedSight, forecastSight, risk };
+}

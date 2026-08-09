@@ -1,6 +1,7 @@
 import { CHAMBER_ORDER, EXPRESSION_BY_ID, MUTATION_BY_ID, SPECIES_BY_ID } from './content';
 import { contractRequirementText, currentUsage, expressionsForPlant, matchingContracts, mutationCandidates, projectCycle } from './engine';
 import type { ChamberId, GameState, PlantState } from './types';
+import { getCurrentThemePalette } from '../utils';
 
 const RESET = '\x1b[0m';
 const DIM = '\x1b[2m';
@@ -23,10 +24,10 @@ function meter(value: number, max: number, full = '◆', empty = '◇'): string 
 function lampGlyph(mode: GameState['chambers']['a1']['lamp']): string { return mode === 'blue' ? '☼' : mode === 'red' ? '◉' : mode === 'uv' ? '✦' : '·'; }
 function waterGlyph(mode: GameState['chambers']['a1']['water']): string { return mode === 'soak' ? '≈' : mode === 'mist' ? '~' : '·'; }
 
-function plantArt(plant: PlantState | null, chamberId: ChamberId): string[] {
+function plantArt(plant: PlantState | null, chamberId: ChamberId, ascii = false): string[] {
   if (!plant) return ['       ◇       ', '     EMPTY      ', '   SEED READY   '];
   const definition = SPECIES_BY_ID[plant.speciesId];
-  const stem = definition.glyph;
+  const stem = ascii ? definition.asciiGlyph : definition.glyph;
   const stage = Math.min(4, Math.floor(plant.mass / 3));
   const left = stage >= 1 ? `${stem}─` : ' │ ';
   const right = stage >= 2 ? `─${stem}` : ' │ ';
@@ -40,13 +41,13 @@ function plantArt(plant: PlantState | null, chamberId: ChamberId): string[] {
   ];
 }
 
-function renderChamber(out: string[], state: GameState, chamberId: ChamberId, x: number, y: number): void {
+function renderChamber(out: string[], state: GameState, chamberId: ChamberId, x: number, y: number, ascii = false): void {
   const chamber = state.chambers[chamberId];
   const selected = state.selectedChamberId === chamberId;
   const plant = chamber.plant;
   const definition = plant ? SPECIES_BY_ID[plant.speciesId] : undefined;
   const border = selected ? `${CYAN}${BOLD}` : `${DIM}${state.helpOpen ? '' : ''}`;
-  const art = plantArt(plant, chamberId);
+  const art = plantArt(plant, chamberId, ascii);
   const name = plant ? `${definition!.shortName} ${plant.name}` : 'EMPTY CHAMBER';
   const stats = plant ? `M${plant.mass} B${plant.bloom} G${plant.glow} S${plant.stress}` : 'NO SPECIMEN';
   const rootLimit = plant && expressionsForPlant(plant).includes('living-trellis') ? 10 : 8;
@@ -155,14 +156,17 @@ function renderReport(out: string[], state: GameState, cols: number): void {
   center(out, cols, 25, 'R REPLAY   N NEXT GAME   Q QUIT', `${DIM}${CYAN}`);
 }
 
-export function renderFrame(state: GameState, cols: number, rows: number, theme: string, glitchFrame: number): string {
+export function renderFrame(state: GameState, cols: number, rows: number, theme: string, glitchFrame = 0, ascii = false): string {
+  void glitchFrame;
+  const palette = getCurrentThemePalette();
+  theme = palette.ink;
   const out: string[] = ['\x1b[2J\x1b[H'];
   if (cols < MIN_COLS || rows < MIN_ROWS) {
     center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', `${RED}${BOLD}`);
     center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, `${DIM}${theme}`);
     return out.join('');
   }
-  const offset = glitchFrame % 60 >= 56 ? ((glitchFrame % 3) - 1) : 0;
+  const offset = 0;
   const title = '◈ BOTANY // LAB ◈';
   put(out, Math.max(1, Math.floor((cols - title.length) / 2) + 1 + offset), 1, `${theme}${BOLD}${title}${RESET}`);
 
@@ -188,10 +192,10 @@ export function renderFrame(state: GameState, cols: number, rows: number, theme:
   const usage = currentUsage(state);
   put(out, 3, 2, `${theme}CYCLE ${String(Math.min(state.cycle, state.maxCycles)).padStart(2, '0')}/${String(state.maxCycles).padStart(2, '0')}  FUND ${state.facility.funding}/${state.facility.fundingTarget}  SEALS ${meter(state.facility.biosecuritySeals, 3)}  ⚗ ${state.facility.mutationReagent}${RESET}`);
   put(out, 3, 3, `${DIM}${theme}LIGHT ${usage.light}/${state.facility.lightBudget}  WATER ${usage.water}/${state.facility.waterBudget}  ◉ FILTER ${state.facility.filterLoad}/${state.facility.filterCapacity}${RESET}`);
-  renderChamber(out, state, 'a1', 3, 4);
-  renderChamber(out, state, 'a2', 27, 4);
-  renderChamber(out, state, 'b1', 3, 14);
-  renderChamber(out, state, 'b2', 27, 14);
+  renderChamber(out, state, 'a1', 3, 4, ascii);
+  renderChamber(out, state, 'a2', 27, 4, ascii);
+  renderChamber(out, state, 'b1', 3, 14, ascii);
+  renderChamber(out, state, 'b2', 27, 14, ascii);
   renderContracts(out, state);
   renderForecast(out, state);
   const last = state.lastEvents[0]?.text ?? 'CONFIGURE THE LAB.';

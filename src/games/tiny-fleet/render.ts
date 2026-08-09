@@ -1,101 +1,86 @@
-import { getCurrentThemeColor } from '../utils';
-import { pointKey } from './grid';
+import { clipToWidth, padToWidth, centerText } from '../../ui/terminal';
+import { getCurrentThemePalette, type TerminalThemePalette } from '../utils';
 import { deriveObservation, hullPips, orderLabel } from './engine';
+import { pointKey } from './grid';
 import type { GameState, Point, ShipState } from './types';
 
-const RESET = '\x1b[0m'; const DIM = '\x1b[2m'; const BRIGHT = '\x1b[1m';
-const at = (lines: string[], x: number, y: number, value: string): void => { lines.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${value}`); };
-const box = (lines: string[], x: number, y: number, width: number, height: number, title: string, color: string): void => {
-  const inner = Math.max(0, width - title.length - 5);
-  at(lines, x, y, `${color}┌─ ${title} ${'─'.repeat(inner)}┐${RESET}`);
-  for (let row = 1; row < height - 1; row++) at(lines, x, y + row, `${color}│${' '.repeat(Math.max(0, width - 2))}│${RESET}`);
-  at(lines, x, y + height - 1, `${color}└${'─'.repeat(Math.max(0, width - 2))}┘${RESET}`);
-};
-const arrow = (facing: ShipState['facing']): string => ({ N: '↑', E: '→', S: '↓', W: '←' }[facing]);
-const shipGlyph = (ship: ShipState): string => ship.side === 'player' ? ship.classId === 'scout' ? 'S' : ship.classId === 'escort' ? 'E' : 'F' : ship.side === 'neutral' ? 'C' : 'P';
-const cellText = (point: Point): string => `${String.fromCharCode(65 + point.x)}${point.y + 1}`;
+const RESET = '\x1b[0m';
+const BOLD = '\x1b[1m';
+export const TINY_FLEET_MIN_COLS = 80;
+export const TINY_FLEET_MIN_ROWS = 28;
+function row(value: string, width: number, style = ''): string { return `${style}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
+function center(value: string, width: number): string { return centerText(value, width); }
+function arrow(facing: ShipState['facing']): string { return ({ N: '^', E: '>', S: 'v', W: '<' }[facing]); }
+function shipGlyph(ship: ShipState): string { return ship.side === 'player' ? ship.classId === 'scout' ? 'S' : ship.classId === 'escort' ? 'E' : 'F' : ship.side === 'neutral' ? 'C' : 'P'; }
+function cell(point: Point): string { return `${String.fromCharCode(65 + point.x)}${point.y + 1}`; }
 
-function mapPanel(lines: string[], state: GameState, color: string): void {
-  const view = deriveObservation(state, 'player'); const x0 = 4; const y0 = 7;
-  box(lines, 2, 5, 25, 14, 'SEA CHART', color);
-  at(lines, x0, y0 - 1, `${color}A B C D E F G H I${RESET}`);
-  const visible = new Map(view.visibleShips.map(ship => [ship.id, ship]));
+function resize(cols: number, rows: number, palette: TerminalThemePalette): string { return ['\x1b[2J\x1b[H', row('g/ TINY FLEET', cols, `${palette.focus}${BOLD}`), '', center('THE PLOTTING TABLE NEEDS MORE ROOM.', cols), center(`NEED 80x28  HAVE ${cols}x${rows}`, cols), center('Resize before sealing the fleet.', cols)].join('\r\n'); }
+
+function mapRows(state: GameState, palette: TerminalThemePalette): string[] {
+  const view = deriveObservation(state, 'player');
   const own = new Map(view.ownShips.map(ship => [ship.id, ship]));
-  const possible = new Set(view.tracks.flatMap(track => track.possible.map(pointKey)));
-  for (let y = 0; y < 9; y++) {
-    at(lines, x0 - 2, y0 + y, `${color}${y + 1}${RESET}`);
-    let row = '';
-    for (let x = 0; x < 9; x++) {
-      const point = { x, y }; const key = pointKey(point); let glyph = state.scenario.terrain[y]?.[x] === 'island' ? '#' : state.scenario.terrain[y]?.[x] === 'fog' ? '~' : '.';
-      let style = color;
-      if (state.smoke.some(smoke => smoke.pos.x === x && smoke.pos.y === y)) { glyph = 's'; style = '\x1b[1;96m'; }
-      if (state.wrecks.some(wreck => wreck.x === x && wreck.y === y)) { glyph = 'x'; style = '\x1b[1;90m'; }
-      if (view.objective.controlPoints.some(control => control.x === x && control.y === y)) { glyph = 'o'; style = '\x1b[1;93m'; }
-      if (view.objective.point && view.objective.point.x === x && view.objective.point.y === y) { glyph = 'O'; style = '\x1b[1;93m'; }
-      if (possible.has(key)) { glyph = ':'; style = '\x1b[1;33m'; }
-      for (const ship of [...own.values(), ...visible.values()]) if (ship.pos.x === x && ship.pos.y === y) { glyph = shipGlyph(ship); style = ship.side === 'player' ? '\x1b[1;97m' : ship.side === 'neutral' ? '\x1b[1;92m' : '\x1b[1;91m'; }
-      if (state.cursor.x === x && state.cursor.y === y && state.phase === 'planning') { row += `\x1b[7m${glyph} \x1b[0m`; }
-      else row += `${style}${glyph}${RESET} `;
+  const visible = new Map(view.visibleShips.map(ship => [ship.id, ship]));
+  const tracks = new Set(view.tracks.flatMap(track => track.possible.map(pointKey)));
+  const rows = [row('PLOTTING TABLE  [exact] [estimated] [unknown stays unknown]', 44, `${palette.focus}${BOLD}`)];
+  for (let y = 0; y < 9; y += 1) {
+    let line = `${palette.muted}${String(y + 1).padStart(2, ' ')} ${RESET}`;
+    for (let x = 0; x < 9; x += 1) {
+      const point = { x, y }; const key = pointKey(point);
+      let glyph = state.scenario.terrain[y]?.[x] === 'island' ? '#' : state.scenario.terrain[y]?.[x] === 'fog' ? '~' : '.';
+      let style = palette.line;
+      if (state.wrecks.some(wreck => wreck.x === x && wreck.y === y)) { glyph = 'x'; style = palette.muted; }
+      if (state.smoke.some(smoke => smoke.pos.x === x && smoke.pos.y === y)) { glyph = 's'; style = palette.warning; }
+      if (tracks.has(key)) { glyph = ':'; style = palette.warning; }
+      for (const ship of [...own.values(), ...visible.values()]) if (ship.pos.x === x && ship.pos.y === y) { glyph = shipGlyph(ship); style = ship.side === 'player' ? palette.focus : palette.danger; }
+      if (state.cursor.x === x && state.cursor.y === y && state.phase === 'planning') glyph = `[${glyph}]`;
+      line += `${style}${glyph.padEnd(2, ' ')}${RESET}`;
     }
-    at(lines, x0, y0 + y, row);
+    rows.push(line);
   }
+  rows.push(row('    A B C D E F G H I', 44, palette.muted));
+  return rows;
 }
 
-function fleetPanel(lines: string[], state: GameState, color: string): void {
-  box(lines, 28, 5, 49, 8, 'FLEET ORDERS', color);
+function contactRows(state: GameState, width: number, palette: TerminalThemePalette): string[] {
+  const view = deriveObservation(state, 'player');
+  const rows = [row('CONTACT LEDGER', width, `${palette.focus}${BOLD}`)];
+  for (const ship of view.visibleShips.filter(item => item.side === 'enemy')) rows.push(row(`${ship.id} EXACT ${cell(ship.pos)} ${arrow(ship.facing)} ${hullPips(ship)}`, width, palette.danger));
+  for (const track of view.tracks.filter(item => !item.exact)) rows.push(row(`${track.contactId} ESTIMATE ${cell(track.lastExact)} AGE ${track.age} / ${track.possible.length} CELLS / ${track.source}`, width, palette.warning));
+  if (rows.length === 1) rows.push(row('No public contacts. Last known marks remain the evidence.', width, palette.muted));
+  return rows;
+}
+
+function orderRows(state: GameState, width: number, palette: TerminalThemePalette): string[] {
   const own = state.ships.filter(ship => ship.side === 'player');
-  own.forEach((ship, index) => {
-    const order = state.orders.player[ship.id];
-    const status = ship.afloat ? `${hullPips(ship)} ${ship.reload ? 'RELOAD' : 'READY'}` : 'SUNK';
-    at(lines, 30, 7 + index, `${index + 1} ${shipGlyph(ship)}${arrow(ship.facing)} ${ship.id} ${status} ${orderLabel(order).slice(0, 20)}`);
-  });
-  at(lines, 30, 11, `${color}${Object.keys(state.orders.player).length}/${own.filter(ship => ship.afloat).length} ORDERS SEALED? ${state.phase === 'planning' ? 'NO — EDITING' : 'YES'}${RESET}`);
+  const rows = [row(state.phase === 'orderReview' ? 'SEALED ORDER DOCKET' : 'ORDER CHITS', width, `${palette.focus}${BOLD}`)];
+  own.forEach((ship, index) => rows.push(row(`${index + 1} ${shipGlyph(ship)}${arrow(ship.facing)} ${ship.id} ${ship.afloat ? hullPips(ship) : 'SUNK'}  ${orderLabel(state.orders.player[ship.id])}`, width, ship.afloat ? palette.ink : palette.muted)));
+  const assigned = Object.keys(state.orders.player).length;
+  rows.push(row(`${assigned}/${own.filter(ship => ship.afloat).length} ASSIGNED`, width, assigned === own.filter(ship => ship.afloat).length ? palette.good : palette.warning));
+  if (state.phase === 'orderReview') rows.push(row('ENTER seal and resolve  BACKSPACE/ESC edit', width, palette.focus));
+  else rows.push(row('ENTER review docket  TAB cycle panel', width, palette.muted));
+  return rows;
 }
 
-function contactsPanel(lines: string[], state: GameState, color: string): void {
-  const view = deriveObservation(state, 'player'); box(lines, 28, 14, 49, 7, 'CONTACTS', color);
-  let row = 16;
-  for (const ship of view.visibleShips.filter(item => item.side === 'enemy')) {
-    at(lines, 30, row++, `${ship.id} EXACT ${cellText(ship.pos)} ${arrow(ship.facing)} ${hullPips(ship)}${ship.reload ? ' RLD' : ''}`.slice(0, 45));
-  }
-  for (const track of view.tracks.filter(item => !item.exact)) {
-    at(lines, 30, row++, `${track.contactId} TRACK ${cellText(track.lastExact)} AGE ${track.age} · ${track.possible.length} CELLS`.slice(0, 45));
-  }
-  if (row === 16) at(lines, 30, row, `${DIM}${color}NO CONTACTS. WATCH THE LAST KNOWN MARKERS.${RESET}`);
+function reportRows(state: GameState, width: number, palette: TerminalThemePalette): string[] {
+  const rows = [row(state.outcome ? 'AFTER-ACTION REPORT' : 'ROUND RESOLUTION', width, `${palette.focus}${BOLD}`)];
+  state.reports.slice(-7).forEach(event => rows.push(row(`${event.kind === 'warning' ? '[!]' : event.kind === 'success' ? '[+]' : '[.]'} ${event.text}`, width, event.kind === 'warning' ? palette.warning : event.kind === 'success' ? palette.good : palette.ink)));
+  rows.push(row(state.outcome ? 'ENTER continue to battle report' : 'ENTER next planning round', width, palette.focus));
+  return rows;
 }
 
-function lowerPanel(lines: string[], state: GameState, color: string): void {
-  box(lines, 28, 22, 49, 5, state.panel.toUpperCase(), color);
-  if (state.panel === 'mission') { at(lines, 30, 24, `${state.objective.text.slice(0, 44)}`); at(lines, 30, 25, `ROUND ${state.round}/${state.roundLimit} · ${state.scenario.mastery.slice(0, 30)}`); return; }
-  const items = state.panel === 'log' ? state.log.slice(-2) : state.reports.slice(-2).map(event => event.text);
-  items.forEach((text, index) => at(lines, 30, 24 + index, `${text.slice(0, 44)}`));
+function playing(state: GameState, cols: number, palette: TerminalThemePalette): string {
+  const leftWidth = 46; const rightWidth = Math.max(30, cols - leftWidth - 5);
+  const left = mapRows(state, palette);
+  const right = state.phase === 'roundReport' || state.phase === 'battleReport' || state.phase === 'ending' ? reportRows(state, rightWidth, palette) : [...orderRows(state, rightWidth, palette), '', ...contactRows(state, rightWidth, palette), '', row(`MISSION ${state.objective.text}`, rightWidth, palette.ink), row(`ROUND ${state.round}/${state.roundLimit}  FLAGS ${state.flags}/3`, rightWidth, palette.muted)];
+  const lines = ['\x1b[2J\x1b[H', row('g/ TINY FLEET', cols, `${palette.focus}${BOLD}`), row(`ROUND ${String(state.round).padStart(2, '0')}/${state.roundLimit}  ${state.objective.text}  ${state.notice}`, cols, palette.muted), ''];
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) lines.push(`${padToWidth(left[i] ?? '', leftWidth)}  ${padToWidth(right[i] ?? '', rightWidth)}`);
+  lines.push('', row('1-3 ship  arrows aim  WASD helm  F fire  X special  G brace  . hold  ENTER review/seal  ? help  ESC pause', cols, palette.muted));
+  return lines.slice(0, 28).join('\r\n');
 }
 
-function reportOverlay(lines: string[], state: GameState, color: string): void {
-  const title = state.outcome ? (state.outcome === 'victory' ? 'MISSION COMPLETE' : state.outcome === 'draw' ? 'TACTICAL DRAW' : 'MISSION FAILED') : 'ROUND RESOLVED';
-  box(lines, 12, 8, 57, 12, title, state.outcome === 'victory' ? '\x1b[1;92m' : state.outcome ? '\x1b[1;91m' : color);
-  const report = state.reports.slice(-6);
-  report.forEach((event, index) => at(lines, 15, 10 + index, `${event.kind === 'warning' ? '!' : event.kind === 'success' ? '✓' : '·'} ${event.text.slice(0, 50)}`));
-  at(lines, 15, 18, state.outcome ? 'ENTER: AFTER-ACTION REPORT' : 'ENTER: NEXT PLANNING ROUND');
-}
-
-export function renderFrame(state: GameState, cols: number, rows: number, themeColor = getCurrentThemeColor(), glitchFrame = 0): string {
-  const lines: string[] = ['\x1b[2J\x1b[H'];
-  if (cols < 80 || rows < 28) { at(lines, Math.max(1, Math.floor(cols / 2) - 10), Math.max(2, Math.floor(rows / 2)), '\x1b[1;91mTERMINAL TOO SMALL' + RESET); at(lines, Math.max(1, Math.floor(cols / 2) - 15), Math.max(3, Math.floor(rows / 2) + 2), `Need 80x28  Have ${cols}x${rows}`); return lines.join(''); }
-  const title = '✦ T I N Y  F L E E T ✦'; const offset = glitchFrame % 60 >= 56 ? (glitchFrame % 3) - 1 : 0;
-  at(lines, Math.floor((cols - title.length) / 2) + offset, 1, `${themeColor}${BRIGHT}${title}${RESET}`);
-  if (state.phase === 'start') { at(lines, 28, 8, `${themeColor}${BRIGHT}THREE SHIPS. ONE SEALED TURN.${RESET}`); at(lines, 30, 11, 'T  TRAINING     P  CAMPAIGN'); at(lines, 30, 13, 'Read the tracks. Predict the fire.'); at(lines, 30, 16, 'Q  QUIT'); return lines.join(''); }
-  if (state.phase === 'briefing') { box(lines, 14, 6, 62, 16, state.scenario.title, themeColor); state.scenario.briefing.forEach((text, index) => at(lines, 18, 10 + index * 2, text.slice(0, 54))); at(lines, 18, 17, `OBJECTIVE: ${state.objective.text.slice(0, 44)}`); at(lines, 18, 20, 'ENTER  BEGIN BATTLE     ESC  PAUSE'); return lines.join(''); }
-  at(lines, 3, 3, `${themeColor}ROUND ${String(state.round).padStart(2, '0')}/${state.roundLimit}   FLAGS ${'◆'.repeat(state.flags)}${'◇'.repeat(Math.max(0, 3 - state.flags))}   ${state.objective.text.slice(0, 44)}${RESET}`);
-  mapPanel(lines, state, themeColor); fleetPanel(lines, state, themeColor); contactsPanel(lines, state, themeColor); lowerPanel(lines, state, themeColor);
-  at(lines, 3, 21, `${themeColor}${state.notice.slice(0, 72)}${RESET}`);
-  at(lines, 3, 27, `${DIM}${themeColor}[1-3/Tab] ship  arrows aim  WASD helm  F fire  X special  G brace  . hold  Enter seal  I panel  ? help  Esc pause${RESET}`);
-  if (state.phase === 'roundReport') reportOverlay(lines, state, themeColor);
-  if (state.phase === 'battleReport' || state.phase === 'ending') {
-    box(lines, 18, 8, 45, 12, state.campaignComplete ? 'CAMPAIGN COMPLETE' : 'AFTER-ACTION REPORT', state.outcome === 'victory' ? '\x1b[1;92m' : themeColor);
-    at(lines, 22, 11, state.campaignComplete ? 'THE LANTERN COAST HOLDS.' : `${state.outcome?.toUpperCase() ?? 'REPORT'} · FLAGS ${state.flags}/3`);
-    at(lines, 22, 13, `BATTLE ${state.scenarioIndex} · ${state.scenario.title.slice(11)}`.slice(0, 39));
-    at(lines, 22, 15, state.campaignComplete ? 'R RESTART   Q QUIT' : state.outcome === 'victory' ? 'N NEXT BATTLE   R RETRY   Q QUIT' : 'R RETRY   Q QUIT');
-  }
-  return lines.join('');
+export function renderFrame(state: GameState, cols: number, rows: number, palette: TerminalThemePalette = getCurrentThemePalette()): string {
+  if (cols < TINY_FLEET_MIN_COLS || rows < TINY_FLEET_MIN_ROWS) return resize(cols, rows, palette);
+  if (state.phase === 'start') return ['\x1b[2J\x1b[H', row('g/ TINY FLEET', cols, `${palette.focus}${BOLD}`), '', center('THREE SHIPS. ONE SEALED TURN.', cols), '', row('[T] training   [P/ENTER] campaign   [Q] quit', cols, palette.focus), row('Plot from evidence. Seal the docket. Read the public replay.', cols, palette.ink)].join('\r\n');
+  if (state.phase === 'briefing') return ['\x1b[2J\x1b[H', row(`g/ TINY FLEET  ${state.scenario.title}`, cols, `${palette.focus}${BOLD}`), '', ...state.scenario.briefing.map(text => row(text, cols - 4, palette.ink)), '', row('ENTER begin battle  ESC pause', cols, palette.focus)].join('\r\n');
+  return playing(state, cols, palette);
 }

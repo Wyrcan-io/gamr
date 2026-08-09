@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, createState } from './engine';
 import { directionForKey, renderFrame } from './render';
@@ -37,6 +37,7 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
   const handleKey = (event: KeyboardEvent): void => {
     const key = event.key.toLowerCase();
     event.preventDefault(); event.stopPropagation();
+    if (key === 'escape' && state.helpOpen) { run({ type: 'toggleHelp' }); return; }
     if (key === 'escape' && !['start', 'ending', 'gameOver'].includes(state.phase)) { paused = !paused; pauseSelection = 0; return; }
     if (handlePause(key, event)) return;
     if (state.helpOpen) { if (key === 'h' || key === 'escape') run({ type: 'toggleHelp' }); return; }
@@ -56,9 +57,10 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
     if (state.phase !== 'traversal') return;
     if (key === 'q') { quit(); return; }
     const direction = directionForKey(key);
-    if (direction) { run({ type: 'move', direction, hurried: event.shiftKey }); return; }
+    if (direction) { run({ type: 'previewMove', direction, hurried: event.shiftKey }); return; }
     if (key === 'b') run({ type: 'brace' });
-    else if (key === '.' || key === ' ') run({ type: 'wait' });
+    else if (key === 'enter' || key === ' ') run({ type: 'commitMove' });
+    else if (key === '.') run({ type: 'wait' });
     else if (key === 'e' || key === 'enter') run({ type: 'interact' });
     else if (key === 'i') run({ type: 'toggleInventory' });
     else if (key === 'tab') run({ type: 'cycleSurvey' });
@@ -67,7 +69,7 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
   };
 
   const render = (): void => {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), 0);
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette().focus, 0);
     if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   };

@@ -1,4 +1,5 @@
 import type { GameState, Passenger, PanelButton } from './types';
+import { clipToWidth, displayWidth, padToWidth } from '../../ui/terminal';
 
 export interface RenderTheme {
   accent: string;
@@ -16,7 +17,7 @@ export function stripAnsi(value: string): string {
 }
 
 export function visibleWidth(value: string): number {
-  return stripAnsi(value).length;
+  return displayWidth(value);
 }
 
 function color(theme: RenderTheme, code: string, value: string): string {
@@ -24,13 +25,11 @@ function color(theme: RenderTheme, code: string, value: string): string {
 }
 
 function fit(value: string, width: number): string {
-  const plain = stripAnsi(value);
-  return plain.length > width ? `${plain.slice(0, Math.max(0, width - 1))}…` : plain.padEnd(width, ' ');
+  return padToWidth(clipToWidth(value, width, ''), width);
 }
 
 function center(value: string, width: number): string {
-  const plain = stripAnsi(value);
-  const left = Math.max(0, Math.floor((width - plain.length) / 2));
+  const left = Math.max(0, Math.floor((width - displayWidth(value)) / 2));
   return `${' '.repeat(left)}${value}`;
 }
 
@@ -67,9 +66,21 @@ function renderPlanning(state: GameState, width: number, theme: RenderTheme): st
   panelLines.push(`ROUTE: ${state.plannedRoute.length ? state.plannedRoute.join(' → ') : '—'}`);
   lines.push(...box('PANEL / STOPS', panelLines, width, theme));
   lines.push(...box('SERVICE MEMO', [puzzle.contract.memo], width, theme, theme.warning));
-  const clues = puzzle.clues.map((clue, index) => `${index + 1}. ${clue.renderedText}`);
+  const clues = puzzle.clues.map((clue, index) => `${index + 1}. [${clue.sourceTime === 'current' ? 'NOW' : 'PREV'} / ${clue.speakerId}] ${clue.renderedText}`);
   lines.push(...box('EVIDENCE / RIDER TESTIMONY', clues, width, theme, theme.muted));
   return lines;
+}
+
+function renderRouteReview(state: GameState, width: number, theme: RenderTheme): string[] {
+  const puzzle = state.puzzle;
+  if (!puzzle) return box('ROUTE REVIEW', ['No manifest.'], width, theme);
+  const route = state.plannedRoute.length ? state.plannedRoute : ['—'];
+  const coverage = puzzle.passengers.map(passenger => `${passenger.name}: ${passenger.destination ?? 'NO DESTINATION'} ${passenger.constraints.length ? passenger.constraints.map(item => item.kind).join(', ') : 'no extra constraint'}`);
+  return [
+    ...box('ROUTE TAPE / REVIEW', [`${route.map((stop, index) => `${String(index + 1).padStart(2, '0')} ${stop}`).join('  →  ')}`, '', 'This is a review, not departure.', 'ENTER  CONFIRM DEPARTURE', 'BACKSPACE / ESC  RETURN TO PANEL'], width, theme, theme.warning),
+    ...box('RIDER COVERAGE', coverage, width, theme, theme.muted),
+    ...box('SERVICE MEMO', [puzzle.contract.memo], width, theme, theme.warning),
+  ];
 }
 
 function renderAudit(state: GameState, width: number, theme: RenderTheme): string[] {
@@ -102,6 +113,7 @@ function renderStateBody(state: GameState, width: number, theme: RenderTheme): s
   if (state.phase === 'start') return box('NIGHT OPERATOR CONSOLE', ['The directory says twelve floors.', 'The button panel says thirteen.', '', '[ENTER] STORY CAMPAIGN', '[T] TUTORIAL   [A] AFTER HOURS', '[Q] QUIT'], width, theme);
   if (state.phase === 'briefing') return box(`SHIFT ${state.shiftIndex + 1} / BRIEFING`, [...state.storyLines, '', state.puzzle?.contract.memo ?? '', '', 'Press ENTER to open the doors.'], width, theme);
   if (state.phase === 'planning') return renderPlanning(state, width, theme);
+  if (state.phase === 'routeReview') return renderRouteReview(state, width, theme);
   if (state.phase === 'transit') return box('IN TRANSIT', [`ROUTE: ${state.plannedRoute.join(' → ')}`, 'The shaft climbs through a floor that is not on the directory.', 'The arrival chime is listening.', '', 'Traveling…'], width, theme, theme.warning);
   if (state.phase === 'audit') return renderAudit(state, width, theme);
   if (state.phase === 'interlude') return box(`SHIFT ${state.shiftIndex + 1} INTERLUDE`, [...state.storyLines, '', 'Press ENTER to accept the next manifest.'], width, theme, theme.warning);

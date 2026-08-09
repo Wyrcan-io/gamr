@@ -80,4 +80,17 @@ describe('Blackout Grid topology and restoration', () => {
     expect(renderFrame(state, 79, 28, '\x1b[36m', 0)).toContain('TERMINAL TOO SMALL');
     expect(renderFrame(state, 80, 28, '\x1b[36m', 0)).toContain('BLACKOUT GRID');
   });
+
+  it('owns focus timing in the deterministic engine', () => {
+    let state = running(91);
+    const activated = applyCommand(state, { type: 'activateFocus' });
+    expect(activated.accepted).toBe(true);
+    expect(activated.state.focusCharges).toBe(1);
+    expect(activated.state.focusBeats).toBe(12);
+    const tickBefore = activated.state.tick;
+    advance(activated.state);
+    expect(activated.state.tick).toBe(tickBefore);
+    advance(activated.state);
+    expect(activated.state.tick).toBe(tickBefore + 1);
+  });
 });

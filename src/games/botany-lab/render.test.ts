@@ -25,4 +25,11 @@ describe('Botany Lab renderer', () => {
     expect(frame).toContain('TERMINAL TOO SMALL');
     expect(frame).toContain('NEED 80x28');
   });
+
+  it('keeps plant identity readable in ASCII mode', () => {
+    const running = applyCommand(applyCommand(createState(5, 'standard'), { type: 'startStandard', seed: 5 }).state, { type: 'dismissBriefing' }).state;
+    const frame = stripAnsi(renderFrame(running, 80, 28, '\x1b[96m', 0, true));
+    expect(frame).toContain('HELIOX');
+    expect(frame).toContain('F');
+  });
 });

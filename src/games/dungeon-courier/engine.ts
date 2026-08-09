@@ -77,7 +77,7 @@ function initialState(seed: number, mode: GameState['mode']): GameState {
     version: 1, seed: seed >>> 0, mode, phase: 'start', deliveryIndex: 0, contractOffers: [], selectedOffer: 0, contract: null, floor: null,
     courier: { pos: { x: 2, y: 2 }, previousPos: { x: 2, y: 2 }, inventory: initialItems(tutorial), selectedSlot: 0 },
     score: 0, pay: 0, upgrades: [], surveyMode: 'none', helpOpen: false, notice: 'THE UNDERWAY POST IS WAITING.', eventLog: [], lastReport: null, reports: [], outcome: null,
-    floorFlags: { webbingUsed: false, handcartUsed: false, benchUsed: false, soleReady: true, claimUsed: false },
+    floorFlags: { webbingUsed: false, handcartUsed: false, benchUsed: false, soleReady: true, claimUsed: false }, previewDirection: 'E', previewHurried: false,
   };
 }
 
@@ -122,6 +122,7 @@ function beginContract(state: GameState, offer: ContractOffer): void {
   state.surveyMode = 'none';
   state.helpOpen = false;
   state.floorFlags = { webbingUsed: false, handcartUsed: false, benchUsed: false, soleReady: true, claimUsed: false };
+  state.previewDirection = 'E'; state.previewHurried = false;
   state.phase = 'briefing';
   state.notice = `${PARCELS[offer.parcelId].label}: ${PARCELS[offer.parcelId].rule}.`;
   addEvent(state, `DELIVERY ${state.deliveryIndex + 1}: ${PARCELS[offer.parcelId].label}.`);
@@ -479,7 +480,9 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
       if (next.phase === 'contract' && next.contractOffers[command.index]) { next.selectedOffer = command.index; beginContract(next, next.contractOffers[command.index]); return accept(); }
       return accept(false);
     case 'dismissBriefing': if (next.phase === 'briefing') { next.phase = 'traversal'; addEvent(next, 'TRAVERSAL ACTIVE. READ THE PREVIEW BEFORE MOVING.'); } else return accept(false); return accept();
-    case 'move': if (next.phase === 'traversal') { events.push(...doMove(next, command.direction, Boolean(command.hurried))); return accept(); } return accept(false);
+    case 'previewMove': if (next.phase === 'traversal') { next.previewDirection = command.direction; next.previewHurried = Boolean(command.hurried); next.notice = previewText(next, command.direction, Boolean(command.hurried)).reason; return accept(); } return accept(false);
+    case 'commitMove': if (next.phase === 'traversal') { events.push(...doMove(next, next.previewDirection, next.previewHurried)); return accept(); } return accept(false);
+    case 'move': if (next.phase === 'traversal') { next.previewDirection = command.direction; next.previewHurried = Boolean(command.hurried); events.push(...doMove(next, command.direction, Boolean(command.hurried))); return accept(); } return accept(false);
     case 'brace': if (next.phase === 'traversal') { events.push(...doBrace(next)); return accept(); } return accept(false);
     case 'wait': if (next.phase === 'traversal') { events.push(...doWait(next)); return accept(); } return accept(false);
     case 'interact': if (next.phase === 'traversal') { interact(next); if (next.phase === 'traversal') events.push(...advanceTicks(next, 1)); return accept(); } return accept(false);

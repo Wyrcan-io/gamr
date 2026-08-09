@@ -23,7 +23,10 @@ export type Command =
 const NEIGHBOURS: Record<StationNodeId, StationNodeId[]> = { G: ['H'], H: ['G', 'A', 'C'], A: ['H', 'B'], B: ['A', 'C'], C: ['H', 'B', 'D'], D: ['C'] };
 const clamp = (n: number, min: number, max: number): number => Math.max(min, Math.min(max, n));
 const copyRooms = (rooms: Record<RoomId, RoomState>): Record<RoomId, RoomState> => Object.fromEntries(ROOMS.map(id => [id, { ...rooms[id] }])) as Record<RoomId, RoomState>;
-const pendingFromRooms = (rooms: Record<RoomId, RoomState>): PendingConfiguration => ({ rooms: Object.fromEntries(ROOMS.map(id => [id, { lamp: rooms[id].lamp, audio: rooms[id].audio, door: rooms[id].door }])) as PendingConfiguration['rooms'] });
+const pendingFromRooms = (rooms: Record<RoomId, RoomState>): PendingConfiguration => ({
+  rooms: Object.fromEntries(ROOMS.map(id => [id, { lamp: rooms[id].lamp, audio: rooms[id].audio, door: rooms[id].door }])) as PendingConfiguration['rooms'],
+  fieldAction: null,
+});
 
 function rng(seed: number): () => number { let x = seed >>> 0; return () => { x = (Math.imul(x ^ (x >>> 16), 2246822519) + 3266489917) >>> 0; return (x ^ (x >>> 13)) / 4294967296; }; }
 
@@ -75,6 +78,15 @@ function applyPower(state: GameState): { demand: number; shed: string[] } {
 }
 
 function resolveCycle(state: GameState, extra: string[] = []): GameState {
+  const fieldAction = state.pending.fieldAction;
+  if (fieldAction?.kind === 'moveTechnician') {
+    state.technicianRoom = fieldAction.to;
+    extra.push(`TECHNICIAN MOVED TO ${fieldAction.to}`);
+  } else if (fieldAction?.kind === 'probe') {
+    state.battery = clamp(state.battery - 1, 0, 6);
+    extra.push(`DIAGNOSTIC PROBE: ${fieldAction.roomId}`);
+  }
+  state.pending.fieldAction = null;
   let seals = ROOMS.filter(id => state.pending.rooms[id].door === 'sealed').length;
   for (const room of [...ROOMS].reverse()) {
     if (seals <= state.battery) break;
@@ -87,7 +99,13 @@ function resolveCycle(state: GameState, extra: string[] = []): GameState {
 }
 
 export function applyCommand(input: GameState, command: Command): GameState {
-  const state = { ...input, rooms: copyRooms(input.rooms), anomalies: Object.fromEntries(Object.entries(input.anomalies).map(([id, a]) => [id, { ...a }])) } as GameState;
+  const state = {
+    ...input,
+    rooms: copyRooms(input.rooms),
+    anomalies: Object.fromEntries(Object.entries(input.anomalies).map(([id, a]) => [id, { ...a, knownEvidence: [...a.knownEvidence] }])) ,
+    pending: { rooms: Object.fromEntries(ROOMS.map(id => [id, { ...input.pending.rooms[id] }])) as GameState['pending']['rooms'], fieldAction: input.pending.fieldAction ? { ...input.pending.fieldAction } : null },
+    incidents: [...input.incidents],
+  } as GameState;
   switch (command.type) {
     case 'startRun': return setupShift({ ...blankState(command.seed ?? state.seed, command.mode), upgrades: [], integrity: 6 }, 0);
     case 'dismissBriefing': if (state.phase === 'briefing') state.phase = 'working'; break;
@@ -95,9 +113,9 @@ export function applyCommand(input: GameState, command: Command): GameState {
     case 'setLamp': if (state.phase === 'working') state.pending.rooms[command.roomId].lamp = command.lamp; break;
     case 'setAudio': if (state.phase === 'working') state.pending.rooms[command.roomId].audio = command.audio; break;
     case 'setDoor': if (state.phase === 'working') state.pending.rooms[command.roomId].door = command.door; break;
-    case 'moveTechnician': if (state.phase === 'working' && NEIGHBOURS[state.technicianRoom].includes(command.to)) { state.technicianRoom = command.to; return resolveCycle(state, [`TECHNICIAN MOVED TO ${command.to}`]); } break;
+    case 'moveTechnician': if (state.phase === 'working' && NEIGHBOURS[state.technicianRoom].includes(command.to)) { state.pending.fieldAction = { kind: 'moveTechnician', to: command.to }; state.notice = `MOVE PREVIEW: TECHNICIAN TO ${command.to}. ENTER TO COMMIT.`; } break;
     case 'commitCycle': if (state.phase === 'working') return resolveCycle(state); break;
-    case 'useProbe': if (state.phase === 'working' && state.battery > 0) { state.battery -= 1; return resolveCycle(state, [`DIAGNOSTIC PROBE: ${command.roomId}`]); } break;
+    case 'useProbe': if (state.phase === 'working' && state.battery > 0) { state.pending.fieldAction = { kind: 'probe', roomId: command.roomId }; state.notice = `PROBE PREVIEW: ${command.roomId}. BATTERY -1 ON COMMIT.`; } break;
     case 'showHelp': state.notice = 'CONFIGURE FREELY. ENTER ADVANCES ONE CYCLE. EVERY REACTION IS LOGGED.'; break;
     case 'showRules': { const anomaly = state.anomalies[state.rooms[state.selectedRoom].anomalyId ?? '']; state.notice = anomaly ? `${anomalyName(anomaly.id)}: ${ANOMALIES[anomaly.id]!.clue}` : 'NO ANOMALY IN THIS CHAMBER.'; break; }
     case 'showLog': state.notice = state.incidents.length ? state.incidents[state.incidents.length - 1]!.text : 'INCIDENT LOG EMPTY.'; break;
@@ -116,3 +134,11 @@ export function anomalyGlyph(id: string): string { return ANOMALIES[id]?.glyph ?
 export function lampLabel(lamp: LampMode): string { return lamp === 'bright' ? 'BRIGHT' : lamp === 'dim' ? 'DIM' : 'DARK'; }
 export function audioLabel(audio: AudioMode): string { return audio.toUpperCase(); }
 export function roomIds(): RoomId[] { return ROOMS; }
+
+export interface CycleProjection { state: GameState; accepted: boolean; reason?: string; }
+
+export function projectCycle(input: GameState): CycleProjection {
+  if (input.phase !== 'working') return { state: input, accepted: false, reason: 'CYCLE NOT READY' };
+  const projected = applyCommand(input, { type: 'commitCycle' });
+  return { state: projected, accepted: true };
+}

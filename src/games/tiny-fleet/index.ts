@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, createState } from './engine';
 import { renderFrame } from './render';
@@ -9,7 +9,7 @@ import type { Command, GameState, ShipOrder } from './types';
 export interface TinyFleetController { stop: () => void; isRunning: boolean; }
 
 export function runTinyFleetGame(terminal: Terminal): TinyFleetController {
-  let running = true; let paused = false; let pauseSelection = 0; let frame = 0;
+  let running = true; let paused = false; let pauseSelection = 0;
   let state: GameState = createState(Date.now());
   let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
@@ -41,6 +41,7 @@ export function runTinyFleetGame(terminal: Terminal): TinyFleetController {
     if (key === 'escape' && !['start', 'ending', 'battleReport'].includes(state.phase)) { paused = !paused; pauseSelection = 0; return; }
     if (state.phase === 'start') { if (key === 't') send({ type: 'start', mode: 'skirmish' }); else if (key === 'p' || key === 'enter') send({ type: 'start', mode: 'campaign' }); else if (key === 'q') quit(); return; }
     if (state.phase === 'briefing') { if (key === 'enter' || key === ' ') send({ type: 'dismissBriefing' }); return; }
+    if (state.phase === 'orderReview') { if (key === 'enter' || key === ' ') send({ type: 'sealOrders' }); else if (key === 'escape' || key === 'backspace') send({ type: 'closeOrderReview' }); return; }
     if (state.phase === 'roundReport') { if (key === 'enter' || key === ' ') send({ type: 'dismissReport' }); return; }
     if (state.phase === 'battleReport' || state.phase === 'ending') { if (key === 'r') restart(); else if (key === 'n' && state.outcome === 'victory') send({ type: 'nextBattle' }); else if (key === 'q') quit(); return; }
     if (key === '?') { state = { ...state, notice: 'ONE ORDER PER SHIP. MOVEMENT AND FIRE RESOLVE TOGETHER. TRACKS ARE POSSIBILITIES, NOT PROMISES.' }; return; }
@@ -60,11 +61,11 @@ export function runTinyFleetGame(terminal: Terminal): TinyFleetController {
     }
     else if (key === '.') send({ type: 'queueOrder', shipId: state.selectedShipId, order: selectedOrder('hold') });
     else if (key === 'backspace' || key === 'u') send({ type: 'clearOrder', shipId: state.selectedShipId });
-    else if (key === 'enter' || key === ' ') send({ type: 'sealOrders' });
+    else if (key === 'enter' || key === ' ') send({ type: 'openOrderReview' });
   }
 
   function pauseOverlay(): string { return renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); }
-  function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), frame++); if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += pauseOverlay(); terminal.write(output); }
+  function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette()); if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += pauseOverlay(); terminal.write(output); }
 
   const originalStop = controller.stop;
   controller.stop = () => { if (!running) return; running = false; if (renderInterval) clearInterval(renderInterval); keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); originalStop(); };

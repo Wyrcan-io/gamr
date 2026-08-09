@@ -163,7 +163,7 @@ export function applyCommand(input: GameState, command: Command): CommandResult 
   if (command.type === 'dismissWindowReport' && state.phase === 'shiftReport') return { state: finishShift(state), events: ['shift-report'] };
   if (command.type === 'chooseUpgrade' && state.phase === 'upgrade') { const offer = state.upgradeOffers.find(item => item.id === command.upgradeId); if (offer) { state.upgrades.push(offer.id); return { state: beginNextShift(state), events: [`upgrade:${offer.id}`] }; } return { state, events: [] }; }
   if (command.type === 'toggleHelp') { state.helpOpen = !state.helpOpen; return { state, events: [] }; }
-  if (command.type === 'toggleLog' || command.type === 'toggleForecast') { state.logOpen = !state.logOpen; return { state, events: [] }; }
+  if (command.type === 'toggleLog') { state.logOpen = !state.logOpen; return { state, events: [] }; }
   if (state.phase === 'gameOver' || state.phase === 'ending') return { state, events: [] };
   if (command.type === 'selectJob') { if (state.jobs[command.jobId]) { state.selectedJobId = command.jobId; const job = state.jobs[command.jobId]; state.selectedStartWindow = Math.max(state.currentWindow, job.scheduledStart ?? job.earliestWindow); state.notice = job.description; } return { state, events: [] }; }
   if (command.type === 'selectStart') { const job = state.selectedJobId ? state.jobs[state.selectedJobId] : undefined; const max = state.currentWindow + 3; state.selectedStartWindow = clamp(state.selectedStartWindow + command.delta, state.currentWindow, max); if (job) state.notice = placement(state, job, state.selectedStartWindow).reason; return { state, events: [] }; }

@@ -4,7 +4,7 @@ export type SideId = 'player' | 'enemy';
 export type FactionId = SideId | 'neutral';
 export type ShipClassId = 'scout' | 'escort' | 'flagship';
 export type TerrainCell = 'sea' | 'island' | 'fog';
-export type Phase = 'start' | 'briefing' | 'planning' | 'roundReport' | 'battleReport' | 'ending';
+export type Phase = 'start' | 'briefing' | 'planning' | 'orderReview' | 'roundReport' | 'battleReport' | 'ending';
 export type BattleMode = 'campaign' | 'skirmish';
 export type ObjectiveKind = 'eliminate' | 'hold' | 'escort';
 
@@ -131,6 +131,8 @@ export type Command =
   | { type: 'queueOrder'; shipId: string; order: ShipOrder }
   | { type: 'clearOrder'; shipId: string }
   | { type: 'cyclePanel' }
+  | { type: 'openOrderReview' }
+  | { type: 'closeOrderReview' }
   | { type: 'sealOrders' }
   | { type: 'dismissReport' }
   | { type: 'restart' }

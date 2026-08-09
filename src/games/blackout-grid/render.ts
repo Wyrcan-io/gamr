@@ -1,5 +1,6 @@
 import { DISTRICT_CONTENT } from './content';
-import { closePreview, districtContent, selectedAsset, serviceRatioForState } from './engine';
+import { getCurrentThemePalette } from '../utils';
+import { closePreview, districtContent, selectedActionPreview, selectedAsset, serviceRatioForState } from './engine';
 import type { GameState, GridEdge, GridNode, Point } from './types';
 import { GRID_HEIGHT, GRID_WIDTH } from './types';
 
@@ -78,6 +79,8 @@ function lineForCell(state: GameState, point: Point): string {
 
 function selectedDetails(state: GameState, out: string[], x: number, y: number, theme: string): void {
   const item = selectedAsset(state);
+  const action = selectedActionPreview(state);
+  put(out, x, y - 1, `${theme}${BOLD}ACTION ${action.action}${action.ok ? '' : ' [BLOCKED]'}${RESET}`);
   if (item.edge) {
     const edge = item.edge;
     const preview = edge.breaker !== 'closed' && edge.condition === 'intact' ? closePreview(state, edge.id) : undefined;
@@ -145,6 +148,8 @@ function renderUpgrade(state: GameState, out: string[], cols: number, theme: str
 }
 
 export function renderFrame(state: GameState, cols: number, rows: number, theme: string, glitchFrame: number, upgrades: string[] = [], message = ''): string {
+  const palette = getCurrentThemePalette();
+  theme = palette.ink;
   const out: string[] = ['\x1b[2J\x1b[H'];
   if (cols < 80 || rows < 28) { center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', RED + BOLD); center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED 80x28  HAVE ${cols}x${rows}`, DIM + theme); return out.join(''); }
   const titleOffset = glitchFrame % 60 >= 56 ? (glitchFrame % 3) - 1 : 0;

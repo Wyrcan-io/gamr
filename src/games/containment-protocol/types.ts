@@ -25,7 +25,10 @@ export interface AnomalyState {
 }
 
 export interface Incident { cycle: number; text: string; kind: 'info' | 'warning' | 'success' | 'breach'; }
-export interface PendingConfiguration { rooms: Record<RoomId, Pick<RoomState, 'lamp' | 'audio' | 'door'>>; }
+export interface PendingConfiguration {
+  rooms: Record<RoomId, Pick<RoomState, 'lamp' | 'audio' | 'door'>>;
+  fieldAction: { kind: 'moveTechnician'; to: StationNodeId } | { kind: 'probe'; roomId: RoomId } | null;
+}
 export interface CycleResult { cycle: number; notices: string[]; deltas: Record<string, number>; demand: number; capacity: number; shed: string[]; breached: string[]; }
 export interface Upgrade { id: string; name: string; text: string; }
 export interface GameState {
@@ -54,4 +57,3 @@ export interface GameState {
   score: number;
   notice: string;
 }
-

@@ -37,6 +37,20 @@ describe('The 13th Lift engine', () => {
     expect(state.notice).toContain('INTERCOM');
   });
 
+  it('reviews a route before confirming departure', () => {
+    let state = command(createState(17), { type: 'startCampaign', seed: 17 });
+    state = command(state, { type: 'dismissBriefing' });
+    const button = state.puzzle!.safeRoutes[0]![0]!;
+    state.selectedButtonIndex = state.puzzle!.panel.findIndex(item => item.id === button);
+    state = command(state, { type: 'toggleStop' });
+    state = command(state, { type: 'openRouteReview' });
+    expect(state.phase).toBe('routeReview');
+    expect(state.lastEvaluation).toBeNull();
+    state = command(state, { type: 'confirmRoute' });
+    expect(state.phase).toBe('transit');
+    expect(state.lastEvaluation).not.toBeNull();
+  });
+
   it('requires protected threads for the operator ending', () => {
     let state = command(createState(9), { type: 'startCampaign', seed: 9 });
     state.phase = 'finale';

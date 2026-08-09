@@ -82,4 +82,11 @@ describe('Orbital Post engine', () => {
     state = applyCommand(state, { type: 'dismissWindowReport' }).state;
     expect(getQueueJobs(state).some(job => job.title === 'COLONY BURST')).toBe(true);
   });
+
+  it('keeps the forecast command separate from the incident log', () => {
+    const state = working(17);
+    const opened = applyCommand(state, { type: 'toggleLog' }).state;
+    expect(opened.logOpen).toBe(true);
+    expect(opened.helpOpen).toBe(false);
+  });
 });

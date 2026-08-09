@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createState } from './engine';
+import { applyCommand, createState, planningComparison } from './engine';
 
 describe('The Quiet Heist engine', () => {
   it('keeps guard forecasts deterministic until commit', () => {
@@ -35,5 +35,15 @@ describe('The Quiet Heist engine', () => {
     state = applyCommand(state, { type: 'commit' });
     expect(state.turn).toBe(2);
     expect(applyCommand(state, { type: 'undo' })).toEqual(state);
+  });
+
+  it('keeps NOW separate from the planned state', () => {
+    let state = applyCommand(createState(123), { type: 'dismissBriefing' });
+    const before = JSON.stringify(state);
+    state = applyCommand(state, { type: 'move', direction: 'N' });
+    const comparison = planningComparison(state);
+    expect(JSON.stringify(comparison.current.player)).toBe(JSON.stringify({ x: 1, y: 6 }));
+    expect(comparison.planned.player).not.toEqual(comparison.current.player);
+    expect(JSON.stringify(state)).not.toBe(before);
   });
 });

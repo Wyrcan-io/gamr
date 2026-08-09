@@ -94,9 +94,9 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     domEvent.stopPropagation();
     const key = domEvent.key.toLowerCase();
     if (key === 'escape') {
+      if (state.activeOverlay !== 'none') { dispatch({ type: 'toggleOverlay', overlay: 'none' }); return; }
       paused = !paused;
       pauseSelection = 0;
-      if (paused) state = applyCommand(state, { type: 'toggleOverlay', overlay: 'none' }).state;
       return;
     }
     if (handlePause(key, domEvent)) return;
@@ -134,12 +134,14 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     }
     if (domEvent.key === 'Enter') {
       if (state.phase === 'briefing') dispatch({ type: 'dismissBriefing' });
-      else if (state.phase === 'planning') dispatch({ type: 'commitRoute' });
+      else if (state.phase === 'planning') dispatch({ type: 'openRouteReview' });
+      else if (state.phase === 'routeReview') dispatch({ type: 'confirmRoute' });
       else if (state.phase === 'transit') dispatch({ type: 'finishTransit' });
       else if (state.phase === 'audit') dispatch({ type: 'dismissAudit' });
       else if (state.phase === 'interlude') dispatch({ type: 'dismissInterlude' });
       return;
     }
+    if (state.phase === 'routeReview' && (domEvent.key === 'Backspace' || key === 'escape')) { dispatch({ type: 'toggleStop' }); return; }
     if (domEvent.key === 'ArrowLeft' || key === 'a' || domEvent.key === 'ArrowUp' || key === 'w') dispatch({ type: 'moveButtonCursor', delta: -1 });
     else if (domEvent.key === 'ArrowRight' || key === 'f' || domEvent.key === 'ArrowDown' || key === 's') dispatch({ type: 'moveButtonCursor', delta: 1 });
     else if (domEvent.key === ' ') dispatch({ type: 'toggleStop' });
@@ -173,6 +175,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     if (renderInterval) clearInterval(renderInterval);
     if (gameInterval) clearInterval(gameInterval);
     keyListener?.dispose();
+    terminal.write('\x1b[?25h\x1b[0m\x1b[?1049l');
     originalStop();
   };
   return controller;

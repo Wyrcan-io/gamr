@@ -121,6 +121,8 @@ export interface GameState {
   reports: DeliveryReport[];
   outcome: 'won' | 'lost' | null;
   floorFlags: { webbingUsed: boolean; handcartUsed: boolean; benchUsed: boolean; soleReady: boolean; claimUsed: boolean };
+  previewDirection: Direction;
+  previewHurried: boolean;
 }
 
 export type Command =
@@ -129,6 +131,8 @@ export type Command =
   | { type: 'chooseOffer'; index: number }
   | { type: 'dismissBriefing' }
   | { type: 'move'; direction: Direction; hurried?: boolean }
+  | { type: 'previewMove'; direction: Direction; hurried?: boolean }
+  | { type: 'commitMove' }
   | { type: 'brace' }
   | { type: 'wait' }
   | { type: 'interact' }

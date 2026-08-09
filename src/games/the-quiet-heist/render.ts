@@ -1,48 +1,87 @@
-import { briefing, jobTitle, objectiveLabel, visible } from './engine';
+import { clipToWidth, padToWidth, centerText } from '../../ui/terminal';
+import { getCurrentThemePalette, type TerminalThemePalette } from '../utils';
+import { briefing, jobLocations, jobTitle, objectiveLabel, planningComparison } from './engine';
 import type { GameState, Point } from './types';
 
-const RESET = '\x1b[0m'; const DIM = '\x1b[2m';
-const at = (lines: string[], x: number, y: number, value: string): void => { lines.push(`\x1b[${y};${Math.max(1, x)}H${value}`); };
-const box = (lines: string[], x: number, y: number, width: number, height: number, title: string, color: string): void => { at(lines, x, y, `${color}┌─ ${title} ${'─'.repeat(Math.max(0, width - title.length - 4))}┐${RESET}`); for (let i = 1; i < height - 1; i++) at(lines, x, y + i, `${color}│${' '.repeat(Math.max(0, width - 2))}│${RESET}`); at(lines, x, y + height - 1, `${color}└${'─'.repeat(Math.max(0, width - 2))}┘${RESET}`); };
-const key = (p: Point): string => `${p.x},${p.y}`;
-const cellAt = (state: GameState, p: Point): string => state.grid[p.y]?.[p.x] ?? '#';
-function mapFrame(state: GameState, lines: string[], color: string): void {
-  const seen = visible(state); const forecast = new Set(state.forecast.flatMap(i => i.vision).map(key));
-  const x0 = 3; const y0 = 6;
-  for (let y = 0; y < 8; y++) {
-    let row = '';
-    for (let x = 0; x < 12; x++) {
-      const p = { x, y }; const k = key(p); let glyph = cellAt(state, p); let style = color;
-      if (glyph === '#') { glyph = '█'; style = `${color}\x1b[2m`; }
-      else if (glyph === 'E' || glyph === 'S') { glyph = glyph === 'E' ? '⇱' : '⇲'; style = '\x1b[1;92m'; }
-      else { glyph = seen.has(k) ? '·' : forecast.has(k) ? '░' : '·'; style = seen.has(k) ? '\x1b[1;91m' : forecast.has(k) ? '\x1b[1;93m' : color; }
-      if (x === 1 && y === 5) { glyph = 'H'; style = '\x1b[1;96m'; }
-      if (x === 3 && y === 5 && !state.keyTaken) { glyph = '◇'; style = '\x1b[1;93m'; }
-      if (x === 9 && y === 2 && !state.asset) { glyph = '◎'; style = '\x1b[1;95m'; }
-      for (const noise of state.noise) if (samePoint(noise.pos, p)) { glyph = '♪'; style = '\x1b[1;96m'; }
-      if (samePoint(state.camera.pos, p)) { glyph = state.camera.jammed > 0 ? '⊘' : '◉'; style = state.camera.jammed > 0 ? '\x1b[1;90m' : '\x1b[1;95m'; }
-      for (const guard of state.guards) if (samePoint(guard.pos, p)) { glyph = guard.id.slice(1); style = '\x1b[1;91m'; }
-      if (samePoint(state.player, p)) { glyph = '@'; style = '\x1b[1;97m'; }
-      row += `${style}${glyph}${RESET} `;
+const RESET = '\x1b[0m';
+const BOLD = '\x1b[1m';
+export const QUIET_HEIST_MIN_COLS = 80;
+export const QUIET_HEIST_MIN_ROWS = 28;
+
+function row(value: string, width: number, style = ''): string { return `${style}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
+function center(value: string, width: number): string { return centerText(value, width); }
+function mark(point: Point): string { return `${String.fromCharCode(65 + point.x)}${point.y + 1}`; }
+function same(a: Point, b: Point): boolean { return a.x === b.x && a.y === b.y; }
+function glyphFor(cell: string): string { return cell === '#' ? '#' : cell === 'E' ? '<' : cell === 'S' ? '>' : '.'; }
+
+function resize(cols: number, rows: number, palette: TerminalThemePalette): string {
+  return ['\x1b[2J\x1b[H', row('g/ THE QUIET HEIST', cols, `${palette.focus}${BOLD}`), '', center('THE ARCHITECT\'S PLAN NEEDS MORE ROOM.', cols), center(`NEED 80x28  HAVE ${cols}x${rows}`, cols), center('Resize the terminal to keep NOW and AFTER COMMIT legible.', cols)].join('\r\n');
+}
+
+function start(cols: number, palette: TerminalThemePalette): string {
+  return ['\x1b[2J\x1b[H', row('g/ THE QUIET HEIST', cols, `${palette.focus}${BOLD}`), row('A museum floor plan where the building answers after you commit.', cols, palette.muted), '', row('[T] tutorial   [C] campaign   [Q] quit', cols, palette.focus), row('Plan two actions. Read NOW, PLAN, and AFTER COMMIT as different layers.', cols, palette.ink)].join('\r\n');
+}
+
+function briefingFrame(state: GameState, cols: number, palette: TerminalThemePalette): string {
+  const lines = [row(`g/ THE QUIET HEIST   ${jobTitle(state)}`, cols, `${palette.focus}${BOLD}`), '', row('BRIEFING / READ THE CONTRACT', cols, palette.warning), ...briefing(state).map(text => row(text, cols - 4, palette.ink)), '', row('ENTER  BEGIN PLANNING     ESC  PAUSE     Q  QUIT', cols, palette.focus)];
+  return ['\x1b[2J\x1b[H', ...lines].join('\r\n');
+}
+
+function mapRows(state: GameState, compare: ReturnType<typeof planningComparison>, palette: TerminalThemePalette): string[] {
+  const locations = jobLocations(state);
+  const rows: string[] = [row('ARCHITECT\'S PLAN  [solid NOW] [numbered PLAN] [~ forecast]', 34, `${palette.focus}${BOLD}`)];
+  for (let y = 0; y < 8; y += 1) {
+    let line = `${palette.muted}${String(y + 1).padStart(2, ' ')} ${RESET}`;
+    for (let x = 0; x < 12; x += 1) {
+      const point = { x, y };
+      const cell = state.grid[y]?.[x] ?? '#';
+      const key = `${x},${y}`;
+      let glyph = glyphFor(cell);
+      let style = palette.ink;
+      if (same(point, compare.planned.player)) { glyph = compare.current.player.x === x && compare.current.player.y === y ? '@' : '@2'; style = palette.focus; }
+      else if (state.guards.some(guard => same(guard.pos, point))) { glyph = 'G'; style = palette.danger; }
+      else if (same(point, state.camera.pos)) { glyph = state.camera.jammed > 0 ? 'c' : 'C'; style = state.camera.jammed > 0 ? palette.muted : palette.warning; }
+      else if (!state.keyTaken && same(point, locations.key)) { glyph = 'K'; style = palette.good; }
+      else if (!state.asset && same(point, locations.display)) { glyph = 'D'; style = palette.good; }
+      else if (state.noise.some(noise => same(noise.pos, point))) { glyph = '~'; style = palette.warning; }
+      else if (compare.plannedSight.has(key) && !compare.currentSight.has(key)) { glyph = '+'; style = palette.warning; }
+      else if (compare.currentSight.has(key)) { glyph = 'v'; style = palette.danger; }
+      else if (compare.forecastSight.has(key)) { glyph = '?'; style = palette.muted; }
+      line += `${style}${glyph.padEnd(2, ' ')}${RESET}`;
     }
-    at(lines, x0, y0 + y, row);
+    rows.push(line);
   }
+  rows.push(row('    A B C D E F G H I J K L', 34, palette.muted));
+  return rows;
 }
-function samePoint(a: Point, b: Point): boolean { return a.x === b.x && a.y === b.y; }
-function drawPanel(lines: string[], state: GameState, color: string): void {
-  box(lines, 35, 5, 43, 10, 'SECURITY FORECAST', color);
-  state.forecast.forEach((intent, i) => { const guard = state.guards.find(g => g.id === intent.guardId); const from = guard ? `(${guard.pos.x + 1},${guard.pos.y + 1})` : ''; const to = `(${intent.to.x + 1},${intent.to.y + 1})`; at(lines, 38, 7 + i * 2, `G${intent.guardId.slice(1)} ${intent.reason.padEnd(8)} ${from} → ${to}`); at(lines, 38, 8 + i * 2, `${DIM}${color}VISION: ${intent.vision.slice(0, 5).map(p => `(${p.x + 1},${p.y + 1})`).join(' ')}${RESET}`); });
-  at(lines, 38, 12, `CAM ${state.camera.jammed > 0 ? '⊘ JAMMED' : '◉ ACTIVE'}  FACE ${state.camera.direction}`);
-  box(lines, 35, 16, 43, 9, 'CONTRACT / INCIDENTS', color); at(lines, 38, 18, `NOW: ${objectiveLabel(state).slice(0, 36)}`); state.incidents.slice(0, 5).forEach((incident, i) => at(lines, 38, 19 + i, `${incident.kind === 'warning' ? '!' : incident.kind === 'success' ? '✓' : '·'} ${incident.text.slice(0, 38)}`));
+
+function ledgerRows(state: GameState, compare: ReturnType<typeof planningComparison>, width: number, palette: TerminalThemePalette): string[] {
+  const rows: string[] = [row('SECURITY LEDGER', width, `${palette.focus}${BOLD}`), row(`NOW      ${mark(compare.current.player)}  sight ${compare.currentSight.size} cells`, width, palette.ink), row(`PLAN     ${mark(compare.planned.player)}  ${state.pending.length ? state.pending.map(action => action.label).join(' / ') : 'no actions queued'}`, width, palette.ink), row(`FORECAST ${state.forecast.map(intent => `${intent.guardId}->${mark(intent.to)} ${intent.reason}`).join(' | ') || 'none'}`, width, palette.muted), row(`AFTER    sight ${compare.plannedSight.size} cells  ${compare.risk}`, width, compare.risk.includes('EXPOSED') ? palette.warning : palette.good), row(`CAMERA   ${state.camera.jammed > 0 ? 'OFFLINE' : `ACTIVE ${state.camera.direction}`}`, width, palette.warning), ''];
+  rows.push(row(`OBJECTIVE  ${objectiveLabel(state)}`, width, `${palette.focus}${BOLD}`));
+  rows.push(row(`TURN ${state.turn}  AP ${state.ap}/2  ALARM ${state.alarm}/3  DECOYS ${state.decoys}  JAMMERS ${state.jammers}`, width, palette.ink));
+  rows.push(row(`NOTICE    ${state.notice}`, width, palette.muted));
+  rows.push(row('RESULTS   commit advances guards; planning does not.', width, palette.muted));
+  return rows;
 }
-export function renderFrame(state: GameState, cols: number, rows: number, color: string, glitchFrame: number): string {
-  const lines: string[] = ['\x1b[2J\x1b[H']; if (cols < 80 || rows < 28) { at(lines, Math.max(1, Math.floor(cols / 2) - 10), Math.max(2, Math.floor(rows / 2)), '\x1b[1;91mTERMINAL TOO SMALL' + RESET); at(lines, Math.max(1, Math.floor(cols / 2) - 14), Math.max(3, Math.floor(rows / 2) + 2), `Need 80x28  Have ${cols}x${rows}`); return lines.join(''); }
-  const title = '✦ THE QUIET HEIST ✦'; const offset = glitchFrame % 60 >= 56 ? (glitchFrame % 3) - 1 : 0; at(lines, Math.floor((cols - title.length) / 2) + offset, 1, `${color}\x1b[1m${title}${RESET}`);
-  if (state.phase === 'start') { at(lines, 29, 8, `${color}\x1b[1mA SMALL MUSEUM. A BIG SILENCE.${RESET}`); at(lines, 27, 11, 'T  TUTORIAL     C  CAMPAIGN'); at(lines, 27, 13, 'Predict patrols. Make noise on purpose.'); at(lines, 27, 15, 'Every guard turn resolves on ENTER.'); at(lines, 27, 20, `${DIM}${color}Q  QUIT${RESET}`); return lines.join(''); }
-  if (state.phase === 'briefing') { box(lines, 15, 7, 66, 13, jobTitle(state), color); briefing(state).forEach((line, i) => at(lines, 19, 10 + i * 2, line.slice(0, 58))); at(lines, 19, 18, `${color}ENTER  BEGIN JOB     ESC  PAUSE     Q  QUIT${RESET}`); return lines.join(''); }
-  at(lines, 3, 3, `${color}TURN ${String(state.turn).padStart(2, '0')}   AP ${'●'.repeat(state.ap)}${'○'.repeat(2 - state.ap)}   ALARM ${'◆'.repeat(state.alarm)}${'◇'.repeat(3 - state.alarm)} ${state.alarm === 0 ? 'QUIET' : state.alarm === 1 ? 'ALERT' : state.alarm === 2 ? 'LOCKDOWN' : 'CAUGHT'}   DECOYS ${state.decoys}   JAMMER ${state.jammers}${RESET}`);
-  at(lines, 3, 4, `${color}${jobTitle(state)}   OBJ: ${objectiveLabel(state)}${RESET}`); box(lines, 2, 5, 29, 11, 'MUSEUM FLOOR', color); mapFrame(state, lines, color); drawPanel(lines, state, color);
-  box(lines, 2, 17, 29, 8, 'ACTION PREVIEW', color); const pending = state.pending.length ? state.pending.map(a => a.label).join(' | ') : 'No actions queued.'; at(lines, 4, 19, `AP ${state.ap}/2   ${pending.slice(0, 23)}`); at(lines, 4, 21, state.notice.slice(0, 25)); at(lines, 4, 23, 'ARROWS MOVE  I INTERACT');
-  at(lines, 35, 26, `${DIM}${color}X decoy  J jam camera  U undo  ENTER commit  ? help  ESC pause${RESET}`); if (state.phase === 'report') { at(lines, 33, 13, '\x1b[1;93mTURN RESOLVED — ENTER TO PLAN\x1b[0m'); } if (state.phase === 'ending' || state.phase === 'gameOver') { const won = state.phase === 'ending'; box(lines, 20, 9, 42, 10, won ? 'HEIST COMPLETE' : 'SECURITY REPORT', won ? '\x1b[1;92m' : '\x1b[1;91m'); at(lines, 24, 12, won ? '✓ ASSET SECURED. EXIT CLEAN.' : '✕ YOU WERE IDENTIFIED.'); at(lines, 24, 14, `SCORE ${state.score}  TURN ${state.turn}`); at(lines, 24, 16, 'R RESTART   N NEXT JOB   Q QUIT'); }
-  return lines.join('');
+
+function playing(state: GameState, cols: number, palette: TerminalThemePalette): string {
+  const compare = planningComparison(state);
+  const leftWidth = 35;
+  const rightWidth = Math.max(36, cols - leftWidth - 5);
+  const left = mapRows(state, compare, palette);
+  const right = ledgerRows(state, compare, rightWidth, palette);
+  const lines: string[] = ['\x1b[2J\x1b[H', row(`g/ THE QUIET HEIST   ${jobTitle(state)}`, cols, `${palette.focus}${BOLD}`), row(`TURN ${String(state.turn).padStart(2, '0')}  AP ${state.ap}/2  ALARM ${state.alarm}/3  ${objectiveLabel(state)}`, cols, palette.muted), ''];
+  const count = Math.max(left.length, right.length);
+  for (let i = 0; i < count; i += 1) lines.push(`${padToWidth(left[i] ?? '', leftWidth)}  ${padToWidth(right[i] ?? '', rightWidth)}`);
+  lines.push('', row('ARROWS/WASD move  I interact  X decoy  J jam  U/BACKSPACE undo  ENTER commit  ? help  ESC pause', cols, palette.muted));
+  if (state.phase === 'report') lines.push(row('[TURN RESOLVED] Read the changed ledger, then press ENTER to plan.', cols, palette.warning));
+  if (state.phase === 'ending' || state.phase === 'gameOver') lines.push(row(state.phase === 'ending' ? '[+] HEIST COMPLETE' : '[!] SECURITY REPORT', cols, state.phase === 'ending' ? palette.good : palette.danger));
+  return lines.slice(0, 28).join('\r\n');
+}
+
+export function renderFrame(state: GameState, cols: number, rows: number, palette: TerminalThemePalette = getCurrentThemePalette()): string {
+  if (cols < QUIET_HEIST_MIN_COLS || rows < QUIET_HEIST_MIN_ROWS) return resize(cols, rows, palette);
+  if (state.phase === 'start') return start(cols, palette);
+  if (state.phase === 'briefing') return briefingFrame(state, cols, palette);
+  return playing(state, cols, palette);
 }

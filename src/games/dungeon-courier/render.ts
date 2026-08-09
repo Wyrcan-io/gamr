@@ -118,7 +118,7 @@ function panelLines(state: GameState): string[] {
   const contract = state.contract!;
   const parcel = contract.parcel;
   const items = state.courier.inventory.map((item, index) => `${index + 1}${item ? ` ${ITEMS[item.id].short}` : ' ---'}`);
-  const preview = state.phase === 'traversal' ? previewText(state, 'E') : undefined;
+  const preview = state.phase === 'traversal' ? previewText(state, state.previewDirection, state.previewHurried) : undefined;
   return [
     `${CYAN}${BOLD}PARCEL${RESET}`,
     `${PARCELS[parcel.id].label.slice(0, 22)}`,
@@ -128,7 +128,7 @@ function panelLines(state: GameState): string[] {
     `${DIM}${SEAL_LABELS[parcel.seal].slice(0, 25)}${RESET}`,
     `${CYAN}${BOLD}SATCHEL${RESET}`,
     ...items,
-    `${CYAN}${BOLD}PREVIEW EAST${RESET}`,
+    `${CYAN}${BOLD}PREVIEW ${state.previewDirection}${state.previewHurried ? ' / HURRY' : ''}${RESET}`,
     preview ? `${preview.legal ? GREEN : RED}${preview.label} ${preview.legal ? preview.reason : preview.reason}${RESET}` : `${DIM}Open traversal to preview.${RESET}`,
     `${CYAN}${BOLD}ROUTE / SHIFT${RESET}`,
     state.surveyMode === 'routes' ? `${GREEN}STABLE 31  FAST 22+R${RESET}` : state.surveyMode === 'shift' ? `GATE ${state.floor!.gateOpen ? 'OPEN' : 'CLOSED'}  IN ${state.floor!.shiftIn}` : state.surveyMode === 'threats' ? 'P: LOOP ARROWS ACTIVE' : 'TAB: SURVEY OVERLAYS',
@@ -143,7 +143,7 @@ function renderTraversal(state: GameState, cols: number): string[] {
   for (let i = 0; i < map.length; i++) rows.push(`${map[i]}  │ ${plain(panel[i] ?? '', 29)}`);
   rows.push(`${DIM}──────────────────────────────────────────────  └─────────────────────────────${RESET}`);
   rows.push(`LOG: ${state.eventLog[0] ?? 'No events yet.'}`);
-  rows.push(`${DIM}[Arrows/WASD] Step  [Shift+Arrow] Hurry  [B] Brace  [.] Wait  [E/Enter] Interact${RESET}`);
+  rows.push(`${DIM}[Arrows/WASD] Aim step  [Shift+Arrow] Aim hurry  [Space/Enter] Commit  [B] Brace  [.] Wait  [E] Interact${RESET}`);
   rows.push(`${DIM}[1–4] Tool  [I] Satchel  [Tab] Survey  [H] Help  [Esc] Pause${RESET}`);
   return rows;
 }

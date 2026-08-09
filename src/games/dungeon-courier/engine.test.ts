@@ -45,6 +45,15 @@ describe('Dungeon Courier engine', () => {
     expect(preview.stressDelta).toBeGreaterThanOrEqual(1);
   });
 
+  it('selects a move preview without advancing the dungeon', () => {
+    const state = startStandard();
+    const next = applyCommand(state, { type: 'previewMove', direction: 'E', hurried: true }).state;
+    expect(next.previewDirection).toBe('E');
+    expect(next.previewHurried).toBe(true);
+    expect(next.floor?.tick).toBe(0);
+    expect(next.courier.pos).toEqual(state.courier.pos);
+  });
+
   it('brace grants guard and advances the dungeon by one tick', () => {
     const state = startStandard();
     const next = applyCommand(state, { type: 'brace' }).state;
@@ -79,4 +88,3 @@ describe('Dungeon Courier engine', () => {
     expect(state.courier.pos.x).toBe(7);
   });
 });
-

@@ -54,7 +54,7 @@ export function createState(seed = Date.now(), mode: GameState['mode'] = 'standa
   const state: GameState = {
     version: 1, seed: safeSeed, mode, phase: 'start', tick: 0, stageIndex: 0,
     stages: cloneStatePart(blueprint.stages), nodes: cloneStatePart(blueprint.nodes), edges: cloneStatePart(blueprint.edges),
-    assignments: {}, jobs: [], crewSlots: 1, lineKits: 2, generatorFuel: 32, focusCharges: 2, upgrades: [],
+    assignments: {}, jobs: [], crewSlots: 1, lineKits: 2, generatorFuel: 32, focusCharges: 2, focusBeats: 0, upgrades: [],
     civicStrain: 0, maximumStrain: 0, stabilityBeats: 0, score: 0, feederTrips: 0, sourceTrips: 0, maxHeat: 0,
     selected: { kind: 'edge', id: 'e-north-h' }, forecast: [], eventLog: [], lastEvents: [], tutorialStep: mode === 'tutorial' ? 0 : null, stageScoreStart: 0,
   };
@@ -350,6 +350,10 @@ function evaluateOutcome(state: GameState, stageCleared: boolean, events: Engine
 export function advance(state: GameState): TickResult {
   const result: TickResult = { events: [], energizedEdges: [], deenergizedEdges: [], trips: [], faults: [], districtsRestored: [], jobsCompleted: [], stageCleared: false };
   if (state.phase !== 'running') return result;
+  if (state.focusBeats > 0) {
+    state.focusBeats--;
+    if (state.focusBeats % 2 === 1) return result;
+  }
   state.tick++;
   progressJobs(state, result.events, result.jobsCompleted);
   resolveStormEvents(state, result.events, result.faults);
@@ -417,6 +421,15 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     if (command.type === 'startCrewJob') return startCrewJob(state);
     if (command.type === 'toggleDistrict') return toggleDistrict(state);
     if (command.type === 'toggleGenerator') return toggleGenerator(state);
+    if (command.type === 'activateFocus') {
+      if (state.focusCharges <= 0) return { state, accepted: false, events: [], reason: 'NO FOCUS CHARGES' };
+      if (state.focusBeats > 0) return { state, accepted: false, events: [], reason: 'FOCUS ALREADY ACTIVE' };
+      state.focusCharges--;
+      state.focusBeats = 12;
+      const item = event(state, 'info', 'FOCUS ACTIVE — SIMULATION SLOWED');
+      setEvents(state, [item]);
+      return { state, accepted: true, events: [item] };
+    }
   }
   if (state.phase === 'upgrade' && command.type === 'chooseUpgrade') {
     const upgrade = upgradeChoices(state).find(choice => choice.id === command.upgradeId);
@@ -443,6 +456,20 @@ export function closePreview(state: GameState, edgeId: string): { ok: boolean; r
   const worst = Math.max(0, ...Object.values(state.edges).filter(item => item.energized).map(item => item.flowMW / Math.max(1, effectiveCapacity(state, item))));
   state.assignments = snapshot.assignments; Object.assign(state.nodes, snapshot.nodes); Object.assign(state.edges, snapshot.edges);
   return { ok: true, districts, worstUtilization: worst };
+}
+
+export function selectedActionPreview(state: GameState): { action: string; ok: boolean; reason?: string; cost?: string; impact?: string } {
+  const asset = selectedAsset(state);
+  if (asset.edge) {
+    const edge = asset.edge;
+    if (edge.breaker === 'closed') return { action: 'OPEN', ok: true, cost: 'none', impact: 'isolate this span' };
+    if (edge.condition !== 'intact') return { action: 'CLOSE', ok: false, reason: 'edge must be repaired first' };
+    const preview = closePreview(state, edge.id);
+    return { action: 'CLOSE', ok: preview.ok, reason: preview.reason, cost: 'breaker action', impact: preview.ok ? `${Math.round(preview.worstUtilization * 100)}% peak / ${preview.districts.length} district(s)` : undefined };
+  }
+  if (asset.node?.district) return { action: asset.node.district.serviceBreaker === 'closed' ? 'SHED LOAD' : 'RESTORE LOAD', ok: true, cost: 'pickup demand', impact: asset.node.district.powered ? 'service remains live' : 'cold pickup for a few beats' };
+  if (asset.node?.generator) return { action: asset.node.generator.online ? 'STOP RESERVE' : 'START RESERVE', ok: true, cost: asset.node.generator.online ? 'fuel continues' : 'fuel', impact: 'island source state changes' };
+  return { action: 'SELECT ASSET', ok: false, reason: 'choose a breaker, district, or reserve' };
 }
 
 export function districtContent(kind: DistrictKind) { return DISTRICT_CONTENT[kind]; }

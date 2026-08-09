@@ -1,4 +1,5 @@
 import { currentShift, getPlacementValidation, getQueueJobs, jobIcon, laneLabel, weatherLabel } from './engine';
+import { getCurrentThemePalette } from '../utils';
 import { WEATHER } from './content';
 import type { GameState, Job, LaneId } from './types';
 
@@ -35,10 +36,13 @@ function forecast(state: GameState, ascii: boolean): string {
 
 function laneRow(state: GameState, lane: LaneId, ascii: boolean): string {
   const cells: string[] = [];
+  const preview = getPlacementValidation(state);
+  const selected = state.selectedJobId ? state.jobs[state.selectedJobId] : undefined;
   for (let offset = 0; offset < 4; offset += 1) {
     const window = state.currentWindow + offset;
     const job = Object.values(state.jobs).find(candidate => candidate.scheduledStart !== undefined && candidate.scheduledStart <= window && window < candidate.scheduledStart + candidate.duration && candidate.lanes.includes(lane) && !['complete', 'cancelled', 'missed'].includes(candidate.state));
-    cells.push(job ? fit(`${jobStateGlyph(job, ascii)} ${job.title.slice(0, 11)}`, 15) : fit('·', 15));
+    const ghost = selected && preview.reservations.some(item => item.window === window && item.lane === lane) && selected.state === 'queued';
+    cells.push(job ? fit(`${jobStateGlyph(job, ascii)} ${job.title.slice(0, 11)}`, 15) : ghost ? fit(`${ascii ? '?' : '◇'} ${selected.title.slice(0, 11)}`, 15) : fit('·', 15));
   }
   return `${laneLabel(lane).padEnd(5)} ${cells.join('|')}`;
 }
@@ -70,7 +74,7 @@ function workingScreen(state: GameState, cols: number, rows: number, theme: stri
   if (state.phase === 'cancelConfirm') lines.push(`CANCEL ${state.pendingCancelJobId ? state.jobs[state.pendingCancelJobId]?.title : 'ORDER'}?  Y confirm   N abort`);
   lines.push('');
   lines.push(state.armedAdvance ? 'ADVANCE ARMED — ENTER RESOLVE   SPACE cancel arm' : 'SPACE arm advance   ENTER resolve   ↑/↓ jobs   ←/→ start window');
-  lines.push('S schedule   X remove   C cancel   R forecast   L log   H help   ESC pause');
+  lines.push('S schedule   X remove   C cancel   L log   H help   ESC pause');
   if (state.helpOpen) { lines.push(''); lines.push(box('HELP')); lines.push('│ Schedule an order, then arm and resolve one window at a time.            │'); lines.push('│ Blocked jobs stay in place; move them after the report if their deadline │'); lines.push('│ permits. Weather restrictions are exact and shown in the forecast.       │'); lines.push(`└${'─'.repeat(74)}┘`); }
   if (state.logOpen) { lines.push(''); lines.push(box('INCIDENT LOG')); state.log.slice(0, 5).forEach(item => lines.push(`│ W${String(item.window + 1).padStart(2, '0')} ${fit(item.text, 68)} │`)); lines.push(`└${'─'.repeat(74)}┘`); }
   while (lines.length < rows) lines.push('');
@@ -101,6 +105,8 @@ function terminalEnd(state: GameState, cols: number, rows: number, theme: string
 }
 
 export function renderFrame(state: GameState, cols: number, rows: number, theme: string, ascii = false): string {
+  const palette = getCurrentThemePalette();
+  theme = palette.ink;
   if (cols < 80 || rows < 28) return `${esc}2J${esc}H\n\n  Terminal too small for Kestrel Station.\n\n  Need: 80x28   Have: ${cols}x${rows}\n\n  Make the pane larger, then return.`;
   if (state.phase === 'start') return startScreen(cols, rows, theme);
   if (state.phase === 'briefing') return briefing(state, cols, rows, theme);

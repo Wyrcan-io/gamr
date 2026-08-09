@@ -153,6 +153,7 @@ export interface GameState {
   lineKits: number;
   generatorFuel: number;
   focusCharges: number;
+  focusBeats: number;
   upgrades: string[];
   civicStrain: number;
   maximumStrain: number;
@@ -179,6 +180,7 @@ export type Command =
   | { type: 'startCrewJob' }
   | { type: 'toggleDistrict' }
   | { type: 'toggleGenerator' }
+  | { type: 'activateFocus' }
   | { type: 'chooseUpgrade'; upgradeId: string }
   | { type: 'toggleHelp' }
   | { type: 'restartSameSeed' };

@@ -218,6 +218,18 @@ export function applyCommand(input: GameState, command: Command): CommandResult 
     state.notice = state.plannedRoute.length ? `ROUTE QUEUED: ${state.plannedRoute.join(' → ')}` : 'ROUTE CLEARED.';
     return { state, events };
   }
+  if (command.type === 'openRouteReview' && state.phase === 'planning' && state.puzzle) {
+    if (state.plannedRoute.length === 0) return reject(state, 'PROGRAM AT LEAST ONE STOP BEFORE REVIEW.');
+    state.phase = 'routeReview'; state.notice = 'ROUTE TAPE OPEN. ENTER AGAIN TO DEPART.';
+    return { state, events };
+  }
+  if (command.type === 'confirmRoute' && state.phase === 'routeReview' && state.puzzle) {
+    state.lastEvaluation = evaluateRoute(state.puzzle.trueWorld, state.puzzle.passengers, state.plannedRoute, state.puzzle.panel);
+    state.phase = 'transit'; state.transitResolved = false; state.notice = 'DOORS CLOSED. THE SHAFT IS MOVING.';
+    emit(events, 'notice', state.notice);
+    return { state, events };
+  }
+  if (command.type === 'toggleStop' && state.phase === 'routeReview') { state.phase = 'planning'; state.notice = 'ROUTE REVIEW CLOSED. EDITING RESUMED.'; return { state, events }; }
   if (command.type === 'undoStop' && state.phase === 'planning') {
     state.plannedRoute = state.plannedRoute.slice(0, -1);
     return { state, events };

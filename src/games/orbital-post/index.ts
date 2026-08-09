@@ -58,7 +58,6 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
     else if (key === 'enter') run({ type: state.armedAdvance ? 'advanceWindow' : 'scheduleJob' });
     else if (key === 'x') run({ type: 'unscheduleJob' });
     else if (key === 'c') run({ type: 'requestCancel' });
-    else if (key === 'r') run({ type: 'toggleForecast' });
     else if (key === 'l') run({ type: 'toggleLog' });
     else if (key === 'h' || key === '?') run({ type: 'toggleHelp' });
   };

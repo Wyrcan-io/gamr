@@ -1,29 +1,74 @@
-import { getCurrentThemeColor } from '../utils';
-import { anomalyGlyph, anomalyName, audioLabel, currentShift, lampLabel } from './engine';
-import { ROOM_NAMES } from './content';
+import { getCurrentThemePalette } from '../utils';
+import { anomalyGlyph, anomalyName, currentShift, projectCycle } from './engine';
+import { ROOM_NAMES, ROOMS } from './content';
 import type { GameState, RoomId } from './types';
 
-const esc = '\x1b[';
-const ansi = (code: string, text: string) => `${esc}${code}m${text}${esc}0m`;
-const bar = (value: number, max: number, full = '#', empty = '-') => full.repeat(Math.max(0, Math.min(max, value))) + empty.repeat(Math.max(0, max - value));
-const fit = (text: string, width: number) => text.length > width ? `${text.slice(0, Math.max(0, width - 1))}…` : text.padEnd(width);
-const line = (x: number, y: number, text: string) => `${esc}${y};${x}H${text}`;
+const RESET = '\x1b[0m';
+const MIN_COLS = 80;
+const MIN_ROWS = 28;
 
-function roomLine(state: GameState, id: RoomId): string {
-  const room = state.rooms[id]; const anomaly = room.anomalyId ? state.anomalies[room.anomalyId] : undefined; const status = room.breached ? '×' : anomaly && anomaly.pressure >= 4 ? '!' : '◆'; const anomalyText = anomaly ? `${anomalyGlyph(anomaly.id)}${anomaly.pressure}` : '--'; return `${id} ${status} ${anomalyText} ${lampLabel(room.lamp).slice(0, 1)} ${room.audio.slice(0, 1).toUpperCase()} ${room.door === 'sealed' ? '#' : '.'}`;
+function clean(value: string): string { return value.replace(/\x1b\[[0-9;]*m/g, ''); }
+function fit(value: string, width: number): string {
+  const text = clean(value);
+  return text.length > width ? `${text.slice(0, Math.max(0, width - 1))}…` : text.padEnd(width, ' ');
+}
+function bar(value: number, max: number, width = 8): string {
+  const filled = Math.round(Math.max(0, Math.min(1, value / Math.max(1, max))) * width);
+  return '#'.repeat(filled) + '.'.repeat(width - filled);
+}
+function line(text: string, palette: ReturnType<typeof getCurrentThemePalette>, role: keyof ReturnType<typeof getCurrentThemePalette> = 'ink'): string {
+  return `${palette[role]}${text}${RESET}`;
+}
+function roomRow(state: GameState, projected: GameState, roomId: RoomId, selected: boolean): string {
+  const room = state.rooms[roomId];
+  const next = projected.rooms[roomId];
+  const anomaly = room.anomalyId ? state.anomalies[room.anomalyId] : undefined;
+  const nextAnomaly = room.anomalyId ? projected.anomalies[room.anomalyId] : undefined;
+  const marker = room.breached ? '[X]' : anomaly && anomaly.pressure >= 4 ? '[!]' : '[ ]';
+  const focus = selected ? '>' : ' ';
+  const pressure = anomaly ? `${anomaly.pressure}->${nextAnomaly?.pressure ?? anomaly.pressure}` : '--';
+  const delta = anomaly && nextAnomaly ? nextAnomaly.pressure - anomaly.pressure : 0;
+  return `${focus} ${roomId} ${marker} ${fit(ROOM_NAMES[roomId], 7)} ${anomaly ? fit(`${anomalyGlyph(anomaly.id)} ${anomalyName(anomaly.id)}`, 18) : fit('EMPTY', 18)} P${pressure} ${delta >= 0 ? '+' : ''}${delta}  L:${room.lamp[0].toUpperCase()}→${next.lamp[0].toUpperCase()} A:${room.audio[0].toUpperCase()}→${next.audio[0].toUpperCase()} D:${room.door === 'sealed' ? '#' : '.'}→${next.door === 'sealed' ? '#' : '.'}`;
 }
 
-export function renderFrame(state: GameState, cols: number, rows: number, themeColor = getCurrentThemeColor(), glitchFrame = 0): string {
-  if (cols < 80 || rows < 28) return `${esc}2J${esc}H${line(Math.max(1, Math.floor((cols - 18) / 2)), Math.max(1, Math.floor(rows / 2) - 1), ansi('1;91', 'TERMINAL TOO SMALL'))}${line(1, Math.max(1, Math.floor(rows / 2) + 1), `Need 80x28  Have ${cols}x${rows}`)}`;
-  let out = `${esc}2J${esc}H`; const title = glitchFrame % 60 > 55 ? 'C0NTAINMENT PR0T0C0L' : 'CONTAINMENT PROTOCOL'; out += line(Math.floor((cols - title.length) / 2), 1, `${themeColor}${title}${esc}0m`);
-  if (state.phase === 'start') { out += line(25, 5, ansi('1;96', 'HALCYON ANNEX / NIGHT CONTROL')); out += line(27, 8, 'T  TUTORIAL'); out += line(27, 9, 'C  CAMPAIGN'); out += line(27, 10, 'N  NIGHT WATCH'); out += line(21, 14, 'Learn the rule. Hold the room.'); return out; }
-  if (state.phase === 'briefing') { const shift = currentShift(state); out += line(8, 5, ansi('1;93', `SHIFT ${state.shiftIndex + 1}: ${shift.title}`)); out += line(8, 7, fit(shift.brief, 64)); out += line(8, 10, 'ACTIVE ANOMALIES:'); let y = 11; for (const anomaly of Object.values(state.anomalies)) { out += line(10, y++, `${anomalyGlyph(anomaly.id)} ${anomalyName(anomaly.id)} — ${state.rooms[anomaly.roomId].id}`); } out += line(8, 17, 'ENTER  begin observation    R  rules / dossier'); return out; }
-  const integrity = bar(state.integrity, 6, '◆', '·'); const battery = bar(state.battery, 6, '▰', '·'); out += line(3, 3, `INTEGRITY ${integrity}  POWER ${state.powerCapacity}  BATTERY ${battery}  CYCLES ${String(state.cyclesRemaining).padStart(2, '0')}  SHIFT ${state.shiftIndex + 1}`);
-  out += line(3, 4, ansi('1;93', fit(state.notice, cols - 6)));
-  out += line(3, 6, '┌─ STATION MAP ─────────────────────────┐'); out += line(3, 7, `│       [A ${roomLine(state, 'A')}]──[B ${roomLine(state, 'B')}]       │`); out += line(3, 8, '│            │          │              │'); out += line(3, 9, `│ [G]──────[H ${state.technicianRoom === 'H' ? '@' : '·'}]──────[C ${roomLine(state, 'C')}]       │`); out += line(3, 10, '│                       │              │'); out += line(3, 11, `│                     [D ${roomLine(state, 'D')}]       │`); out += line(3, 12, '└──────────────────────────────────────┘');
-  const room = state.rooms[state.selectedRoom]; const anomaly = room.anomalyId ? state.anomalies[room.anomalyId] : undefined; out += line(45, 6, `┌─ CHAMBER ${state.selectedRoom} / ${ROOM_NAMES[state.selectedRoom]} ─────────────┐`); out += line(45, 7, `│ PRESSURE ${anomaly ? `[${bar(anomaly.pressure, 6)}] ${anomaly.pressure}/6` : 'EMPTY'}             │`); out += line(45, 8, `│ ANOMALY  ${fit(anomaly ? `${anomalyGlyph(anomaly.id)} ${anomalyName(anomaly.id)}` : 'NONE', 32)} │`); out += line(45, 9, `│ LAMP ${lampLabel(room.lamp).padEnd(8)} AUDIO ${audioLabel(room.audio).padEnd(7)} │`); out += line(45, 10, `│ DOOR ${room.door.toUpperCase().padEnd(8)} TECH ${state.technicianRoom === state.selectedRoom ? 'INSIDE' : 'REMOTE'}  │`); out += line(45, 11, `│ EVIDENCE ${anomaly ? `${anomaly.knownEvidence.length}/2 ${anomaly.confirmed ? '✓ CONFIRMED' : ''}` : '--'}                 │`); out += line(45, 12, '└─────────────────────────────────────────┘');
-  out += line(3, 14, '┌─ ROOM CONFIGURATION ───────────────────┐'); out += line(3, 15, `│ A ${roomLine(state, 'A')}   B ${roomLine(state, 'B')}   C ${roomLine(state, 'C')}   D ${roomLine(state, 'D')} │`); out += line(3, 16, `│ DEMAND PREVIEW  ${state.lastCycle ? `${state.lastCycle.demand}/${state.lastCycle.capacity}` : '—'}  [1-3 lamp] [S/H/W/T sound] │`); out += line(3, 17, '└────────────────────────────────────────┘');
-  out += line(45, 14, '┌─ INCIDENT LOG ─────────────────────────┐'); const logs = state.incidents.slice(-5); for (let i = 0; i < 5; i++) out += line(45, 15 + i, `│ ${fit(logs[i] ? `C${String(logs[i].cycle).padStart(2, '0')} ${logs[i].text}` : '', 39)}│`); out += line(45, 20, '└─────────────────────────────────────────┘');
-  out += line(3, 23, '[←→] room  [1-3] lamp  [S/H/W/T] audio  [D] door  [M] move  [P] probe'); out += line(3, 24, '[Enter] commit cycle  [R] rules  [L] log  [H] help  [Esc] pause  [Q] quit');
-  if (state.phase === 'cycleReport') { out += line(22, 26, ansi('1;91', 'CYCLE RESOLVED — ENTER to continue')); } else if (state.phase === 'shiftReport') { out += line(17, 26, ansi('1;92', 'SHIFT COMPLETE — choose an upgrade with 1/2/3')); const offers = state.upgradeOffers.length ? state.upgradeOffers : []; offers.forEach((offer, i) => { out += line(8, 27 + i, `${i + 1}. ${offer.name}: ${offer.text}`); }); } else if (state.phase === 'gameOver') out += line(20, 26, ansi('1;91', 'CONTAINMENT FAILED — R restart shift / Q quit')); else if (state.phase === 'ending') out += line(23, 26, ansi('1;92', 'HANDOFF ACCEPTED — N next game / Q quit')); return out;
+export function renderFrame(state: GameState, cols: number, rows: number, _themeColor = '', _glitchFrame = 0): string {
+  const palette = getCurrentThemePalette();
+  if (cols < MIN_COLS || rows < MIN_ROWS) {
+    return `\x1b[2J\x1b[H\n\n${line('TERMINAL TOO SMALL', palette, 'danger')}\n\nNeed ${MIN_COLS}x${MIN_ROWS}  Have ${cols}x${rows}\n`;
+  }
+  const out: string[] = ['\x1b[2J\x1b[H'];
+  out.push(line('g/ CONTAINMENT PROTOCOL', palette, 'focus'));
+  if (state.phase === 'start') {
+    out.push('', line('HALCYON ANNEX // FOUR ROOMS, ONE RULE AT A TIME', palette, 'ink'), '', 'T  TUTORIAL     C  CAMPAIGN     N  NIGHT WATCH     Q  QUIT', '', line('Tune the room. Read the projection. Commit one cycle.', palette, 'muted'));
+    return out.join('\n');
+  }
+  if (state.phase === 'briefing') {
+    const shift = currentShift(state);
+    out.push('', line(`SHIFT ${state.shiftIndex + 1}: ${shift.title}`, palette, 'focus'), '', fit(shift.brief, cols - 4), '', 'ACTIVE ANOMALIES');
+    Object.values(state.anomalies).forEach(anomaly => out.push(`  ${anomalyGlyph(anomaly.id)} ${anomalyName(anomaly.id)}  ROOM ${anomaly.roomId}`));
+    out.push('', line('ENTER  open the containment bench    R  dossier', palette, 'muted'));
+    return out.join('\n');
+  }
+  if (state.phase === 'gameOver' || state.phase === 'ending') {
+    out.push('', line(state.phase === 'ending' ? 'HANDOFF ACCEPTED' : 'CONTAINMENT FAILED', palette, state.phase === 'ending' ? 'good' : 'danger'), '', `INTEGRITY ${state.integrity}/6  SCORE ${state.score}`, '', fit(state.notice, cols - 4), '', 'R restart shift   N next game   Q quit');
+    return out.join('\n');
+  }
+  const projection = state.phase === 'working' ? projectCycle(state) : { state, accepted: true };
+  const projected = projection.state;
+  out.push('', `SHIFT ${state.shiftIndex + 1}  CYCLE ${String(state.cycle).padStart(2, '0')}  LEFT ${String(state.cyclesRemaining).padStart(2, '0')}  INTEGRITY [${bar(state.integrity, 6)}] ${state.integrity}/6  BATTERY [${bar(state.battery, 6)}] ${state.battery}/6`);
+  out.push(line(`NOTICE  ${fit(state.notice, cols - 11)}`, palette, 'warning'), '', line('ROOM CROSS-SECTION // CURRENT → PENDING → PROJECTED', palette, 'focus'));
+  ROOMS.forEach(roomId => out.push(roomRow(state, projected, roomId, state.selectedRoom === roomId)));
+  const last = state.lastCycle;
+  const next = projected.lastCycle;
+  out.push('', line('CONTAINMENT LEDGER', palette, 'focus'));
+  out.push(`DEMAND ${next?.demand ?? '—'}/${next?.capacity ?? state.powerCapacity}   SHED ${next?.shed.length ? next.shed.join(',') : 'NONE'}   DOORS ${state.pending.rooms.A.door === 'sealed' ? 'A ' : ''}${state.pending.rooms.B.door === 'sealed' ? 'B ' : ''}${state.pending.rooms.C.door === 'sealed' ? 'C ' : ''}${state.pending.rooms.D.door === 'sealed' ? 'D' : 'NONE'}`);
+  out.push(`TECHNICIAN ${state.technicianRoom}   FIELD ${state.pending.fieldAction ? state.pending.fieldAction.kind.toUpperCase() : 'NONE'}   LAST ${last?.notices[0] ? fit(last.notices[0], 45) : 'NO CYCLE YET'}`);
+  const room = state.rooms[state.selectedRoom];
+  const anomaly = room.anomalyId ? state.anomalies[room.anomalyId] : undefined;
+  out.push('', line(`SELECTED ${state.selectedRoom} / ${ROOM_NAMES[state.selectedRoom]}  ${anomaly ? `${anomalyName(anomaly.id)}  EVIDENCE ${anomaly.knownEvidence.length}/2` : 'EMPTY'}`, palette, 'focus'));
+  out.push('', line('[←→] room  [1-3] lamp  [S/H/W/T] audio  [D] door  [M] queue move  [P] queue probe', palette, 'muted'));
+  out.push(line('[Enter] commit  [R] rules  [L] log  [H] help  [Esc] pause  [Q] quit', palette, 'muted'));
+  if (state.phase === 'cycleReport') out.push('', line('CYCLE RESOLVED — ENTER to continue', palette, 'good'));
+  if (state.phase === 'shiftReport') out.push('', line('SHIFT COMPLETE — ENTER to continue', palette, 'good'));
+  return out.join('\n');
 }

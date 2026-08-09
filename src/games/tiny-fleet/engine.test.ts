@@ -88,4 +88,15 @@ describe('Tiny Fleet engine', () => {
     flagship.reload = 1;
     expect(validateOrder(state, 'player', 'F1', { type: 'fire', target: { x: 4, y: 4 } }).valid).toBe(false);
   });
+
+  it('opens a complete order docket before sealing', () => {
+    let state = planning();
+    for (const ship of livingShipsForTest(state)) state = applyCommand(state, { type: 'queueOrder', shipId: ship.id, order: { type: 'hold' } });
+    state = applyCommand(state, { type: 'openOrderReview' });
+    expect(state.phase).toBe('orderReview');
+    state = applyCommand(state, { type: 'sealOrders' });
+    expect(state.phase).toBe('roundReport');
+  });
 });
+
+function livingShipsForTest(state: GameState): GameState['ships'] { return state.ships.filter(ship => ship.side === 'player' && ship.afloat); }

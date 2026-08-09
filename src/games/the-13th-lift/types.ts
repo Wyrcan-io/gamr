@@ -2,6 +2,7 @@ export type Phase =
   | 'start'
   | 'briefing'
   | 'planning'
+  | 'routeReview'
   | 'transit'
   | 'audit'
   | 'interlude'
@@ -186,6 +187,8 @@ export type Command =
   | { type: 'requestHint' }
   | { type: 'confirmHint' }
   | { type: 'commitRoute' }
+  | { type: 'openRouteReview' }
+  | { type: 'confirmRoute' }
   | { type: 'finishTransit' }
   | { type: 'dismissAudit' }
   | { type: 'dismissInterlude' }

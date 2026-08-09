@@ -36,5 +36,19 @@ describe('containment protocol engine', () => {
     const run = () => commands.reduce((state, command) => applyCommand(state, command), createState(99));
     expect(JSON.stringify(run())).toBe(JSON.stringify(run()));
   });
-});
 
+  it('keeps pending configuration immutable and queues field actions for commit', () => {
+    let state = applyCommand(createState(12), { type: 'startRun', mode: 'tutorial', seed: 12 });
+    state = applyCommand(state, { type: 'dismissBriefing' });
+    const before = JSON.stringify(state);
+    const preview = applyCommand(state, { type: 'setLamp', roomId: 'A', lamp: 'bright' });
+    expect(JSON.stringify(state)).toBe(before);
+    const queued = applyCommand(preview, { type: 'moveTechnician', to: 'A' });
+    expect(queued.cycle).toBe(0);
+    expect(queued.pending.fieldAction).toEqual({ kind: 'moveTechnician', to: 'A' });
+    const committed = applyCommand(queued, { type: 'commitCycle' });
+    expect(committed.cycle).toBe(1);
+    expect(committed.pending.fieldAction).toBeNull();
+    expect(committed.technicianRoom).toBe('A');
+  });
+});

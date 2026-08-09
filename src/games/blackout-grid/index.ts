@@ -25,8 +25,6 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   let helpOpen = false;
   let pauseSelection = 0;
   let glitchFrame = 0;
-  let focusBeats = 0;
-  let beatCounter = 0;
   let message = '';
   let state: GameState = createState(Date.now());
   let renderInterval: ReturnType<typeof setInterval> | undefined;
@@ -83,17 +81,11 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
     else if (key === '2' || key === 'r') runCommand({ type: 'startCrewJob' });
     else if (key === '3' || key === 'l') runCommand({ type: 'toggleDistrict' });
     else if (key === '4' || key === 'g') runCommand({ type: 'toggleGenerator' });
-    else if (key === ' ') {
-      if (state.focusCharges > 0 && focusBeats <= 0) { state.focusCharges--; focusBeats = 12; message = 'FOCUS ACTIVE — SIMULATION SLOWED'; }
-      else message = 'NO FOCUS CHARGES';
-    }
+    else if (key === ' ') runCommand({ type: 'activateFocus' });
   }
 
   function simulationBeat(): void {
     if (!running || paused || helpOpen || state.phase !== 'running') return;
-    beatCounter++;
-    if (focusBeats > 0 && beatCounter % 2 === 1) { focusBeats--; return; }
-    if (focusBeats > 0) focusBeats--;
     const result = advance(state);
     if (result.events.length) message = result.events[result.events.length - 1].text;
   }

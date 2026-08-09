@@ -274,6 +274,12 @@ export function applyCommand(input: GameState, command: Command): GameState {
   if (command.type === 'selectShip' && state.phase === 'planning') { const ship = state.ships.find(item => item.id === command.shipId && item.side === 'player' && item.afloat); if (ship) { state.selectedShipId = ship.id; state.cursor = { ...ship.pos }; } return state; }
   if (command.type === 'moveCursor' && state.phase === 'planning') { state.cursor = { x: Math.max(0, Math.min(BOARD_SIZE - 1, state.cursor.x + command.delta.x)), y: Math.max(0, Math.min(BOARD_SIZE - 1, state.cursor.y + command.delta.y)) }; return state; }
   if (command.type === 'cyclePanel' && state.phase === 'planning') { state.panel = state.panel === 'contacts' ? 'log' : state.panel === 'log' ? 'mission' : 'contacts'; return state; }
+  if (command.type === 'openOrderReview' && state.phase === 'planning') {
+    const missing = livingShips(state, 'player').find(ship => !state.orders.player[ship.id]);
+    if (missing) { state.notice = `ASSIGN AN ORDER TO ${className(missing.classId)} FIRST.`; return state; }
+    state.phase = 'orderReview'; state.notice = 'ORDER DOCKET OPEN. ENTER AGAIN TO SEAL THE FLEET.'; return state;
+  }
+  if (command.type === 'closeOrderReview' && state.phase === 'orderReview') { state.phase = 'planning'; state.notice = 'ORDER DOCKET CLOSED. EDITING RESUMED.'; return state; }
   if (command.type === 'clearOrder' && state.phase === 'planning') { delete state.orders.player[command.shipId]; state.notice = 'ORDER CLEARED.'; return state; }
   if (command.type === 'queueOrder' && state.phase === 'planning') {
     const result = validation(state, 'player', command.shipId, command.order);
@@ -285,6 +291,7 @@ export function applyCommand(input: GameState, command: Command): GameState {
     if (missing) { state.notice = `ASSIGN AN ORDER TO ${className(missing.classId)} FIRST.`; return state; }
     state.phase = 'roundReport'; resolveRound(state); return state;
   }
+  if (command.type === 'sealOrders' && state.phase === 'orderReview') { state.phase = 'roundReport'; resolveRound(state); return state; }
   if (command.type === 'dismissReport' && state.phase === 'roundReport') {
     if (state.outcome) state.phase = 'battleReport';
     else { state.phase = 'planning'; state.orders = { player: {}, enemy: {} }; prepareEnemy(state); state.notice = 'NEW ROUND. READ THE CONTACTS, THEN SEAL THREE ORDERS.'; }

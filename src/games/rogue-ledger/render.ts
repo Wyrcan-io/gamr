@@ -12,18 +12,32 @@ function put(out: string[], x: number, y: number, text: string): void { out.push
 function line(value: string, width: number, color = ''): string { return `${color}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
 function centered(out: string[], cols: number, y: number, value: string, color: string): void { put(out, Math.max(1, Math.floor((cols - displayWidth(value)) / 2) + 1), y, `${color}${value}${RESET}`); }
 
+export function renderTitle(cols: number, rows: number, palette = getThemePalette()): string {
+  const out: string[] = ['\x1b[2J\x1b[H'];
+  if (cols < MIN_COLS || rows < MIN_ROWS) {
+    centered(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'LEDGER NEEDS MORE ROOM', `${palette.danger}${BOLD}`);
+    centered(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, palette.muted);
+    return out.join('');
+  }
+  centered(out, cols, 5, 'g/ ROGUE LEDGER', `${palette.focus}${BOLD}`);
+  centered(out, cols, 8, 'IMPROBABLE FINANCE', palette.ink);
+  centered(out, cols, 13, 'ENTER STANDARD RUN   T INDUCTION', `${palette.good}${BOLD}`);
+  centered(out, cols, 16, 'Q QUIT', palette.muted);
+  return out.join('');
+}
+
 export function renderFrame(state: GameState, cols: number, rows: number, palette = getThemePalette(), model: RogueRenderModel = { selectedTreatment: 0, helpOpen: false, paused: false }): string {
   const out: string[] = ['\x1b[2J\x1b[H'];
   if (cols < MIN_COLS || rows < MIN_ROWS) { centered(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'LEDGER NEEDS MORE ROOM', `${palette.danger}${BOLD}`); centered(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, palette.muted); return out.join(''); }
   put(out, 3, 1, `${palette.focus}${BOLD}g/ ROGUE LEDGER${RESET}`);
   put(out, 24, 1, line(`${state.mode === 'tutorial' ? 'INDUCTION' : 'STANDARD RUN'}  Q${state.quarter}/4`, 28, palette.muted));
   put(out, 3, 3, line(`CASH ${state.cash >= 0 ? '+' : ''}${state.cash}  PROFIT ${state.profit >= 0 ? '+' : ''}${state.profit}/${state.target}  AUDIT ${state.audit}/12  STANDING ${state.standing}`, cols - 6, palette.ink));
+  if (model.helpOpen) { help(out, cols, palette); return out.join(''); }
   if (state.phase === 'briefing') return briefing(out, cols, state, palette);
   if (state.phase === 'draft') return draft(out, cols, state, palette);
   if (state.phase === 'report') return report(out, cols, state, palette);
   if (state.phase === 'ending' || state.phase === 'gameOver') return ending(out, cols, state, palette);
   workbench(out, cols, state, palette, model);
-  if (model.helpOpen) help(out, cols, palette);
   if (model.paused) centered(out, cols, 13, 'PAUSED', `${palette.warning}${BOLD}`);
   return out.join('');
 }
@@ -55,4 +69,3 @@ function workbench(out: string[], cols: number, state: GameState, palette: Termi
 }
 
 function help(out: string[], cols: number, palette: TerminalThemePalette): void { const width = Math.min(68, cols - 10); const x = Math.floor((cols - width) / 2) + 1; put(out, x, 7, `${palette.focus}${BOLD}g/ ROGUE LEDGER / ACCOUNTING CARD${RESET}`); ['Book applies the full entry now.', 'Capitalize lowers the expense now and schedules payment later.', 'Defer protects this row now but creates a larger later payment.', 'Reserve moves part of income or expense into the next quarter.', 'Decline protects cash but can cost Standing or violate a clause.', 'Preview shows the arithmetic before Enter commits it.'].forEach((text, i) => put(out, x, 10 + i, line(text, width, palette.ink))); }
-

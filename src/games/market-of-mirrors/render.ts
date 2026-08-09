@@ -17,17 +17,34 @@ function centered(out: string[], cols: number, y: number, value: string, color: 
 function money(value: number): string { return `${value >= 0 ? '+' : ''}${value}`; }
 function meter(value: number, max: number, width: number): string { const filled = Math.round(Math.max(0, Math.min(1, value / Math.max(1, max))) * width); return `[${'+'.repeat(filled)}${'.'.repeat(width - filled)}]`; }
 
+export function renderTitle(cols: number, rows: number, palette = getThemePalette()): string {
+  const out: string[] = ['\x1b[2J\x1b[H'];
+  if (cols < MIN_COLS || rows < MIN_ROWS) {
+    centered(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'MARKET NEEDS MORE ROOM', `${palette.danger}${BOLD}`);
+    centered(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, palette.muted);
+    return out.join('');
+  }
+  centered(out, cols, 5, 'g/ MARKET OF MIRRORS', `${palette.focus}${BOLD}`);
+  centered(out, cols, 8, 'BUY THE STRANGE. SELL THE STORY.', palette.ink);
+  centered(out, cols, 13, 'ENTER STANDARD MARKET   T GUIDED FAIR', `${palette.good}${BOLD}`);
+  centered(out, cols, 16, 'Q QUIT', palette.muted);
+  return out.join('');
+}
+
 export function renderFrame(state: GameState, cols: number, rows: number, palette = getThemePalette(), model: MarketRenderModel = { selectedGood: 0, secondGood: 1, selectedArtifact: 0, selectedFaction: 0, frame: 0, intensity: 0, focus: 'tape', helpOpen: false, paused: false }): string {
   const out: string[] = ['\x1b[2J\x1b[H'];
   if (cols < MIN_COLS || rows < MIN_ROWS) { centered(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'MARKET NEEDS MORE ROOM', `${palette.danger}${BOLD}`); centered(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, palette.muted); return out.join(''); }
   put(out, 3, 1, `${palette.focus}${BOLD}g/ MARKET OF MIRRORS${RESET}`);
   put(out, 31, 1, line(`${state.mode === 'tutorial' ? 'GUIDED FAIR' : 'NINE-DAY MARKET'}  DAY ${state.day}/${state.maxDay}`, 30, palette.muted));
+  if (model.helpOpen) {
+    help(out, cols, palette);
+    return out.join('');
+  }
   if (state.phase === 'briefing') return briefing(out, cols, state, palette);
   if (state.phase === 'ending') return ending(out, cols, state, palette);
   if (state.phase === 'draft') return draft(out, cols, state, palette);
   if (state.phase === 'bellReport') bell(out, cols, state, palette);
   else market(out, cols, state, palette, model);
-  if (model.helpOpen) help(out, cols, palette);
   if (model.paused) centered(out, cols, 12, 'PAUSED', `${palette.warning}${BOLD}`);
   return out.join('');
 }

@@ -34,12 +34,12 @@ export function renderFrame(state: GameState, cols: number, rows: number, palett
   const title = `g/ SIGNAL//NOISE   CASE ${String(Math.min(6, state.caseIndex + 1)).padStart(2, '0')}/06`;
   put(out, 3, 1, `${palette.focus}${BOLD}${padToWidth(title, Math.min(58, cols - 6))}${RESET}`);
   put(out, Math.max(3, cols - 31), 1, line(`${state.correctReplies} CORRECT  ${state.failedCases} FAILED`, 28, palette.muted));
+  if (options.helpOpen) { helpFrame(out, cols, palette); return out.join(''); }
   if (state.caseState.phase === 'start') return startFrame(out, cols, palette);
   if (state.caseState.phase === 'brief') return briefFrame(out, cols, state, palette);
   if (state.caseState.phase === 'ending') return endingFrame(out, cols, state, palette);
   if (state.caseState.phase === 'debrief') return debriefFrame(out, cols, state, palette);
   listeningFrame(out, cols, state, palette);
-  if (options.helpOpen) helpFrame(out, cols, palette);
   if (options.paused) put(out, Math.floor(cols / 2) - 7, 12, `${palette.warning}${BOLD}PAUSED${RESET}`);
   return out.join('');
 }

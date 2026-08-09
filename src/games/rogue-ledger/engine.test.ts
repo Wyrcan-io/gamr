@@ -19,6 +19,18 @@ describe('Rogue Ledger engine', () => {
     expect(state.lastResult).toEqual(preview);
   });
 
+  it('cancels a preview before the accounting entry is committed', () => {
+    let state = createState(42);
+    state = applyCommand(state, { type: 'dismissBriefing' });
+    const treatment = currentTransaction(state)!.allowedTreatments[0]!;
+    state = applyCommand(state, { type: 'selectTreatment', treatment });
+    const cash = state.cash;
+    state = applyCommand(state, { type: 'cancelPreview' });
+    expect(state.phase).toBe('working');
+    expect(state.cash).toBe(cash);
+    expect(state.history).toHaveLength(0);
+  });
+
   it('capitalization creates a visible future liability', () => {
     const state = createState(42);
     const expense = state.deck.find(transaction => transaction.baseCredits < 0 && transaction.allowedTreatments.includes('capitalize'))!;
@@ -31,5 +43,18 @@ describe('Rogue Ledger engine', () => {
     const state = createState(42);
     const income = state.deck.find(transaction => transaction.baseCredits > 0)!;
     expect(() => evaluateEntry(state, income, 'capitalize')).toThrow('Treatment is not allowed');
+  });
+
+  it('lets the four-entry induction finish without imposing the standard target', () => {
+    let state = createState(42, 'tutorial');
+    expect(state.target).toBe(0);
+    state = applyCommand(state, { type: 'dismissBriefing' });
+    for (let index = 0; index < 4; index += 1) {
+      state = applyCommand(state, { type: 'selectTreatment', treatment: 'decline' });
+      state = applyCommand(state, { type: 'confirmEntry' });
+      state = applyCommand(state, { type: 'dismissResult' });
+    }
+    expect(state.phase).toBe('ending');
+    expect(state.notice).toContain('INDUCTION COMPLETE');
   });
 });

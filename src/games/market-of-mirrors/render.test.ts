@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { stripAnsi } from '../../ui/terminal';
 import { getThemePalette } from '../utils';
 import { applyCommand, createState } from './engine';
-import { renderFrame } from './render';
+import { renderFrame, renderTitle } from './render';
 
 const model = { selectedGood: 0, secondGood: 1, selectedArtifact: 0, selectedFaction: 0, frame: 0, intensity: 0, focus: 'tape' as const, helpOpen: false, paused: false };
 
@@ -23,5 +23,12 @@ describe('Market of Mirrors renderer', () => {
     expect(preview).toContain('ACTION PREVIEW');
     expect(help).toContain('LEDGER CARD');
     expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper'), model))).toContain('NEED 80x28');
+  });
+
+  it('renders a themed title with truthful start controls', () => {
+    const title = stripAnsi(renderTitle(80, 28, getThemePalette('paper')));
+    expect(title).toContain('MARKET OF MIRRORS');
+    expect(title).toContain('ENTER STANDARD MARKET');
+    expect(title).not.toContain('? HELP');
   });
 });

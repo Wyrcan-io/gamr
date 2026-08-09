@@ -13,20 +13,20 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   let paused = false;
   let pauseSelection = 0;
   let helpOpen = false;
-  let state = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
+  let runSeed = Date.now();
+  let state = createState(runSeed);
   let keyListener: { dispose: () => void } | undefined;
 
   const controller: SignalNoiseController = { stop: () => { running = false; }, get isRunning() { return running; } };
-  const run = (command: Command): void => { state = applyCommand(state, command).state; };
+  const run = (command: Command): void => { state = applyCommand(state, command).state; render(); };
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
-  const restart = (): void => { run({ type: 'restart' }); paused = false; pauseSelection = 0; };
+  const restart = (): void => { run({ type: 'restart' }); paused = false; pauseSelection = 0; render(); };
 
   function handlePause(key: string, event: KeyboardEvent): boolean {
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event);
     pauseSelection = result.newSelection;
-    if (!result.confirmed) return true;
+    if (!result.confirmed) { render(); return true; }
     switch (pauseSelection) {
       case 0: paused = false; break;
       case 1: restart(); break;
@@ -35,6 +35,7 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
       case 4: controller.stop(); dispatchGameSwitch(terminal); break;
       default: break;
     }
+    if (running) render();
     return true;
   }
 
@@ -45,15 +46,15 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   function handleKey(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
     event.preventDefault(); event.stopPropagation();
-    if (key === '?' || key === 'h') { helpOpen = !helpOpen; return; }
-    if (helpOpen) { if (key === 'escape' || key === 'backspace' || key === 'enter') helpOpen = false; return; }
-    if (key === 'escape' && !['start', 'ending', 'gameOver'].includes(state.caseState.phase)) { paused = !paused; pauseSelection = 0; return; }
+    if (helpOpen) { if (key === 'escape' || key === 'backspace' || key === 'enter' || key === '?' || key === 'h') helpOpen = false; render(); return; }
+    if (key === '?' || key === 'h') { helpOpen = true; render(); return; }
+    if (key === 'escape' && !['start', 'ending', 'gameOver'].includes(state.caseState.phase)) { paused = !paused; pauseSelection = 0; render(); return; }
     if (handlePause(key, event)) return;
     const phase = state.caseState.phase;
     if (phase === 'start') { if (key === 'q') quit(); else if (key === 't') run({ type: 'start', mode: 'tutorial' }); else if (key === 'p' || key === 'enter') run({ type: 'start', mode: 'campaign' }); return; }
     if (phase === 'brief') { if (key === 'enter' || key === ' ') run({ type: 'continueBrief' }); return; }
     if (phase === 'debrief') { if (key === 'enter' || key === ' ') run({ type: 'continueDebrief' }); return; }
-    if (phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
+    if (phase === 'ending') { if (key === 'r') restart(); else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } else if (key === 'q') quit(); return; }
     if (event.key === 'ArrowLeft' || key === 'a') run({ type: 'changeCentre', delta: -1 });
     else if (event.key === 'ArrowRight' || key === 'd') run({ type: 'changeCentre', delta: 1 });
     else if (event.key === 'ArrowUp' || key === 'w') run({ type: 'changeBandwidth', delta: 1 });
@@ -85,15 +86,13 @@ export function runSignalNoiseGame(terminal: Terminal): SignalNoiseController {
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     keyListener?.dispose();
-    terminal.write('\x1b[?25h\x1b[?1049l');
+    terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     baseStop();
   };
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
     render();
   }, 50);

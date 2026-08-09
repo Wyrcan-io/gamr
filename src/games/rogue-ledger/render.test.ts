@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { stripAnsi } from '../../ui/terminal';
 import { getThemePalette } from '../utils';
 import { applyCommand, createState, currentTransaction } from './engine';
-import { renderFrame } from './render';
+import { renderFrame, renderTitle } from './render';
 
 describe('Rogue Ledger renderer', () => {
   it('renders standard briefing and accounting rows', () => {
@@ -23,5 +23,12 @@ describe('Rogue Ledger renderer', () => {
     expect(preview).toContain('RED-PENCIL MARGIN');
     expect(help).toContain('ACCOUNTING CARD');
     expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper')))).toContain('NEED 80x28');
+  });
+
+  it('renders a themed title with only reachable start controls', () => {
+    const title = stripAnsi(renderTitle(80, 28, getThemePalette('paper')));
+    expect(title).toContain('ROGUE LEDGER');
+    expect(title).toContain('ENTER STANDARD RUN');
+    expect(title).not.toContain('? HELP');
   });
 });

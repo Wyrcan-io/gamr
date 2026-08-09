@@ -59,7 +59,7 @@ function deckFor(seed: number, quarter: number): Transaction[] {
 
 export function createState(seed = Date.now(), mode: 'tutorial' | 'standard' = 'standard'): GameState {
   const clean = seed >>> 0;
-  return { seed: clean, mode, tutorialStep: mode === 'tutorial' ? 0 : null, phase: 'briefing', quarter: 1, cash: 120, profit: 0, target: targetFor(1), floor: 55, audit: 0, standing: 60, rules: [], categories: [], liabilities: [], deck: deckFor(clean, 1).slice(0, mode === 'tutorial' ? 4 : 5), index: 0, selectedTreatment: null, preview: null, lastResult: null, history: [], offers: [], notice: mode === 'tutorial' ? 'INDUCTION: read the row, then compare now and later.' : 'READ THE FORECAST. EVERY CREDIT HAS A STORY.' };
+  return { seed: clean, mode, tutorialStep: mode === 'tutorial' ? 0 : null, phase: 'briefing', quarter: 1, cash: 120, profit: 0, target: mode === 'tutorial' ? 0 : targetFor(1), floor: 55, audit: 0, standing: 60, rules: [], categories: [], liabilities: [], deck: deckFor(clean, 1).slice(0, mode === 'tutorial' ? 4 : 5), index: 0, selectedTreatment: null, preview: null, lastResult: null, history: [], offers: [], notice: mode === 'tutorial' ? 'INDUCTION: read the row, then compare now and later.' : 'READ THE FORECAST. EVERY CREDIT HAS A STORY.' };
 }
 
 export function currentTransaction(state: GameState): Transaction | undefined { return state.deck[state.index]; }

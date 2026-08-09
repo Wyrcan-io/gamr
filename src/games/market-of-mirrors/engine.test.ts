@@ -22,6 +22,17 @@ describe('Market of Mirrors engine', () => {
     expect(state.actions).toBe(2);
   });
 
+  it('cancels a preview without spending an action or changing cash', () => {
+    let state = createState(7);
+    state = applyCommand(state, { type: 'dismissBriefing' });
+    state = applyCommand(state, { type: 'previewAction', action: { type: 'buy', goodId: 'echo' } });
+    const cash = state.cash;
+    state = applyCommand(state, { type: 'cancelPreview' });
+    expect(state.phase).toBe('market');
+    expect(state.cash).toBe(cash);
+    expect(state.actions).toBe(3);
+  });
+
   it('combines two owned lots into a named artifact', () => {
     let state = createState(9);
     state = applyCommand(state, { type: 'dismissBriefing' });

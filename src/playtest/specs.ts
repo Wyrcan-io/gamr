@@ -1,6 +1,6 @@
 import { allGames } from '../games';
 import type { GameInfo } from '../games';
-import type { PlaytestAction, PlaytestMemory, PlaytestObservation, PlaytestSpec } from './types';
+import type { PlaytestAction, PlaytestMemory, PlaytestObservation, PlaytestSpec, PlayerPolicy } from './types';
 
 function textIncludes(...needles: string[]) {
   return (observation: PlaytestObservation): boolean => {
@@ -68,6 +68,15 @@ function fiveMinutePolicy(_observation: PlaytestObservation, memory: PlaytestMem
   if (index >= sequence.length) return undefined;
   memory.values.set('five-minute-index', index + 1);
   return { key: sequence[index]!, waitMs: 70, label: 'draft kingdom' };
+}
+
+function scriptedPolicy(sequence: string[], memoryKey: string, label: string, waitMs = 70): PlayerPolicy {
+  return (_observation, memory) => {
+    const index = Number(memory.values.get(memoryKey) ?? 0);
+    if (index >= sequence.length) return undefined;
+    memory.values.set(memoryKey, index + 1);
+    return { key: sequence[index]!, waitMs, label };
+  };
 }
 
 function baseSpec(game: GameInfo): PlaytestSpec {
@@ -189,6 +198,63 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
       { id: 'placement-preview', description: 'A legal placement projection is visible.', required: true, detect: textIncludes('projection', 'legal target', 'preview') },
       { id: 'placement-recorded', description: 'A placement is committed and score changes.', required: true, detect: textIncludes('placement recorded', 'glory') },
       { id: 'kingdom-ending', description: 'The final kingdom chronicle is reached.', required: true, detect: textIncludes('kingdom chronicle sealed', 'final glory') },
+    ],
+  },
+  'signal-noise': {
+    profileVersion: 1,
+    coverage: 'seeded-completion',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start induction' }],
+    policy: scriptedPolicy(['Enter', 'Enter', 'Tab', 'Tab', 'Enter', '1', 'Enter', 'Enter'], 'signal-noise-index', 'resolve induction receiver'),
+    maxActions: 18,
+    maxElapsedMs: 7000,
+    milestones: [
+      { id: 'receiver-open', description: 'The listening post opens after the induction brief.', required: true, detect: textIncludes('LISTENING POST', 'SWEEP OR TUNE') },
+      { id: 'bearing-captured', description: 'The receiver exposes locks or candidate zones.', required: true, detect: textIncludes('LOCKS', 'CANDIDATES') },
+      { id: 'channel-resolved', description: 'The induction channel reaches a controlled response.', required: true, detect: textIncludes('CHANNEL STABLE', 'INDUCTION COMPLETE') },
+    ],
+  },
+  'last-train-home': {
+    profileVersion: 1,
+    coverage: 'seeded-completion',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start dispatch induction' }],
+    policy: scriptedPolicy(['Enter', '1', 'Enter', 'Enter', 'Tab', 'Tab', '2', 'Enter', 'Enter', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', '3', 'Enter'], 'last-train-home-index', 'complete dispatch induction'),
+    maxActions: 26,
+    maxElapsedMs: 9000,
+    milestones: [
+      { id: 'dispatch-open', description: 'The induction dispatch board opens.', required: true, detect: textIncludes('DISPATCH INDUCTION', 'NEXT COMMIT') },
+      { id: 'turn-projection', description: 'The first committed turn produces a visible resolution.', required: true, detect: textIncludes('TURN 1 RESOLUTION', 'NEXT COMMIT') },
+      { id: 'induction-complete', description: 'The three-step railway induction reaches its ending.', required: true, detect: textIncludes('TUTORIAL COMPLETE', 'INDUCTION COMPLETE') },
+    ],
+  },
+  'market-of-mirrors': {
+    profileVersion: 1,
+    coverage: 'seeded-completion',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start guided fair' }],
+    policy: scriptedPolicy(['Enter', 'b', 'Enter', '2', 'b', 'Enter', 'e', 'Enter', '1', 'c', 'Enter', 'e', 'Enter', 'p', 'Enter', 'e', 'Enter'], 'market-of-mirrors-index', 'complete guided fair'),
+    maxActions: 26,
+    maxElapsedMs: 9000,
+    milestones: [
+      { id: 'auction-open', description: 'The Guided Fair auction tape opens.', required: true, detect: textIncludes('AUCTION TAPE', 'GUIDED FAIR') },
+      { id: 'action-preview', description: 'An economic action exposes a before/after preview.', required: true, detect: textIncludes('ACTION PREVIEW', 'CASH') },
+      { id: 'closing-bell', description: 'The guided market produces a closing-bell report.', required: true, detect: textIncludes('CLOSING BELL') },
+      { id: 'guided-ending', description: 'The three-day Guided Fair reaches its ending.', required: true, detect: textIncludes('LAST REFLECTION') },
+    ],
+  },
+  'rogue-ledger': {
+    profileVersion: 1,
+    coverage: 'seeded-completion',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start ledger induction' }],
+    policy: scriptedPolicy(['Enter', 'x', 'Enter', 'Enter', 'x', 'Enter', 'Enter', 'x', 'Enter', 'Enter', 'x', 'Enter', 'Enter'], 'rogue-ledger-index', 'complete ledger induction'),
+    maxActions: 24,
+    maxElapsedMs: 9000,
+    milestones: [
+      { id: 'accounting-row', description: 'The induction opens an accounting row.', required: true, detect: textIncludes('ACCOUNTING ROW', 'OPEN THE FOUR-ENTRY INDUCTION') },
+      { id: 'red-pencil-preview', description: 'A treatment exposes the accounting preview.', required: true, detect: textIncludes('RED-PENCIL MARGIN') },
+      { id: 'induction-ending', description: 'The four-entry induction reaches its ending.', required: true, detect: textIncludes('INDUCTION COMPLETE') },
     ],
   },
 };

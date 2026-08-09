@@ -28,12 +28,12 @@ export function renderFrame(state: GameState, cols: number, rows: number, palett
   put(out, 3, 1, `${palette.focus}${BOLD}g/ LAST TRAIN HOME${RESET}`);
   put(out, 28, 1, line(`${state.scenario.name.toUpperCase()}  SCENARIO ${state.scenarioIndex + 1}/2`, 34, palette.muted));
   put(out, 3, 3, line(`TURN ${String(state.turn).padStart(2, '0')}/${state.maxTurns}  PEOPLE ${state.evacuatedPeople}/${state.targetPeople}  SUPPLIES ${state.evacuatedSupplies}/${state.targetSupplies}  AP ${state.actionPoints}/2`, cols - 6, palette.ink));
+  if (state.helpOpen) { helpFrame(out, cols, palette); return out.join(''); }
   if (state.phase === 'start') return startFrame(out, cols, palette);
   if (state.phase === 'briefing') return briefingFrame(out, cols, state, palette);
   if (state.phase === 'ending' || state.phase === 'gameOver') return endingFrame(out, cols, state, palette);
   if (state.phase === 'turnReport') reportFrame(out, cols, state, palette);
   else planningFrame(out, cols, state, palette);
-  if (state.helpOpen) helpFrame(out, cols, palette);
   return out.join('');
 }
 

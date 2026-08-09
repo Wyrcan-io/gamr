@@ -44,6 +44,9 @@ export type Command =
   | { type: 'assignDie'; assignment: Assignment }
   | { type: 'unassignDie'; dieId: string }
   | { type: 'commitHearing' }
+  | { type: 'previewHearing' }
+  | { type: 'confirmHearing' }
+  | { type: 'cancelPreview' }
   | { type: 'continueAfterHearing' }
   | { type: 'continueAfterCase' }
   | { type: 'choosePrecedent'; precedentId: string }
@@ -57,6 +60,7 @@ export interface PrecedentDefinition { id: string; name: string; text: string; s
 export interface GameState {
   version: 1;
   seed: number;
+  mode: 'tutorial' | 'campaign';
   rng: RngStreams;
   phase: Phase;
   advocateId: string | null;

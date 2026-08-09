@@ -156,6 +156,15 @@ export interface CapsuleDraft {
   clue: string | null;
 }
 
+export interface ActionPreview {
+  actionId: string;
+  cost: number;
+  beforeTick: number;
+  afterTick: number;
+  summary: string;
+  effects: string[];
+}
+
 export interface GameState {
   version: 1;
   seed: number;
@@ -165,6 +174,8 @@ export interface GameState {
   progress: CampaignProgress;
   loop: LoopState;
   capsuleDraft: CapsuleDraft | null;
+  pendingAction: ActionPreview | null;
+  tutorialStep: number;
   focus: Focus;
   selection: number;
   overlay: Overlay;
@@ -179,6 +190,9 @@ export type Command =
   | { type: 'moveSelection'; delta: -1 | 1 }
   | { type: 'travel'; roomId: string }
   | { type: 'perform'; actionId: string }
+  | { type: 'previewAction'; actionId: string }
+  | { type: 'confirmAction' }
+  | { type: 'cancelActionPreview' }
   | { type: 'wait' }
   | { type: 'openOverlay'; overlay: Exclude<Overlay, 'none'> }
   | { type: 'closeOverlay' }

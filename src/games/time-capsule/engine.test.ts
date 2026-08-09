@@ -85,6 +85,19 @@ describe('Time Capsule persistence engine', () => {
     expect(state.notice).toContain('OBJECT');
   });
 
+  it('previews a costly action without advancing the loop', () => {
+    let state = exploring();
+    state = applyCommand(state, { type: 'travel', roomId: 'roof' }).state;
+    const beforeTick = state.loop.tick;
+    state = applyCommand(state, { type: 'previewAction', actionId: 'inspect-ammeter' }).state;
+    expect(state.pendingAction?.beforeTick).toBe(beforeTick);
+    expect(state.pendingAction?.afterTick).toBe(beforeTick + 1);
+    expect(state.loop.tick).toBe(beforeTick);
+    state = applyCommand(state, { type: 'confirmAction' }).state;
+    expect(state.loop.tick).toBe(beforeTick + 1);
+    expect(state.pendingAction).toBeNull();
+  });
+
   it.each([
     ['mend-bell', ['mem-ivo-confession', 'obj-ceramic-link', 'clue-bell-phase']],
     ['open-record', ['mem-mara-oath', 'obj-witness-key', 'clue-senn-order']],

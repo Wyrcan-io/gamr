@@ -16,7 +16,7 @@ export function createState(seed = Date.now()): GameState {
     factions: emptyFactions(), callers, currentOffer: null, currentCaller: null, currentResponse: 0, trackOffer: null, currentTrack: null,
     workUnits: 0, playlist: [], dossier: { evidence: [], pinned: {}, selectedSlot: 'operator' }, flags: {}, roundReports: [], log: [...BRIEF], eventLog: [],
     countercastPreparation: 0, decoyPrepared: false, finaleClaim: null, finaleResponse: null, finaleRisk: null, outcome: null, score: 0,
-    overlay: 'none', selectedIndex: 0, notice: 'THE VAN IS MOVING. THE CARRIER IS CLEAN. FOR NOW.',
+    overlay: 'none', selectedIndex: 0, selectedEvidenceId: null, notice: 'THE VAN IS MOVING. THE CARRIER IS CLEAN. FOR NOW.',
   };
 }
 
@@ -192,14 +192,19 @@ export function applyCommand(input: GameState, command: Command): CommandResult 
     setTrackOffer(state); state.notice = selected.line; state.roundReports.push({ round: state.round + 1, caller: def.alias, response: selected.label, track: '', action: '', changes: changeText(before, state) }); return { state, events };
   }
   if (command.type === 'chooseTrack' && state.phase === 'music' && state.trackOffer) { const id = state.trackOffer[command.index]; applyTrack(state, id, events); return { state, events }; }
+  if (command.type === 'selectEvidence' && state.phase === 'workbench') {
+    const item = state.dossier.evidence.find(value => value.id === command.evidenceId && value.status === 'unverified');
+    if (!item) return reject(state, 'THAT EVIDENCE IS NOT WAITING FOR VERIFICATION.');
+    state.selectedEvidenceId = item.id; state.notice = `TARGETED: ${item.title.toUpperCase()}.`; return { state, events };
+  }
   if (command.type === 'work' && state.phase === 'workbench') {
     const action = command.action; const cost: Record<WorkAction, number> = { patch: 1, scrub: 2, verify: 2, prepare: 2, skip: 0 }; const needed = cost[action];
     if (needed > state.workUnits) return reject(state, `THE TRACK ONLY LEAVES ${state.workUnits} WORK UNIT${state.workUnits === 1 ? '' : 'S'}.`);
     if (action === 'scrub' && state.factions.deepDial.trust < 45 && !state.flags.technicalLead) return reject(state, 'SCRUB NEEDS A TECHNICAL LEAD OR DEEP DIAL TRUST 45+.');
     if (action === 'verify') {
-      const item = state.dossier.evidence.find(evidence => evidence.status === 'unverified');
+      const item = state.dossier.evidence.find(evidence => evidence.id === state.selectedEvidenceId && evidence.status === 'unverified') ?? state.dossier.evidence.find(evidence => evidence.status === 'unverified');
       if (!item) return reject(state, 'NO UNVERIFIED EVIDENCE IS WAITING ON THE BENCH.');
-      item.status = 'verified'; state.notice = `VERIFIED: ${item.title.toUpperCase()}.`; pushEvent(events, 'proof', state.notice);
+      item.status = 'verified'; state.selectedEvidenceId = null; state.notice = `VERIFIED: ${item.title.toUpperCase()}.`; pushEvent(events, 'proof', state.notice);
     }
     if (action === 'patch') state.signal = clamp(state.signal + 10);
     if (action === 'scrub') state.trace = clamp(state.trace - 10);

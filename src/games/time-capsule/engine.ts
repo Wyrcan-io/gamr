@@ -70,6 +70,8 @@ function makeState(seed: number, mode: GameState['mode']): GameState {
     progress: blankProgress(),
     loop: freshLoop(episode, 1),
     capsuleDraft: null,
+    pendingAction: null,
+    tutorialStep: mode === 'tutorial' ? 0 : -1,
     focus: 'actions',
     selection: 0,
     overlay: 'none',
@@ -363,6 +365,23 @@ export function applyCommand(input: GameState, command: Command): CommandResult 
   if (state.phase === 'capsule') return { state, events };
   if (state.phase !== 'exploring') return { state, events };
 
+  if (command.type === 'previewAction') {
+    const action = episodeFor(state).actions.find(value => value.id === command.actionId);
+    if (!action || action.roomId !== state.loop.playerRoom || !actionVisible(state, action)) return { state, events };
+    if (!actionAvailable(state, action)) { incident(state, action.blockedReason ?? 'THAT ACTION IS NOT READY.', 'warning', events); events.push({ type: 'invalid', text: action.blockedReason ?? 'Action blocked.' }); return { state, events }; }
+    const effectLines = action.effects.map(effect => effect.op === 'discover' ? `DISCOVER ${anchorFor(state, effect.anchorId)?.shortName ?? effect.anchorId}` : effect.op === 'setFlag' ? `SET ${effect.key}` : effect.op === 'addItem' ? `CARRY ${effect.itemId}` : effect.op === 'finishEpisode' ? `END ${effect.endingId}` : effect.op.toUpperCase());
+    state.pendingAction = { actionId: action.id, cost: action.cost, beforeTick: state.loop.tick, afterTick: Math.min(episodeFor(state).loopTicks, state.loop.tick + action.cost), summary: action.description, effects: effectLines };
+    state.notice = 'PREVIEW READY. ENTER CONFIRMS; BACKSPACE CANCELS.';
+    return { state, events };
+  }
+  if (command.type === 'cancelActionPreview') { state.pendingAction = null; state.notice = 'ACTION PREVIEW CANCELLED.'; return { state, events }; }
+  if (command.type === 'confirmAction') {
+    if (!state.pendingAction) return { state, events };
+    const actionId = state.pendingAction.actionId;
+    state.pendingAction = null;
+    return applyCommand(state, { type: 'perform', actionId });
+  }
+
   if (command.type === 'travel') {
     if (!neighbours(state).includes(command.roomId)) {
       incident(state, 'THAT ROOM IS NOT CONNECTED TO HERE.', 'warning', events);
@@ -387,10 +406,12 @@ export function applyCommand(input: GameState, command: Command): CommandResult 
       events.push({ type: 'invalid', text: action.blockedReason ?? 'Action blocked.' });
       return { state, events };
     }
+    state.pendingAction = null;
     const mastered = action.effects.some(effect => effect.op === 'masterScene' && state.progress.masteredScenes.includes(effect.sceneId));
     incident(state, mastered && action.echoText ? action.echoText : action.description, 'info', events);
     applyEffects(state, action.effects, events);
     for (let step = 0; step < action.cost && state.phase === 'exploring'; step += 1) advanceTick(state, events);
+    if (state.mode === 'tutorial' && state.tutorialStep < 5) state.tutorialStep += 1;
     return { state, events };
   }
   return { state, events };

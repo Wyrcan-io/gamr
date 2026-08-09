@@ -24,7 +24,7 @@ function cleanSeed(seed: number): number { return (seed >>> 0) || 1; }
 export function createState(seed = Date.now()): GameState {
   const clean = cleanSeed(seed);
   return {
-    version: 1, seed: clean, rng: { docket: hashSeed(clean, 11), roll: hashSeed(clean, 29), reward: hashSeed(clean, 47), shop: hashSeed(clean, 71), flavor: hashSeed(clean, 101) },
+    version: 1, seed: clean, mode: 'campaign', rng: { docket: hashSeed(clean, 11), roll: hashSeed(clean, 29), reward: hashSeed(clean, 47), shop: hashSeed(clean, 71), flavor: hashSeed(clean, 101) },
     phase: 'start', advocateId: null, circuit: 1, caseNumber: 0, standing: 12, maxStanding: 12, fees: 2,
     dice: [], evidencePortfolio: [], precedentIds: [], docket: [], activeCase: null, rewardOptions: [], chambersUsed: false, pendingPreview: null, history: [],
     notice: 'THE COURT IS IN SESSION. SOMEONE HAS FILED A MOTION AGAINST GRAVITY.',
@@ -76,6 +76,33 @@ function addRewardOptions(state: GameState): void {
 
 function error(state: GameState, message: string): CommandResult { return { state, events: [], error: message }; }
 
+function targetKey(target: ActiveCase['hearing']['assignments'][number]['target']): string {
+  return target.kind === 'evidence' ? `e:${target.evidenceId}:${target.slotIndex}` : target.kind;
+}
+
+function resolvePreview(state: GameState, preview: NonNullable<GameState['pendingPreview']>, events: string[]): void {
+  const active = state.activeCase;
+  if (!active) return;
+  active.argument = preview.finalArgument;
+  active.contempt = preview.finalContempt;
+  active.admittedEvidenceIds.push(...preview.admittedEvidenceIds.filter(id => !active.admittedEvidenceIds.includes(id)));
+  state.notice = preview.trace[preview.trace.length - 1] ?? 'THE CLERK RECORDS THE HEARING.';
+  if (preview.outcome === 'continue') { state.phase = 'hearingResult'; events.push('hearing'); return; }
+  const won = preview.outcome === 'win';
+  state.history.push({ caseId: active.definitionId, judgeId: active.judgeId, won, sanctioned: preview.outcome === 'sanction', argument: preview.finalArgument, contempt: preview.finalContempt });
+  if (won) {
+    state.fees += 2 + state.circuit;
+    if (preview.finalContempt === 0 && active.hearing.index < active.pressure.length - 1) state.fees++;
+    state.notice = 'VERDICT: THE COURT ACCEPTS YOUR ABSURDITY.';
+  } else {
+    const damage = preview.outcome === 'sanction' ? 4 : Math.min(5, 2 + Math.ceil(Math.max(0, active.burden - preview.finalArgument) / 5));
+    state.standing = Math.max(0, state.standing - damage);
+    state.notice = state.standing > 0 ? `CASE LOST. STANDING -${damage}.` : 'STANDING EXHAUSTED. THE CLERK HAS RUN OUT OF SYMPATHY.';
+  }
+  state.phase = state.standing <= 0 ? 'gameOver' : 'caseResult';
+  events.push(won ? 'win' : 'loss');
+}
+
 export function applyCommand(state: GameState, command: Command): CommandResult {
   const events: string[] = [];
   switch (command.type) {
@@ -83,7 +110,7 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
       const fresh = createState(command.seed ?? state.seed); fresh.phase = 'advocateSelect'; fresh.notice = 'CHOOSE YOUR ADVOCATE. THE COURT WILL REMEMBER YOUR STYLE.'; return { state: fresh, events: ['start'] };
     }
     case 'startTutorial': {
-      const fresh = createState(state.seed); fresh.advocateId = 'ada-brief'; const advocate = advocateById('ada-brief')!; fresh.dice = advocate.dice.map(item => ({ ...item, faces: item.faces.map(face => ({ ...face })) as typeof item.faces })); fresh.evidencePortfolio = [...advocate.startingEvidence]; fresh.maxStanding = advocate.standing; fresh.standing = advocate.standing; fresh.phase = 'docket'; fresh.notice = 'TUTORIAL: CHOOSE THE MOON DOCKET. THE FIRST THREE HEARINGS ARE SCRIPTED BY THE CLERK.'; fresh.docket = [{ id: 'moon-pendulum', caseId: 'moon', judgeId: 'pendulum', burden: 12, pressure: [1, 1, 2], landmark: false }]; return { state: fresh, events: ['tutorial'] };
+      const fresh = createState(state.seed); fresh.mode = 'tutorial'; fresh.advocateId = 'ada-brief'; const advocate = advocateById('ada-brief')!; fresh.dice = advocate.dice.map(item => ({ ...item, faces: item.faces.map(face => ({ ...face })) as typeof item.faces })); fresh.evidencePortfolio = [...advocate.startingEvidence]; fresh.maxStanding = advocate.standing; fresh.standing = advocate.standing; fresh.phase = 'docket'; fresh.notice = 'TUTORIAL: FILE ONE HEARING. THE CLERK WILL EXPLAIN EACH STEP.'; fresh.docket = [{ id: 'moon-pendulum', caseId: 'moon', judgeId: 'pendulum', burden: 12, pressure: [1, 1, 2], landmark: false }]; return { state: fresh, events: ['tutorial'] };
     }
     case 'restart': return { state: createState(command.seed ?? state.seed), events: ['restart'] };
     case 'chooseAdvocate': {
@@ -127,17 +154,24 @@ export function applyCommand(state: GameState, command: Command): CommandResult 
     }
     case 'assignDie': {
       if (state.phase !== 'hearing' || !state.activeCase) return error(state, 'No hearing is active.');
-      const hearing = state.activeCase.hearing; if (!hearing.rolled.some(item => item.dieId === command.assignment.dieId)) return error(state, 'That die is not rolled.'); if (hearing.assignments.some(item => item.dieId === command.assignment.dieId)) return error(state, 'That die is already assigned.'); if (hearing.assignments.some(item => JSON.stringify(item.target) === JSON.stringify(command.assignment.target))) return error(state, 'That slot is already occupied.'); hearing.assignments.push(command.assignment); break;
+      const hearing = state.activeCase.hearing; if (!hearing.rolled.some(item => item.dieId === command.assignment.dieId)) return error(state, 'That die is not rolled.'); if (hearing.assignments.some(item => item.dieId === command.assignment.dieId)) return error(state, 'That die is already assigned.'); if (hearing.assignments.some(item => targetKey(item.target) === targetKey(command.assignment.target))) return error(state, 'That slot is already occupied.'); hearing.assignments.push(command.assignment); break;
     }
     case 'unassignDie': {
       if (!state.activeCase || state.phase !== 'hearing') return error(state, 'No hearing is active.'); state.activeCase.hearing.assignments = state.activeCase.hearing.assignments.filter(item => item.dieId !== command.dieId); break;
     }
+    case 'previewHearing':
     case 'commitHearing': {
-      if (state.phase !== 'hearing' || !state.activeCase) return error(state, 'No hearing is ready to commit.'); const preview = previewHearing(state); if (!preview.legal) return error(state, preview.error ?? 'The filing is incomplete.');
-      state.pendingPreview = preview; state.activeCase.argument = preview.finalArgument; state.activeCase.contempt = preview.finalContempt; state.activeCase.admittedEvidenceIds.push(...preview.admittedEvidenceIds); state.notice = preview.trace[preview.trace.length - 1] ?? 'THE CLERK RECORDS THE HEARING.';
-      if (preview.outcome === 'continue') { state.phase = 'hearingResult'; events.push('hearing'); }
-      else { const won = preview.outcome === 'win'; state.history.push({ caseId: state.activeCase.definitionId, judgeId: state.activeCase.judgeId, won, sanctioned: preview.outcome === 'sanction', argument: preview.finalArgument, contempt: preview.finalContempt }); if (won) { state.fees += 2 + state.circuit; if (preview.finalContempt === 0 && state.activeCase.hearing.index < state.activeCase.pressure.length - 1) state.fees++; state.notice = 'VERDICT: THE COURT ACCEPTS YOUR ABSURDITY.'; } else { const damage = preview.outcome === 'sanction' ? 4 : Math.min(5, 2 + Math.ceil(Math.max(0, state.activeCase.burden - preview.finalArgument) / 5)); state.standing = Math.max(0, state.standing - damage); state.notice = state.standing > 0 ? `CASE LOST. STANDING -${damage}.` : 'STANDING EXHAUSTED. THE CLERK HAS RUN OUT OF SYMPATHY.'; } state.phase = state.standing <= 0 ? 'gameOver' : 'caseResult'; events.push(won ? 'win' : 'loss'); }
-      break;
+      if (state.phase !== 'hearing' || !state.activeCase) return error(state, 'No hearing is ready to preview.');
+      const preview = previewHearing(state); if (!preview.legal) return error(state, preview.error ?? 'The filing is incomplete.');
+      state.pendingPreview = preview; state.notice = 'PREVIEW READY. ENTER FILES THE HEARING; BACKSPACE CANCELS.'; break;
+    }
+    case 'confirmHearing': {
+      if (state.phase !== 'hearing' || !state.pendingPreview) return error(state, 'Preview the filing before confirming.');
+      const preview = state.pendingPreview; state.pendingPreview = null; resolvePreview(state, preview, events); break;
+    }
+    case 'cancelPreview': {
+      if (state.phase !== 'hearing' || !state.pendingPreview) return error(state, 'No hearing preview is open.');
+      state.pendingPreview = null; state.notice = 'PREVIEW CANCELLED. THE FILING IS STILL EDITABLE.'; break;
     }
     case 'continueAfterHearing': if (state.phase !== 'hearingResult') return error(state, 'No hearing result is waiting.'); resetHearing(state); break;
     case 'continueAfterCase': {

@@ -65,4 +65,20 @@ describe('Dice Tribunal deterministic engine', () => {
     state = result(state, { type: 'assignDie', assignment: { dieId: found!.dieId, target: { kind: 'evidence', evidenceId: found!.evidenceId, slotIndex: found!.slotIndex } } });
     expect(previewHearing(state).legal).toBe(false);
   });
+
+  it('keeps a hearing unchanged until preview confirmation', () => {
+    let state = result(createState(12), { type: 'startTutorial' });
+    state = result(state, { type: 'chooseDocket', choiceId: state.docket[0]!.id });
+    const judge = judgeById(state.activeCase!.judgeId)!;
+    state = result(state, { type: 'chooseInterpretation', interpretationId: judge.defaultInterpretation.id });
+    for (const id of state.evidencePortfolio.slice(0, 4)) state = result(state, { type: 'toggleEvidence', evidenceId: id });
+    state = result(state, { type: 'confirmCaseFile' });
+    state = result(state, { type: 'roll' });
+    const before = { argument: state.activeCase!.argument, contempt: state.activeCase!.contempt, history: state.history.length };
+    state = result(state, { type: 'previewHearing' });
+    expect(state.pendingPreview).not.toBeNull();
+    expect({ argument: state.activeCase!.argument, contempt: state.activeCase!.contempt, history: state.history.length }).toEqual(before);
+    state = result(state, { type: 'cancelPreview' });
+    expect(state.pendingPreview).toBeNull();
+  });
 });

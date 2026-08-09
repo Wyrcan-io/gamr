@@ -23,20 +23,21 @@ function border(out: string[], x: number, y: number, width: number, height: numb
 }
 function writeLines(out: string[], x: number, y: number, lines: string[], color: string, max = 20): void { lines.slice(0, max).forEach((line, index) => put(out, x, y + index, `${color}${truncate(line, 36)}${RESET}`)); }
 
-export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame: number): string {
+export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame: number, selectedIndex = state.selectedIndex): string {
+  void frame;
   const out: string[] = ['\x1b[2J\x1b[H'];
   if (cols < MIN_COLS || rows < MIN_ROWS) {
     center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', RED + '\x1b[1m');
     center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED ${MIN_COLS}x${MIN_ROWS}  HAVE ${cols}x${rows}`, DIM + theme);
     return out.join('');
   }
-  const title = frame % 60 >= 56 ? 'NIGHT FREQUENCY // 91.7' : 'NIGHT FREQUENCY 91.7';
+  const title = 'NIGHT FREQUENCY 91.7';
   center(out, cols, 1, title, theme + '\x1b[1m');
   if (state.phase === 'start') return renderStart(out, cols, theme, state);
   if (state.phase === 'brief') return renderBrief(out, cols, theme, state);
   if (state.phase === 'report' || state.phase === 'ending') return renderReport(out, cols, theme, state);
   renderHeader(out, theme, state);
-  renderMain(out, theme, state);
+  renderMain(out, theme, state, selectedIndex);
   if (state.overlay !== 'none') renderOverlay(out, cols, theme, state);
   return out.join('');
 }
@@ -74,15 +75,16 @@ function renderHeader(out: string[], theme: string, state: GameState): void {
   put(out, 50, 4, `${DIM}${theme}${state.notice.slice(0, 28)}${RESET}`);
 }
 
-function renderMain(out: string[], theme: string, state: GameState): void {
+function renderMain(out: string[], theme: string, state: GameState, selectedIndex: number): void {
   renderFactions(out, theme, state);
   renderDossier(out, theme, state);
-  if (state.phase === 'caller') renderCaller(out, theme, state);
-  else if (state.phase === 'response') renderResponse(out, theme, state);
-  else if (state.phase === 'music') renderMusic(out, theme, state);
+  if (state.phase === 'caller') renderCaller(out, theme, state, selectedIndex);
+  else if (state.phase === 'response') renderResponse(out, theme, state, selectedIndex);
+  else if (state.phase === 'music') renderMusic(out, theme, state, selectedIndex);
   else if (state.phase === 'workbench') renderWorkbench(out, theme, state);
   else renderFinale(out, theme, state);
-  put(out, 2, 26, `${DIM}${theme}[1/2] CHOOSE  [ENTER] CONFIRM  [I] DOSSIER  [L] LOG  [H] HELP  [ESC] PAUSE  [Q] QUIT${RESET}`);
+  const controls = state.phase === 'workbench' ? '[1] PATCH  [2] SCRUB  [3] VERIFY  [4] PREPARE  [5] SKIP  [E] TARGET' : state.phase === 'caller' || state.phase === 'response' || state.phase === 'music' ? '[1/2] SELECT  [ENTER] CONFIRM' : '[1-4] CHOOSE  [I] DOSSIER  [L] LOG  [H] HELP';
+  put(out, 2, 26, `${DIM}${theme}${controls}  [ESC] PAUSE  [Q] QUIT${RESET}`);
 }
 
 function renderFactions(out: string[], theme: string, state: GameState): void {
@@ -105,13 +107,13 @@ function renderDossier(out: string[], theme: string, state: GameState): void {
   put(out, 4, 24, `${DIM}${theme}P cycles a claim in dossier mode${RESET}`);
 }
 
-function renderCaller(out: string[], theme: string, state: GameState): void {
+function renderCaller(out: string[], theme: string, state: GameState, selectedIndex: number): void {
   border(out, 41, 6, 37, 19, 'SWITCHBOARD // CHOOSE A CALL', MAGENTA);
   const offers = currentOffer(state);
   offers.forEach((caller, index) => {
     const y = 8 + index * 8;
-    const color = index === 0 ? CYAN : YELLOW;
-    put(out, 43, y, `${color}[${index === 0 ? '1/A' : '2/D'}] ${caller.alias} // ${caller.district}${RESET}`);
+    const color = index === selectedIndex ? CYAN : YELLOW;
+    put(out, 43, y, `${color}${index === selectedIndex ? '>' : ' '} [${index === 0 ? '1/A' : '2/D'}] ${caller.alias} // ${caller.district}${RESET}`);
     put(out, 43, y + 1, `${theme}${caller.faction[0].toUpperCase()}  ${caller.urgency}  ${caller.source}${RESET}`);
     put(out, 43, y + 2, `${theme}${truncate(caller.topic, 31)}${RESET}`);
     put(out, 43, y + 3, `${DIM}${theme}${truncate(caller.intro, 31)}${RESET}`);
@@ -119,23 +121,23 @@ function renderCaller(out: string[], theme: string, state: GameState): void {
   put(out, 43, 24, `${DIM}${theme}A caller passed may return if protected.${RESET}`);
 }
 
-function renderResponse(out: string[], theme: string, state: GameState): void {
+function renderResponse(out: string[], theme: string, state: GameState, selectedIndex: number): void {
   const caller = currentCaller(state); if (!caller) return;
   border(out, 41, 6, 37, 19, `ON AIR // ${caller.alias}`, MAGENTA);
   put(out, 43, 8, `${theme}${truncate(caller.intro, 31)}${RESET}`);
   caller.responses.forEach((choice, index) => {
-    const y = 12 + index * 5; const color = index === 0 ? CYAN : YELLOW;
-    put(out, 43, y, `${color}[${index === 0 ? '1/A' : '2/D'}] ${truncate(choice.label, 28)}${RESET}`);
+    const y = 12 + index * 5; const color = index === selectedIndex ? CYAN : YELLOW;
+    put(out, 43, y, `${color}${index === selectedIndex ? '>' : ' '} [${index === 0 ? '1/A' : '2/D'}] ${truncate(choice.label, 28)}${RESET}`);
     put(out, 43, y + 1, `${theme}${truncate(choice.line, 31)}${RESET}`);
     put(out, 43, y + 2, `${DIM}${theme}${effectSummary(choice.effects)}${choice.risk ? `  ! ${choice.risk}` : ''}${RESET}`);
   });
 }
 
-function renderMusic(out: string[], theme: string, state: GameState): void {
+function renderMusic(out: string[], theme: string, state: GameState, selectedIndex: number): void {
   border(out, 41, 6, 37, 19, 'MUSIC // PICK A RECORD', MAGENTA);
   currentTracks(state).forEach((track, index) => {
-    const y = 9 + index * 7; const color = index === 0 ? CYAN : YELLOW;
-    put(out, 43, y, `${color}[${index === 0 ? '1/A' : '2/D'}] ♫ ${track.title}${RESET}`);
+    const y = 9 + index * 7; const color = index === selectedIndex ? CYAN : YELLOW;
+    put(out, 43, y, `${color}${index === selectedIndex ? '>' : ' '} [${index === 0 ? '1/A' : '2/D'}] ♫ ${track.title}${RESET}`);
     put(out, 43, y + 1, `${theme}${track.artist} // ${track.tags.join('/')} ${RESET}`);
     put(out, 43, y + 2, `${DIM}${theme}WORK ${track.workUnits}  MASK ${track.masking}  ${effectSummary(track.effects)}${RESET}`);
   });
@@ -150,7 +152,8 @@ function renderWorkbench(out: string[], theme: string, state: GameState): void {
     '[4] PREPARE DECOY/CAST     cost 2', '[5] SKIP WORK               cost 0',
   ];
   actions.forEach((action, index) => put(out, 43, 12 + index * 2, `${index === 4 ? YELLOW : theme}${action}${RESET}`));
-  put(out, 43, 23, `${DIM}${theme}Passive trace after this round is shown in the log.${RESET}`);
+  const unverified = state.dossier.evidence.filter(item => item.status === 'unverified');
+  put(out, 43, 23, unverified.length ? `${CYAN}E TARGET: ${(unverified.find(item => item.id === state.selectedEvidenceId)?.title ?? unverified[0]?.title ?? '').slice(0, 27)}${RESET}` : `${DIM}${theme}Passive trace after this round is shown in the log.${RESET}`);
 }
 
 function renderFinale(out: string[], theme: string, state: GameState): void {
@@ -184,6 +187,9 @@ function renderOverlay(out: string[], cols: number, theme: string, state: GameSt
     writeLines(out, x + 3, 8, state.log.slice(-10), theme, 12);
   } else {
     let row = 8;
+    const citations = state.dossier.evidence.slice(0, 4).map(item => `${item.title} / ${item.sourceGroup} / ${item.status}`);
+    citations.forEach(text => put(out, x + 3, row++, `${DIM}${theme}${text.slice(0, 58)}${RESET}`));
+    row += 1;
     for (const slot of ['operator', 'method', 'origin', 'objective'] as ClaimSlot[]) {
       put(out, x + 3, row++, `${YELLOW}${SLOT_LABELS[slot]}  pinned: ${state.dossier.pinned[slot] ?? 'none'}  confidence: ${confidenceFor(state, slot)}${RESET}`);
       for (const candidate of CANDIDATES.filter(item => item.slot === slot)) {

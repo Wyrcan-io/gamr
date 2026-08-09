@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, createState } from './engine';
 import { renderFrame } from './render';
@@ -13,6 +13,7 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
   let paused = false;
   let pauseSelection = 0;
   let frame = 0;
+  let choiceSelection: 0 | 1 = 0;
   let state = createState(Date.now());
   let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
@@ -44,6 +45,7 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
     if (state.phase === 'caller') run({ type: 'chooseCaller', index });
     else if (state.phase === 'response') run({ type: 'chooseResponse', index });
     else if (state.phase === 'music') run({ type: 'chooseTrack', index });
+    choiceSelection = 0;
   }
   function cycleClaim(slot: ClaimSlot): void { run({ type: 'cyclePin', slot }); }
 
@@ -75,11 +77,13 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
     if (state.phase === 'report') { if (key === 'enter' || key === ' ') run({ type: 'continue' }); return; }
     if (state.phase === 'ending') { if (key === 'r') { state = createState(Date.now()); } else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } return; }
     if (state.phase === 'caller' || state.phase === 'response' || state.phase === 'music') {
-      if (key === '1' || key === 'a' || event.key === 'ArrowLeft') chooseBinary(0);
-      else if (key === '2' || key === 'd' || event.key === 'ArrowRight') chooseBinary(1);
+      if (key === '1' || key === 'a' || event.key === 'ArrowLeft') choiceSelection = 0;
+      else if (key === '2' || key === 'd' || event.key === 'ArrowRight') choiceSelection = 1;
+      else if (key === 'enter' || key === ' ') chooseBinary(choiceSelection);
       return;
     }
     if (state.phase === 'workbench') {
+      if (key === 'e') { const next = state.dossier.evidence.find(item => item.status === 'unverified' && item.id !== state.selectedEvidenceId) ?? state.dossier.evidence.find(item => item.status === 'unverified'); if (next) run({ type: 'selectEvidence', evidenceId: next.id }); return; }
       const actions: Record<string, WorkAction> = { '1': 'patch', '2': 'scrub', '3': 'verify', '4': 'prepare', '5': 'skip' };
       const action = actions[key]; if (action) run({ type: 'work', action });
       return;
@@ -101,7 +105,7 @@ export function runNightFrequencyGame(terminal: Terminal): NightFrequencyControl
   }
 
   function render(): void {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), frame++);
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette().focus, frame++, choiceSelection);
     if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   }

@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
-import { getCurrentThemeColor } from '../utils';
+import { getCurrentThemePalette } from '../utils';
 import { navigateMenu, PAUSE_MENU_ITEMS, renderSimpleMenu } from '../shared/menu';
 import { applyCommand, currentRoom, episode, neighbours, actionsForCurrentRoom, createState } from './engine';
 import { renderFrame } from './render';
@@ -125,8 +125,10 @@ export function runTimeCapsuleGame(terminal: Terminal): TimeCapsuleController {
     if (key === 'q') { quit(); return; }
     if (key === 'j') { command({ type: 'openOverlay', overlay: 'journal' }); return; }
     if (key === 't') { command({ type: 'openOverlay', overlay: 'timeline' }); return; }
-    if (key === 'h' || key === '?') { command({ type: 'openOverlay', overlay: 'help' }); return; }
+    if (key === '?') { command({ type: 'openOverlay', overlay: 'help' }); return; }
+    if (key === 'h') { const lead = episode(state).leads.find(item => (state.progress.hintsUsed[item.id] ?? 0) < 3) ?? episode(state).leads[0]; if (lead) command({ type: 'requestHint', leadId: lead.id }); return; }
     if (key === 'c') { command({ type: 'endLoop' }); return; }
+    if (key === 'backspace' && state.pendingAction) { command({ type: 'cancelActionPreview' }); return; }
     if (key === ' ') { command({ type: 'wait' }); return; }
     if (key === 'tab') { command({ type: 'setFocus', focus: state.focus === 'actions' ? 'map' : state.focus === 'map' ? 'journal' : 'actions' }); return; }
     if (event.key === 'ArrowLeft' || key === 'a') { travelByDirection(-1, 0); return; }
@@ -136,18 +138,19 @@ export function runTimeCapsuleGame(terminal: Terminal): TimeCapsuleController {
     if (key === 'enter') {
       const actions = actionsForCurrentRoom(state);
       const selected = actions[state.selection % Math.max(1, actions.length)];
-      if (selected) command({ type: 'perform', actionId: selected.action.id });
+      if (state.pendingAction) command({ type: 'confirmAction' });
+      else if (selected) command({ type: 'previewAction', actionId: selected.action.id });
       return;
     }
     if (/^[1-5]$/.test(key)) {
       const actions = actionsForCurrentRoom(state);
       const selected = actions[Number(key) - 1];
-      if (selected) command({ type: 'perform', actionId: selected.action.id });
+      if (selected) command({ type: 'previewAction', actionId: selected.action.id });
     }
   };
 
   const render = (): void => {
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), frame++);
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette().focus, frame++, { capsuleKind, capsuleCandidate, helpOpen: state.overlay === 'help' });
     if (paused && terminal.cols >= 80 && terminal.rows >= 28) {
       output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     }

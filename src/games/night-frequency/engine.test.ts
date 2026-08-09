@@ -38,6 +38,20 @@ describe('Night Frequency engine', () => {
     expect(result.state.phase).toBe('workbench');
   });
 
+  it('verifies the evidence item explicitly targeted on the workbench', () => {
+    let state = createState(13);
+    state = command(state, { type: 'start', mode: 'campaign' });
+    state = command(state, { type: 'continueBrief' });
+    state = command(state, { type: 'chooseCaller', index: 0 });
+    state = command(state, { type: 'chooseResponse', index: 0 });
+    state = command(state, { type: 'chooseTrack', index: 0 });
+    const item = state.dossier.evidence.find(value => value.status === 'unverified');
+    expect(item).toBeDefined();
+    state = command(state, { type: 'selectEvidence', evidenceId: item!.id });
+    state = command(state, { type: 'work', action: 'verify' });
+    expect(state.dossier.evidence.find(value => value.id === item!.id)?.status).toBe('verified');
+  });
+
   it('counts only the strongest item from a source group', () => {
     const state = createState(9);
     state.dossier.evidence = [

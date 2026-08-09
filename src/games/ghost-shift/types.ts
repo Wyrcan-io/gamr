@@ -3,7 +3,7 @@ export type DoorId = 'RL' | 'LM' | 'RP' | 'PH' | 'LH' | 'HM' | 'HA' | 'HK' | 'KS
 export type PersonId = 'NORA' | 'SAM' | 'PRIYA' | 'LEON' | 'MICA';
 export type CameraId = 'C01' | 'C02' | 'C03' | 'C04' | 'C05';
 export type Phase = 'start' | 'briefing' | 'monitoring' | 'report' | 'ending' | 'gameOver';
-export type Selection = { kind: 'room'; id: RoomId } | { kind: 'door'; id: DoorId } | { kind: 'camera'; id: CameraId };
+export type Selection = { kind: 'room'; id: RoomId } | { kind: 'door'; id: DoorId } | { kind: 'camera'; id: CameraId } | { kind: 'person'; id: PersonId };
 export type PanelId = 'feed' | 'evidence' | 'log' | 'files';
 
 export interface Person { id: PersonId; name: string; tier: 1 | 2 | 3; build: 'TALL' | 'SHORT' | 'BULKY' | 'SLIM'; schedule: Partial<Record<number, RoomId>>; }

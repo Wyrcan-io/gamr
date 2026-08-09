@@ -137,6 +137,7 @@ export interface GameState {
   score: number;
   overlay: 'none' | 'help' | 'log' | 'dossier';
   selectedIndex: number;
+  selectedEvidenceId: string | null;
   notice: string;
 }
 
@@ -147,6 +148,7 @@ export type Command =
   | { type: 'chooseResponse'; index: 0 | 1 }
   | { type: 'chooseTrack'; index: 0 | 1 }
   | { type: 'work'; action: WorkAction }
+  | { type: 'selectEvidence'; evidenceId: string }
   | { type: 'cyclePin'; slot: ClaimSlot }
   | { type: 'toggleOverlay'; overlay: 'help' | 'log' | 'dossier' | 'none' }
   | { type: 'chooseFinaleClaim'; choice: FinaleClaim }

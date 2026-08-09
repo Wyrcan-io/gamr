@@ -1,6 +1,8 @@
 import { actionsForCurrentRoom, currentRoom, episode, formatClock, neighbours } from './engine';
 import type { AnchorKind, GameState } from './types';
 
+export interface TimeCapsuleRenderModel { frame?: number; capsuleKind?: number; capsuleCandidate?: number; helpOpen?: boolean; }
+
 const RESET = '\x1b[0m';
 const DIM = '\x1b[2m';
 const BRIGHT = '\x1b[1m';
@@ -9,6 +11,7 @@ const GREEN = '\x1b[92m';
 const YELLOW = '\x1b[93m';
 const CYAN = '\x1b[96m';
 const MAGENTA = '\x1b[95m';
+const CAPSULE_KINDS: AnchorKind[] = ['memory', 'object', 'clue'];
 
 const ICONS = {
   loop: '↺', time: '◷', memory: '◉', object: '◆', clue: '◇', anchor: '▣',
@@ -90,10 +93,9 @@ function renderActions(state: GameState, theme: string): string {
   return rows.join('');
 }
 
-function renderMain(state: GameState, cols: number, rows: number, theme: string, frame: number): string {
+function renderMain(state: GameState, cols: number, rows: number, theme: string): string {
   const out: string[] = [`${esc}2J${esc}H`];
-  const glitch = frame % 60 >= 55;
-  const title = glitch ? `${RED}T I M E   C A P S U L E${RESET}` : `${theme}${BRIGHT}T I M E   C A P S U L E${RESET}`;
+  const title = `${theme}${BRIGHT}T I M E   C A P S U L E${RESET}`;
   out.push(pos(1, 3, title));
   out.push(pos(1, Math.max(42, cols - 37), `${theme}LOOP ${String(state.loop.number).padStart(2, '0')}  ${clockMeter(state)}${RESET}`));
   out.push(boxTop(3, 3, 37, 'ARCHIVE MAP', theme), boxSides(3, 3, 37, 14, theme), boxBottom(3, 16, 37, theme));
@@ -107,18 +109,20 @@ function renderMain(state: GameState, cols: number, rows: number, theme: string,
   state.loop.eventLog.slice(0, 3).forEach((event, index) => out.push(pos(23 + index, 5, `${DIM}T${String(event.tick).padStart(2, '0')}${RESET} ${event.text.slice(0, 67)}`)));
   const hint = state.focus === 'actions' ? 'Arrows select  Enter act  1-5 action  Space wait  J journal  H hint  C end loop  Esc menu' : 'Tab changes focus  Arrows select  Enter confirm  J journal  T timeline  Esc menu';
   out.push(pos(rows - 2, 3, `${theme}${hint.slice(0, cols - 6)}${RESET}`));
+  if (state.pendingAction) out.push(pos(14, 43, `${YELLOW}PREVIEW ${state.pendingAction.beforeTick} -> ${state.pendingAction.afterTick}  ${state.pendingAction.summary.slice(0, 30)}${RESET}`));
   if (state.overlay !== 'none') out.push(renderOverlay(state, cols, rows, theme));
   return out.join('');
 }
 
-function renderCapsule(state: GameState, rows: number, theme: string): string {
+function renderCapsule(state: GameState, rows: number, theme: string, model: TimeCapsuleRenderModel): string {
   const out: string[] = [`${esc}2J${esc}H`, pos(2, 3, `${theme}${BRIGHT}${ICONS.loop} THE DAY IS GONE. THREE THINGS MAY CROSS.${RESET}`), pos(4, 3, `${DIM}Choose a staged replacement, then press C to commit the next loop.${RESET}`)];
   const columns: Array<{ kind: AnchorKind; x: number; color: string }> = [{ kind: 'memory', x: 4, color: CYAN }, { kind: 'object', x: 29, color: YELLOW }, { kind: 'clue', x: 54, color: MAGENTA }];
   columns.forEach(({ kind, x, color }) => {
     out.push(boxTop(x, 7, 22, kind.toUpperCase(), color), boxSides(x, 7, 22, 9, color), boxBottom(x, 15, 22, color));
-    out.push(pos(9, x + 2, `${color}${ICONS.anchor} ${draftText(state, kind)}${RESET}`));
+    const active = CAPSULE_KINDS.indexOf(kind) === (model.capsuleKind ?? 0);
+    out.push(pos(9, x + 2, `${color}${active ? '>' : ' '} ${ICONS.anchor} ${draftText(state, kind)}${RESET}`));
     const candidates = episode(state).anchors.filter(anchor => anchor.kind === kind && (state.loop.discoveriesThisLoop.includes(anchor.id) || state.progress.anchors[kind] === anchor.id));
-    candidates.slice(0, 3).forEach((candidate, index) => out.push(pos(11 + index, x + 2, `${index + 1}. ${candidate.shortName.slice(0, 17)}`)));
+    candidates.slice(0, 3).forEach((candidate, index) => out.push(pos(11 + index, x + 2, `${index === (model.capsuleCandidate ?? 0) ? '>' : ' '} ${index + 1}. ${candidate.shortName.slice(0, 15)}`)));
   });
   out.push(pos(18, 4, `${DIM}Current anchors are kept by default. Backspace restores a slot. Empty is allowed.${RESET}`));
   out.push(pos(20, 4, `${CYAN}Tab${RESET} category   ${CYAN}↑↓${RESET} candidate   ${CYAN}C${RESET} commit   ${CYAN}R${RESET} restart episode`));
@@ -152,20 +156,29 @@ function renderOverlay(state: GameState, cols: number, rows: number, theme: stri
       out.push(pos(y + 3 + index, x + 3, `${active ? ICONS.anchor : ICONS.fresh} ${entry.shortName.padEnd(20)} ${active ? entry.journal : `${entry.lead} [FADED]`}`.slice(0, width - 6)));
     });
   } else if (state.overlay === 'timeline') {
-    episode(state).scheduledEvents.slice(0, 12).forEach((event, index) => out.push(pos(y + 3 + index, x + 3, `T${String(event.tick).padStart(2, '0')}  ${event.text}`.slice(0, width - 6))));
+    state.loop.eventLog.slice(0, 6).forEach((event, index) => out.push(pos(y + 3 + index, x + 3, `NOW T${String(event.tick).padStart(2, '0')}  ${event.text}`.slice(0, width - 6))));
+    out.push(pos(y + 11, x + 3, 'NEXT LOOP / CARRIED ANCHORS'.slice(0, width - 6)));
+    kindsForTimeline(state).forEach((text, index) => out.push(pos(y + 12 + index, x + 3, text.slice(0, width - 6))));
+    episode(state).scheduledEvents.slice(0, 6).forEach((event, index) => out.push(pos(y + 16 + index, x + 3, `PLAN T${String(event.tick).padStart(2, '0')}  ${event.text}`.slice(0, width - 6))));
   } else {
     ['The clock advances only on actions.', 'Memory changes who trusts you.', 'Object changes what you can carry.', 'Clue changes what you can prove.', 'Esc closes this panel.'].forEach((line, index) => out.push(pos(y + 4 + index, x + 3, line)));
   }
   return out.join('');
 }
 
-export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame = 0): string {
+function kindsForTimeline(state: GameState): string[] {
+  return (['memory', 'object', 'clue'] as const).map(kind => `${kind.toUpperCase().padEnd(7)}  ${state.progress.anchors[kind] ?? 'EMPTY'}  ${state.capsuleDraft?.[kind] ?? state.progress.anchors[kind] ?? 'EMPTY'}`);
+}
+
+export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame = 0, model: TimeCapsuleRenderModel = {}): string {
   if (cols < 80 || rows < 28) return `${esc}2J${esc}H${pos(Math.max(2, Math.floor(rows / 2)), 3, `${YELLOW}Terminal too small. Need 80x28; have ${cols}x${rows}.${RESET}`)}`;
   if (state.phase === 'start') return renderStart(cols, rows, theme);
   if (state.phase === 'briefing') return renderBriefing(state, cols, rows, theme);
-  if (state.phase === 'capsule') return renderCapsule(state, rows, theme);
+  if (state.phase === 'capsule') return renderCapsule(state, rows, theme, model);
   if (state.phase === 'report' || state.phase === 'ending') return renderReport(state, cols, rows, theme);
-  return renderMain(state, cols, rows, theme, frame);
+  if (model.helpOpen && state.overlay === 'help') return renderOverlay({ ...state, overlay: 'help' }, cols, rows, theme);
+  void frame;
+  return renderMain(state, cols, rows, theme);
 }
 
 export { ICONS };

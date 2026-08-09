@@ -15,7 +15,7 @@ function freshCase(def: CaseDefinition, seed: number, mode: GameState['mode']): 
   const state: GameState = { version: 1, seed: seed >>> 0, mode, phase: 'briefing', caseIndex: CASES.indexOf(def), casesCompleted: 0, correctCases: 0, failedCases: 0, totalScore: 0, turn: 1, battery: def.battery, deadline: def.deadline, rooms: [...ROOMS], doors, cameras, people, intruder, evidence, candidates, doorLog: [], observations: [], operations: [], incidentLog: [], selected: { kind: 'room', id: 'H' }, panel: 'feed', lastResolution: null, notice: 'READ THE BRIEF. CAMERAS AND LOGS ARE READY.', caseTitle: def.title, caseBrief: [...def.briefing] };
   return assess(state);
 }
-export function createState(seed = Date.now()): GameState { return freshCase(CASES[0], seed >>> 0, 'campaign'); }
+export function createState(seed = Date.now()): GameState { const state = freshCase(CASES[0], seed >>> 0, 'campaign'); state.phase = 'start'; return state; }
 function activeDef(state: GameState): CaseDefinition { return CASES[Math.max(0, state.caseIndex % CASES.length)]; }
 function addEvidence(state: GameState, evidence: Evidence): void { if (!state.evidence.some(e => e.id === evidence.id)) state.evidence.push(evidence); }
 function addLog(state: GameState, text: string): void { state.incidentLog = [`T${state.turn.toString().padStart(2, '0')}  ${text}`, ...state.incidentLog].slice(0, 8); }
@@ -25,6 +25,18 @@ function assess(state: GameState): GameState {
     for (const candidate of candidates) {
       if (evidence.contradicts?.includes(candidate.id)) { candidate.status = 'contradicted'; candidate.contradictions.push(evidence.id); }
       if (evidence.supports?.includes(candidate.id)) candidate.supports.push(evidence.id);
+    }
+    if (evidence.kind === 'camera') {
+      const observation = state.observations.find(item => item.id === evidence.id);
+      if (observation && observation.build !== 'UNKNOWN') {
+        for (const candidate of candidates) {
+          const person = state.people[candidate.id];
+          if (person.build !== observation.build && !evidence.supports?.includes(candidate.id) && candidate.status !== 'contradicted') {
+            candidate.status = 'contradicted';
+            candidate.contradictions.push(evidence.id);
+          }
+        }
+      }
     }
   }
   for (const candidate of candidates) if (candidate.status === 'possible' && candidate.supports.length === 0 && state.evidence.some(e => e.kind === 'camera' && e.contradicts?.includes(candidate.id))) candidate.status = 'cleared';
@@ -89,7 +101,7 @@ export function applyCommand(state: GameState, command: Command): GhostCommandRe
     case 'wakeCamera': result = runOperation(state, `CAMERA ${command.id}`, () => { const cam = state.cameras[command.id]; cam.activeUntil = state.turn + 3; cam.quality = cam.quality === 'dark' ? 'grainy' : cam.quality; }); break;
     case 'queryBadge': result = runOperation(state, `BADGE ${command.eventId}`, () => { const event = state.doorLog.find(e => e.id === command.eventId); if (!event) { state.notice = 'NO SUCH DOOR EVENT.'; return; } const person = state.people[event.badge as PersonId]; const door = state.doors[event.doorId]; const valid = Boolean(person && person.tier >= door.tier); const evidence: Evidence = { id: `badge-${event.id}`, turn: state.turn, kind: 'badge', text: `${event.badge} token at ${event.doorId}: ${valid ? 'tier accepted' : `tier ${person?.tier ?? 0} cannot open tier ${door.tier}`}.`, supports: valid ? [event.badge as PersonId] : [], contradicts: valid ? [] : [event.badge as PersonId] }; addEvidence(state, evidence); state.lastResolution = { operation: `BADGE ${command.eventId}`, events: [evidence.text], evidenceAdded: [evidence] }; }); break;
     case 'toggleDoor': result = runOperation(state, `DOOR ${command.id}`, () => { const door = state.doors[command.id]; door.locked = !door.locked; const event: DoorEvent = { id: `lock-${state.turn}-${door.id}`, turn: state.turn, doorId: door.id, action: door.locked ? 'LOCKED' : 'OPEN', badge: 'UNKNOWN', authenticated: true }; state.doorLog.unshift(event); addLog(state, `DOOR ${door.id} ${door.locked ? 'LOCKED' : 'RELEASED'}.`); }); break;
-    case 'probe': result = runOperation(state, `PROBE ${command.room}`, () => { const occupied = state.intruder.position === command.room; const evidence: Evidence = { id: `probe-${command.room}-${state.turn}`, turn: state.turn, kind: 'probe', text: `MOTION PROBE ${ROOM_NAMES[command.room]}: ${occupied ? 'OCCUPANCY' : 'CLEAR'}.`, supports: occupied ? [state.intruder.cover] : [], contradicts: occupied ? [] : [] }; addEvidence(state, evidence); }); break;
+    case 'probe': result = runOperation(state, `PROBE ${command.room}`, () => { const occupied = state.intruder.position === command.room; const evidence: Evidence = { id: `probe-${command.room}-${state.turn}`, turn: state.turn, kind: 'probe', text: `MOTION PROBE ${ROOM_NAMES[command.room]}: ${occupied ? 'OCCUPANCY' : 'CLEAR'}.` }; addEvidence(state, evidence); }); break;
     case 'detain': {
       const possible = state.candidates.filter(c => c.status === 'possible'); const kinds = proofKinds(state); const gate = possible.length === 1 && kinds.size >= 2 && state.intruder.position !== 'E';
       if (!gate) { state.notice = `DETAIN LOCKED — ${possible.length} CANDIDATES / ${kinds.size}/2 PROOF SOURCES.`; return { state, events: ['detain-blocked'] }; }

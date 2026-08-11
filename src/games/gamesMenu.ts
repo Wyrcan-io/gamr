@@ -3,7 +3,7 @@
  *
  * The launcher is deliberately quieter than the games it opens. It is an
  * editorial index: a short list, a useful preview, and explicit routes for
- * Workshop experiments and the compatibility archive.
+ * Workshop experiments.
  */
 
 import type { Terminal } from '@xterm/xterm';
@@ -18,7 +18,6 @@ import {
 } from './utils';
 import { games } from './index';
 import type { GameInfo } from './index';
-import { archivedGames } from './archived';
 import { getUiTheme, getUiThemeModes } from '../themes';
 import { clipToWidth, padToWidth, wrapText } from '../ui/terminal';
 
@@ -44,10 +43,10 @@ export interface GamesMenuOptions {
   }>;
 }
 
-type Section = 'home' | 'all' | 'workshop' | 'archive' | 'appearance';
+type Section = 'home' | 'all' | 'workshop' | 'appearance';
 
 type MenuEntry =
-  | { kind: 'game'; game: GameInfo; archive: boolean }
+  | { kind: 'game'; game: GameInfo }
   | { kind: 'action'; id: string; name: string; description: string }
   | { kind: 'theme'; id: ReturnType<typeof getUiThemeModes>[number]; name: string; description: string };
 
@@ -55,7 +54,6 @@ function sectionTitle(section: Section): string {
   switch (section) {
     case 'all': return 'ALL GAMES';
     case 'workshop': return 'WORKSHOP';
-    case 'archive': return 'ARCADE ARCHIVE';
     case 'appearance': return 'APPEARANCE';
     default: return 'FEATURED';
   }
@@ -64,7 +62,6 @@ function sectionTitle(section: Section): string {
 function statusLabel(entry: MenuEntry): string {
   if (entry.kind === 'theme') return 'EDITION';
   if (entry.kind === 'action') return 'OPEN';
-  if (entry.archive) return 'ARCHIVE';
   const placement = entry.game.placement ?? (entry.game.maturity === 'featured' ? 'featured' : 'catalog');
   const readiness = entry.game.readiness ?? (entry.game.maturity === 'workshop' ? 'workshop' : 'preview');
   return `${placement.toUpperCase()} / ${readiness.toUpperCase()}`;
@@ -135,19 +132,16 @@ export function showGamesMenu(
       }));
     }
 
-    const active = games.map((game) => ({ kind: 'game' as const, game, archive: false }));
-    const archive = archivedGames.map((game) => ({ kind: 'game' as const, game, archive: true }));
+    const active = games.map((game) => ({ kind: 'game' as const, game }));
 
     if (section === 'all') return active;
     if (section === 'workshop') return active.filter((entry) => (entry.game.readiness ?? (entry.game.maturity === 'workshop' ? 'workshop' : 'preview')) === 'workshop');
-    if (section === 'archive') return archive;
 
     const featured = active.filter((entry) => (entry.game.placement ?? (entry.game.maturity === 'featured' ? 'featured' : 'catalog')) === 'featured');
     return [
       ...featured,
       { kind: 'action' as const, id: 'all', name: 'All games', description: 'Browse the twenty active games.' },
       { kind: 'action' as const, id: 'workshop', name: 'Workshop', description: 'Play experiments that are still finding their shape.' },
-      { kind: 'action' as const, id: 'archive', name: 'Arcade Archive', description: 'Nineteen classic games kept for compatibility.' },
       { kind: 'action' as const, id: 'appearance', name: 'Appearance', description: 'Choose an accessible material edition.' },
       ...extraActions.map((action) => ({ kind: 'action' as const, ...action })),
     ];
@@ -176,12 +170,6 @@ export function showGamesMenu(
       writeLine(lines, `pace     ${entry.game.pace ?? 'not listed'}`, width, DIM);
       writeLine(lines, `level    ${difficultyLabel(entry.game.difficulty)}`, width, DIM);
       writeLine(lines, `session  ${entry.game.session ?? 'not listed'}`, width, DIM);
-      if (entry.archive) {
-        lines.push('');
-        for (const paragraph of wrapText('Compatibility collection. The active design standard does not apply here.', width)) {
-          writeLine(lines, paragraph, width, `${accent}${DIM}`);
-        }
-      }
     } else if (entry.kind === 'theme') {
       lines.push('');
       writeLine(lines, `selected ${getTheme() === entry.id ? 'yes' : 'no'}`, width, DIM);
@@ -201,7 +189,6 @@ export function showGamesMenu(
       'ENTER        open selected item',
       'A            all active games',
       'W            workshop',
-      'X            arcade archive',
       'T            appearance',
       '?            close this help',
       'Q            quit',
@@ -249,10 +236,8 @@ export function showGamesMenu(
     lines.push('\x1b[2J\x1b[H');
     writeLine(lines, `g/ index                                      ${getUiTheme(getTheme()).name}`, cols, `${accent}${BOLD}`);
     writeLine(lines, '─'.repeat(cols), cols, accent);
-    writeLine(lines, `${title}  ·  ${entries.length} ${section === 'archive' ? 'classics' : 'entries'}`, cols, `${accent}${BOLD}`);
-    writeLine(lines, section === 'archive'
-      ? 'Compatibility collection. The active catalog is supported separately.'
-      : 'Choose a machine by the kind of attention it asks from you.', cols, DIM);
+    writeLine(lines, `${title}  ·  ${entries.length} entries`, cols, `${accent}${BOLD}`);
+    writeLine(lines, 'Choose a machine by the kind of attention it asks from you.', cols, DIM);
     lines.push('');
 
     const listLines: string[] = [];
@@ -285,7 +270,7 @@ export function showGamesMenu(
     }
 
     lines.push('');
-    for (const footerLine of wrapText('[↑↓] move  [ENTER] open  [A] all  [W] workshop  [X] archive  [T] themes  [?] help  [Q] quit', cols)) {
+    for (const footerLine of wrapText('[↑↓] move  [ENTER] open  [A] all  [W] workshop  [T] themes  [?] help  [Q] quit', cols)) {
       writeLine(lines, footerLine, cols, DIM);
     }
     while (lines.length < rows) lines.push('');
@@ -299,7 +284,7 @@ export function showGamesMenu(
       render();
       return;
     }
-    if (entry.kind === 'action' && (entry.id === 'all' || entry.id === 'workshop' || entry.id === 'archive' || entry.id === 'appearance')) {
+    if (entry.kind === 'action' && (entry.id === 'all' || entry.id === 'workshop' || entry.id === 'appearance')) {
       setSection(entry.id);
       return;
     }
@@ -344,7 +329,6 @@ export function showGamesMenu(
     if (lower === 'q') { controller.stop(); onQuit?.(); return; }
     if (lower === 'a') { setSection('all'); return; }
     if (lower === 'w') { setSection('workshop'); return; }
-    if (lower === 'x') { setSection('archive'); return; }
     if (lower === 't') { setSection('appearance'); return; }
     if (lower === 'h') { setSection('home'); return; }
 

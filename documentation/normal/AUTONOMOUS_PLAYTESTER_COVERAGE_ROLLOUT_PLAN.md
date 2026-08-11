@@ -1,5 +1,7 @@
 # Gamr autonomous playtester coverage rollout plan
 
+> **Archive status update — 2026-08-11:** Sections that preserve or test the 19-game Arcade Archive are superseded. Those compatibility games and their public launch/export surfaces have been removed; the supported catalog now contains 20 active games.
+
 **Created:** 2026-08-03  
 **Depends on:** `AUTONOMOUS_PLAYTESTER_IMPLEMENTATION_PLAN.md`  
 **Scope:** Convert the current vertical slice into explicit, meaningful playtest coverage for every active and archived game  

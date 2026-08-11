@@ -1,6 +1,6 @@
 export type Point = { x: number; y: number };
 export type Direction = 'N' | 'E' | 'S' | 'W';
-export type Phase = 'start' | 'briefing' | 'planning' | 'report' | 'ending' | 'gameOver';
+export type Phase = 'start' | 'briefing' | 'planning' | 'review' | 'report' | 'ending' | 'gameOver';
 export type GuardMode = 'patrol' | 'investigate' | 'pursue';
 export type ObjectiveStep = 'key' | 'case' | 'exit-east' | 'exit-service';
 
@@ -13,14 +13,14 @@ export interface Incident { turn: number; text: string; kind: 'info' | 'warning'
 export interface Job { title: string; brief: string[]; map: string[]; start: Point; key: Point; display: Point; exits: { east: Point; service: Point }; guards: GuardState[]; camera: CameraState; decoys: number; jammers: number; }
 
 export interface GameState {
-  version: 1; seed: number; phase: Phase; jobIndex: number; turn: number; ap: number; alarm: 0 | 1 | 2 | 3;
+  version: 1; seed: number; mode: 'tutorial' | 'campaign'; tutorialStep: number; phase: Phase; jobIndex: number; turn: number; ap: number; alarm: 0 | 1 | 2 | 3;
   grid: string[]; player: Point; facing: Direction; guards: GuardState[]; camera: CameraState; noise: Noise[];
   keyTaken: boolean; caseOpen: boolean; asset: boolean; objective: ObjectiveStep; decoys: number; jammers: number;
-  forecast: GuardIntent[]; pending: PendingAction[]; checkpoint?: GameState; incidents: Incident[]; notice: string; score: number;
+  forecast: GuardIntent[]; pending: PendingAction[]; checkpoint?: GameState; incidents: Incident[]; notice: string; score: number; helpOpen: boolean;
 }
 
 export type Command =
   | { type: 'start'; mode: 'tutorial' | 'campaign' }
-  | { type: 'dismissBriefing' | 'commit' | 'undo' | 'restart' }
+  | { type: 'dismissBriefing' | 'commit' | 'undo' | 'restart' | 'openReview' | 'closeReview' | 'dismissReport' | 'toggleHelp' }
   | { type: 'move'; direction: Direction }
   | { type: 'decoy' | 'interact' | 'jam' };

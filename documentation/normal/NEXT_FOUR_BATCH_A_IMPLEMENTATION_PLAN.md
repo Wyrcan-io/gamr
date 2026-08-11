@@ -1,5 +1,7 @@
 # Gamr Batch A remaining-four implementation plan
 
+> **Archive status update — 2026-08-11:** Sections that preserve or test the 19-game Arcade Archive are superseded. Those compatibility games and their public launch/export surfaces have been removed; the supported catalog now contains 20 active games.
+
 **Created:** 2026-08-09  
 **Scope:** Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency  
 **Current automated migration state:** 8 of 20 active games migrated  

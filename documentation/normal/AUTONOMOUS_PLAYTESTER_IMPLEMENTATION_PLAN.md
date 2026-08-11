@@ -1,5 +1,7 @@
 # Gamr autonomous playtester implementation plan
 
+> **Archive status update — 2026-08-11:** Sections that preserve or test the 19-game Arcade Archive are superseded. Those compatibility games and their public launch/export surfaces have been removed; the supported catalog now contains 20 active games.
+
 **Created:** 2026-08-03  
 **Scope:** Terminal-level autonomous playtesting for all 20 active games, all 19 Arcade Archive games, and future games added to the catalog  
 **Primary outcome:** A repeatable test agent that launches each game through its public terminal interface, plays with human-facing controls, makes meaningful progress, proves completion where the game has an ending, and produces actionable failure evidence

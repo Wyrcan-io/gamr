@@ -4,7 +4,7 @@ export type SideId = 'player' | 'enemy';
 export type FactionId = SideId | 'neutral';
 export type ShipClassId = 'scout' | 'escort' | 'flagship';
 export type TerrainCell = 'sea' | 'island' | 'fog';
-export type Phase = 'start' | 'briefing' | 'planning' | 'orderReview' | 'roundReport' | 'battleReport' | 'ending';
+export type Phase = 'start' | 'briefing' | 'planning' | 'orderReview' | 'roundReport' | 'replay' | 'battleReport' | 'ending';
 export type BattleMode = 'campaign' | 'skirmish';
 export type ObjectiveKind = 'eliminate' | 'hold' | 'escort';
 
@@ -121,6 +121,8 @@ export interface GameState {
   selectedShipId: string;
   cursor: Point;
   panel: 'contacts' | 'log' | 'mission';
+  replayIndex: number;
+  helpOpen: boolean;
 }
 
 export type Command =
@@ -134,6 +136,7 @@ export type Command =
   | { type: 'openOrderReview' }
   | { type: 'closeOrderReview' }
   | { type: 'sealOrders' }
+  | { type: 'openReplay' | 'advanceReplay' | 'toggleHelp' }
   | { type: 'dismissReport' }
   | { type: 'restart' }
   | { type: 'nextBattle' };

@@ -49,16 +49,16 @@ function objectiveText(state: GameState): string {
   if (!state.caseOpen) return 'OPEN THE SAPPHIRE DISPLAY';
   return state.objective === 'exit-service' ? 'ESCAPE VIA STAFF EXIT' : 'ESCAPE VIA STREET EXIT';
 }
-function makeState(jobIndex: number, seed: number): GameState {
-  const job = jobs[jobIndex % jobs.length]!; const state: GameState = { version: 1, seed: seed >>> 0, phase: 'briefing', jobIndex: jobIndex % jobs.length, turn: 1, ap: 2, alarm: 0, grid: [...job.map], player: { ...job.start }, facing: 'E', guards: clone(job.guards), camera: clone(job.camera), noise: [], keyTaken: false, caseOpen: false, asset: false, objective: 'key', decoys: job.decoys, jammers: job.jammers, forecast: [], pending: [], incidents: [], notice: objectiveText({ keyTaken: false, caseOpen: false, objective: 'key' } as GameState), score: 0 };
+function makeState(jobIndex: number, seed: number, mode: 'tutorial' | 'campaign' = 'campaign'): GameState {
+  const job = jobs[jobIndex % jobs.length]!; const state: GameState = { version: 1, seed: seed >>> 0, mode, tutorialStep: 0, phase: 'briefing', jobIndex: jobIndex % jobs.length, turn: 1, ap: 2, alarm: 0, grid: [...job.map], player: { ...job.start }, facing: 'E', guards: clone(job.guards), camera: clone(job.camera), noise: [], keyTaken: false, caseOpen: false, asset: false, objective: 'key', decoys: job.decoys, jammers: job.jammers, forecast: [], pending: [], incidents: [], notice: objectiveText({ keyTaken: false, caseOpen: false, objective: 'key' } as GameState), score: 0, helpOpen: false };
   state.forecast = forecast(state); return state;
 }
-export function createState(seed = Date.now()): GameState { return makeState(0, seed); }
+export function createState(seed = Date.now()): GameState { const state = makeState(0, seed, 'campaign'); state.phase = 'start'; return state; }
 export function jobsForMenu(): readonly Job[] { return jobs; }
 export function jobLocations(state: GameState): Pick<Job, 'key' | 'display' | 'exits'> { const job = activeJob(state); return { key: { ...job.key }, display: { ...job.display }, exits: { east: { ...job.exits.east }, service: { ...job.exits.service } } }; }
 function snapshot(state: GameState): GameState { const result = clone(state); result.checkpoint = undefined; return result; }
 function withPlanning(state: GameState, action: (next: GameState) => void): GameState {
-  const next = clone(state); if (!next.checkpoint) next.checkpoint = snapshot(state); action(next); next.forecast = forecast(next); return next;
+  const next = clone(state); if (!next.checkpoint) next.checkpoint = snapshot(state); action(next); if (next.mode === 'tutorial' && next.pending.length > 0) next.tutorialStep = Math.max(next.tutorialStep, 2); next.forecast = forecast(next); return next;
 }
 function forecast(state: GameState): GuardIntent[] {
   return state.guards.map((guard) => {
@@ -88,14 +88,18 @@ function commit(state: GameState): GameState {
   const seen = visible(next); const playerKey = `${next.player.x},${next.player.y}`; const occupying = next.guards.find(g => same(g.pos, next.player));
   if (occupying) { next.alarm = 3; next.phase = 'gameOver'; addIncident(next, `${occupying.id} entered your tile. CAUGHT.`, 'warning'); }
   else if (seen.has(playerKey) && next.player.y !== 0) setAlarm(next, guardSeen.length ? `${guardSeen.map(g => g.id).join(', ')} confirmed your position.` : 'camera C1 confirmed your position.');
-  next.turn++; next.ap = 2; resolveContract(next); if (next.alarm >= 3 && next.phase !== 'ending') next.phase = 'gameOver'; next.forecast = forecast(next); next.score += 50 - next.alarm * 10; return next;
+  next.turn++; next.ap = 2; resolveContract(next); if (next.alarm >= 3 && next.phase !== 'ending') next.phase = 'gameOver'; else if (next.phase !== 'ending') next.phase = 'report'; next.tutorialStep = next.mode === 'tutorial' ? Math.max(next.tutorialStep, 3) : next.tutorialStep; next.forecast = forecast(next); next.score += 50 - next.alarm * 10; return next;
 }
 export function applyCommand(state: GameState, command: Command): GameState {
-  if (command.type === 'start') { const next = makeState(command.mode === 'tutorial' ? 0 : state.jobIndex, state.seed); next.phase = 'briefing'; return next; }
-  if (command.type === 'restart') return makeState(state.jobIndex, state.seed);
-  if (command.type === 'dismissBriefing' && state.phase === 'briefing') { const next = clone(state); next.phase = 'planning'; addIncident(next, 'MONITORING ACTIVE. PLAN TWO ACTIONS, THEN COMMIT.'); return next; }
+  if (command.type === 'start') { const next = makeState(command.mode === 'tutorial' ? 0 : state.jobIndex, state.seed, command.mode); next.phase = 'briefing'; return next; }
+  if (command.type === 'restart') return makeState(state.jobIndex, state.seed, state.mode);
+  if (command.type === 'toggleHelp') { const next = clone(state); next.helpOpen = !next.helpOpen; return next; }
+  if (command.type === 'dismissBriefing' && state.phase === 'briefing') { const next = clone(state); next.phase = 'planning'; next.tutorialStep = next.mode === 'tutorial' ? Math.max(next.tutorialStep, 1) : next.tutorialStep; addIncident(next, 'MONITORING ACTIVE. PLAN TWO ACTIONS, THEN COMMIT.'); return next; }
+  if (command.type === 'openReview' && state.phase === 'planning') { const next = clone(state); next.phase = 'review'; next.notice = next.pending.length ? 'TURN REVIEW OPEN. ENTER AGAIN TO MOVE THE GUARDS.' : 'NO ACTIONS QUEUED. ADD A MOVE OR TOOL FIRST.'; return next; }
+  if (command.type === 'closeReview' && state.phase === 'review') { const next = clone(state); next.phase = 'planning'; next.notice = 'TURN REVIEW CLOSED. EDITING RESUMED.'; return next; }
+  if (command.type === 'dismissReport' && state.phase === 'report') { const next = clone(state); next.phase = 'planning'; next.notice = 'REPORT ACKNOWLEDGED. PLAN THE NEXT TURN.'; return next; }
+  if (command.type === 'commit' && state.phase === 'review' && state.pending.length > 0) return commit(state);
   if (command.type === 'undo' && state.checkpoint) { const next = clone(state.checkpoint); next.notice = 'LAST ACTION UNDONE. FORECAST RESTORED.'; return next; }
-  if (command.type === 'commit' && state.phase === 'planning') return commit(state);
   if (state.phase !== 'planning') return state;
   if (command.type === 'move') return withPlanning(state, next => { if (next.ap <= 0) { next.notice = 'NO ACTIONS LEFT. ENTER TO COMMIT.'; return; } const delta = dirs[command.direction]; const target = { x: next.player.x + delta.x, y: next.player.y + delta.y }; next.facing = command.direction; if (!walkable(next, target)) { next.notice = 'BLOCKED: WALL OR CLOSED EDGE.'; return; } if (currentVision(next).some(p => same(p, target))) { next.notice = 'MOVE REFUSED: TILE IS SEEN NOW.'; return; } if (next.guards.some(g => same(g.pos, target))) { next.notice = 'MOVE REFUSED: GUARD OCCUPIES THAT TILE.'; return; } next.player = target; next.ap--; next.pending.push({ label: `WALK → (${target.x + 1},${target.y + 1})`, cost: 1, kind: 'move' }); });
   if (command.type === 'decoy') return withPlanning(state, next => { if (next.ap <= 0 || next.decoys <= 0) { next.notice = next.decoys <= 0 ? 'NO DECOYS REMAIN.' : 'NO ACTIONS LEFT.'; return; } const delta = dirs[next.facing]; const pos = { x: next.player.x + delta.x * 2, y: next.player.y + delta.y * 2 }; if (!walkable(next, pos)) { next.notice = 'NO CLEAR THROW LINE.'; return; } next.noise.unshift({ pos, turns: 3, label: 'DECOY' }); next.decoys--; next.ap--; next.pending.push({ label: `DECOY at (${pos.x + 1},${pos.y + 1})`, cost: 1, kind: 'decoy' }); addIncident(next, `DECOY placed at (${pos.x + 1},${pos.y + 1}); guards will investigate.`); });

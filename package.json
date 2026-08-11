@@ -1,7 +1,7 @@
 {
   "name": "@wyrcan/gamr",
   "version": "0.3.2",
-  "description": "Terminal games for xterm.js and CLI — snake, 2048, pong, asteroids, tetris, and more",
+  "description": "A curated anthology of original terminal games for xterm.js and CLI",
   "license": "AGPL-3.0",
   "type": "module",
   "engines": {
@@ -76,11 +76,9 @@
     "games",
     "cli",
     "xterm",
-    "snake",
-    "tetris",
-    "2048",
-    "pong",
-    "asteroids"
+    "terminal-ui",
+    "puzzle-games",
+    "game-anthology"
   ],
   "author": "wyrcan.io",
   "dependencies": {

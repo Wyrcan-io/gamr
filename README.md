@@ -2,7 +2,7 @@
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
-The active lineup contains twenty games. Nineteen classic games remain importable and directly launchable through the **Arcade Archive** for compatibility; they are intentionally separate from the active support promise.
+The lineup contains twenty original games. The former compatibility archive has been retired so the package, launcher, and support promise all describe the same catalog.
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
@@ -14,8 +14,8 @@ The TUI catalog is curated by maturity: four Featured games, two public betas, a
 # Play now — no install needed
 npx @wyrcan/gamr
 
-# Launch a specific active or archived game
-npx @wyrcan/gamr snake
+# Launch a specific game
+npx @wyrcan/gamr stack-trace
 
 # Use a material edition
 npx @wyrcan/gamr stack-trace --theme carbon
@@ -41,7 +41,6 @@ gamr                    # Interactive game menu
 gamr <game>             # Launch a game directly
 gamr --theme <theme>    # Set color theme
 gamr --list             # List all games
-gamr --archive          # List Arcade Archive games
 gamr --help             # Show help
 ```
 
@@ -52,13 +51,13 @@ The current editions are `carbon` (default), `paper`, `indigo`, `lichen`, and `c
 ## Library Usage (xterm.js)
 
 ```typescript
-import { games, archiveGames, setTheme, runGame } from '@wyrcan/gamr';
+import { games, setTheme, runGame } from '@wyrcan/gamr';
 
 // Set the color theme
 setTheme('carbon');
 
 // Run a game in an xterm.js Terminal instance
-const controller = runGame('snake', terminal);
+const controller = runGame('stack-trace', terminal);
 
 // Stop the game
 controller?.stop();
@@ -68,10 +67,6 @@ for (const game of games) {
   console.log(`${game.id}: ${game.name} - ${game.description}`);
 }
 
-// Compatibility collection, intentionally separate from the active catalog.
-for (const game of archiveGames) {
-  console.log(`archive/${game.id}: ${game.name}`);
-}
 ```
 
 ### Automated Playtesting
@@ -105,29 +100,10 @@ terminal.options.theme = xtermTheme;
 
 ## Games
 
-The table below is a complete compatibility reference. The interactive index separates the active catalog from the Arcade Archive; use `gamr --list` for active games and `gamr --archive` for the nineteen classic games.
+The table below is the complete active catalog. Use `gamr --list` to print the same lineup from the CLI.
 
 | Game | Description |
 |------|-------------|
-| Tetris | Stack the blocks |
-| Snake | Eat and grow |
-| 2048 | Slide and combine tiles |
-| Runner | Jump and duck |
-| Pong | Classic paddle game |
-| Wordle | Guess the word |
-| Minesweeper | Clear the mines |
-| Hangman | Guess the word |
-| Space Invaders | Defend Earth |
-| Tower | Build a tower |
-| Simon | Memory game |
-| Frogger | Cross the road |
-| Breakout | Break all the bricks |
-| Asteroids | Shoot the rocks |
-| Typing Test | Test your speed |
-| Tron | Light cycle battle |
-| Crack | Hack the system |
-| Chopper | Deliver passengers |
-| Hyper Fighter | Gem battle vs AI |
 | Packet Panic | Route packets and stop the trace |
 | Dead Letter Department | Inspect the mail and seal what answers back |
 | Signal//Noise | Isolate transmissions, locate the source, choose your reply |

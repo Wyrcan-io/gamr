@@ -31,25 +31,6 @@ function stackTracePolicy(_observation: PlaytestObservation, memory: PlaytestMem
   return { key: sequence[index]!, waitMs: 70, label: 'repair first tape' };
 }
 
-function wordlePolicy(observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
-  const text = observation.text.toLowerCase();
-  if (text.includes('cipher cracked') || text.includes('decryption failed')) return undefined;
-  const guesses = ['ARISE', 'GHOST', 'LUCKY', 'LUNCH', 'MAGIC', 'MONEY'];
-  const index = Number(memory.values.get('wordle-index') ?? 0);
-  const guessIndex = Math.floor(index / 6);
-  if (guessIndex >= guesses.length) return undefined;
-  const position = index % 6;
-  memory.values.set('wordle-index', index + 1);
-  return position === 5
-    ? { key: 'Enter', waitMs: 140, label: `submit guess ${guessIndex + 1}` }
-    : { key: guesses[guessIndex]![position]!, waitMs: 8, label: `type guess ${guessIndex + 1}` };
-}
-
-function snakePolicy(observation: PlaytestObservation): PlaytestAction | undefined {
-  if (observation.text.toLowerCase().includes('game over')) return undefined;
-  return { key: 'ArrowRight', waitMs: 130, label: 'steer snake' };
-}
-
 function packetPanicPolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
   const sequence = ['1', 'Enter', 'ArrowRight', '1', 'Enter', 'ArrowRight', '2', 'Enter', 'ArrowDown', '1', 'Enter'];
   const index = Number(memory.values.get('packet-panic-index') ?? 0);
@@ -137,33 +118,6 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
     milestones: [
       { id: 'repair-bench', description: 'The repair bench opens for the first puzzle.', required: true, detect: textIncludes('repair bench', 'read the contract', 'program modified') },
       { id: 'first-clear', description: 'The first puzzle test suite passes.', required: true, detect: textIncludes('all tests pass', 'repair accepted') },
-    ],
-  },
-  'wordle': {
-    profileVersion: 1,
-    coverage: 'seeded-completion',
-    category: 'text-entry',
-    startActions: [{ key: 'a', waitMs: 70, label: 'start cipher' }],
-    policy: wordlePolicy,
-    maxActions: 45,
-    maxElapsedMs: 8000,
-    milestones: [
-      { id: 'guess-board', description: 'The cipher accepts a five-letter guess.', required: true, detect: textIncludes('attempt 2/6', 'attempt 3/6', 'cipher cracked', 'decryption failed') },
-      { id: 'cipher-ending', description: 'The cipher reaches a win or loss ending.', required: true, detect: textIncludes('cipher cracked', 'decryption failed') },
-    ],
-  },
-  'snake': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
-    category: 'real-time',
-    startActions: [{ key: 'ArrowRight', waitMs: 100, label: 'start snake' }],
-    policy: snakePolicy,
-    maxActions: 40,
-    maxElapsedMs: 7000,
-    maxStalledFrames: 80,
-    milestones: [
-      { id: 'snake-active', description: 'Snake gameplay is active and a score is visible.', required: true, detect: textIncludes('score:', 'high score') },
-      { id: 'snake-ending', description: 'Snake reaches a controlled game-over state.', required: true, detect: textIncludes('game over', 'final score') },
     ],
   },
   'packet-panic': {
@@ -257,6 +211,62 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
       { id: 'induction-ending', description: 'The four-entry induction reaches its ending.', required: true, detect: textIncludes('INDUCTION COMPLETE') },
     ],
   },
+  'the-quiet-heist': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start heist tutorial' }],
+    policy: scriptedPolicy(['Enter', 'ArrowRight', 'Enter', 'Enter', 'Enter'], 'quiet-heist-index', 'review a planned turn'),
+    maxActions: 14,
+    maxElapsedMs: 7000,
+    milestones: [
+      { id: 'architect-plan', description: 'The architectural plan opens with temporal layers.', required: true, detect: textIncludes('ARCHITECT\'S PLAN', 'SECURITY LEDGER') },
+      { id: 'turn-review', description: 'A queued turn can be reviewed before guards move.', required: true, detect: textIncludes('TURN REVIEW', 'ENTER COMMITS') },
+      { id: 'turn-result', description: 'The committed turn produces a durable result report.', required: true, detect: textIncludes('TURN RESOLVED', 'REPORT ACKNOWLEDGED') },
+    ],
+  },
+  'tiny-fleet': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start fleet training' }],
+    policy: scriptedPolicy(['Enter', 'w', '2', '.', '3', '.', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter'], 'tiny-fleet-index', 'seal a public fleet turn'),
+    maxActions: 22,
+    maxElapsedMs: 8000,
+    milestones: [
+      { id: 'plotting-table', description: 'The fleet plotting table opens with contacts and order chits.', required: true, detect: textIncludes('PLOTTING TABLE', 'ORDER CHITS') },
+      { id: 'sealed-docket', description: 'All living ships are visible in a sealed order docket.', required: true, detect: textIncludes('SEALED ORDER DOCKET', 'ENTER SEAL') },
+      { id: 'public-replay', description: 'The resolved turn opens a public replay strip.', required: true, detect: textIncludes('PUBLIC REPLAY', 'ROUND RESOLUTION') },
+    ],
+  },
+  'dungeon-courier': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start parcel tutorial' }],
+    policy: scriptedPolicy(['1', 'Enter', 'ArrowRight', 'Enter', 'Tab', 'h', 'h'], 'dungeon-courier-index', 'preview a parcel route'),
+    maxActions: 18,
+    maxElapsedMs: 8000,
+    milestones: [
+      { id: 'contract-desk', description: 'The parcel contract desk offers a teaching label.', required: true, detect: textIncludes('CHOOSE A CONTRACT', 'PORCELAIN') },
+      { id: 'parcel-briefing', description: 'The selected parcel explains its handling rule.', required: true, detect: textIncludes('DELIVERY BRIEFING', 'CONDITION', 'SEAL') },
+      { id: 'action-preview', description: 'A selected direction exposes its causal action preview.', required: true, detect: textIncludes('PREVIEW', 'STRAIN', 'CLEAR') },
+    ],
+  },
+  'the-13th-lift': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    category: 'turn-based',
+    startActions: [{ key: 't', waitMs: 70, label: 'start lift tutorial' }],
+    policy: scriptedPolicy(['Enter', 'Space', 'ArrowRight', 'Space', 'Enter', 'Enter', 'Enter', 'Enter'], 'thirteenth-lift-index', 'review a route tape'),
+    maxActions: 18,
+    maxElapsedMs: 8000,
+    milestones: [
+      { id: 'rider-manifest', description: 'The lift opens a rider manifest and evidence ledger.', required: true, detect: textIncludes('RIDERS / REQUESTS', 'EVIDENCE') },
+      { id: 'route-review', description: 'The queued stops open a route tape before departure.', required: true, detect: textIncludes('ROUTE TAPE / REVIEW', 'CONFIRM DEPARTURE') },
+      { id: 'arrival-audit', description: 'The ride reaches a durable arrival audit.', required: true, detect: textIncludes('ARRIVAL AUDIT', 'INCIDENT AUDIT') },
+    ],
+  },
 };
 
 export function createPlaytestRegistry(games: readonly GameInfo[] = allGames): Map<string, PlaytestSpec> {
@@ -290,7 +300,7 @@ export function featuredCoverageGaps(games: readonly GameInfo[], registry: Reado
 export interface CoverageSummary {
   gameId: string;
   name: string;
-  group: 'featured' | 'beta' | 'workshop' | 'archive';
+  group: 'featured' | 'beta' | 'workshop';
   coverage: PlaytestSpec['coverage'];
   profileVersion: number;
 }
@@ -303,7 +313,7 @@ export function coverageSummary(games: readonly GameInfo[], registry: ReadonlyMa
     return {
       gameId: game.id,
       name: game.name,
-      group: placement === 'featured' ? 'featured' : readiness === 'workshop' ? 'workshop' : game.maturity === undefined ? 'archive' : 'beta',
+      group: placement === 'featured' ? 'featured' : readiness === 'workshop' ? 'workshop' : 'beta',
       coverage: spec?.coverage,
       profileVersion: spec?.profileVersion ?? 0,
     };

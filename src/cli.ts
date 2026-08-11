@@ -41,7 +41,7 @@ if (typeof globalThis.window === 'undefined') {
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 // Now safe to import game code
-import { games, allGames, archiveGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
+import { games, allGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
 import { getUiThemeModes, isValidThemeMode, type PhosphorMode } from './themes';
 
 // ---------------------------------------------------------------------------
@@ -343,7 +343,6 @@ function printHelp() {
     gamr remove <name>      Remove a game
     gamr --theme <theme>    Set color theme
     gamr --list             List all games
-    gamr --archive          List compatibility games
     gamr --help             Show this help
 
   Games:
@@ -360,7 +359,6 @@ function printHelp() {
 
   Examples:
     gamr stack-trace
-    gamr snake                 # archived compatibility game
     gamr packet-panic --theme indigo
 `);
 }
@@ -375,13 +373,6 @@ function main() {
 
   if (args.includes('--list') || args.includes('-l')) {
     for (const game of games) {
-      console.log(`  ${game.id.padEnd(16)} ${game.description}`);
-    }
-    return;
-  }
-
-  if (args.includes('--archive')) {
-    for (const game of archiveGames) {
       console.log(`  ${game.id.padEnd(16)} ${game.description}`);
     }
     return;

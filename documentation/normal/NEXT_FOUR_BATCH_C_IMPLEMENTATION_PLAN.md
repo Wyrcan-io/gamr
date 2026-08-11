@@ -1,11 +1,13 @@
 # Gamr Batch C maps-and-routes implementation plan
 
 **Created:** 2026-08-09  
+**Source-verified revision:** 2026-08-11
 **Scope:** The Quiet Heist, Tiny Fleet, Dungeon Courier, and The 13th Lift  
-**Current migration state:** 12 of 20 active games have completed the automated migration gate; Batch B has an implementation packet in progress but is not yet signed off  
-**Cohort milestone:** 20 of 20 active games migrated only after Batch B and this cohort complete their automated and human validation gates  
+**Current migration state:** 12 of 20 active games have formal migration sign-off; Batch B and Batch C implementation passes are complete but their validation gates are still open
+**Remaining to fully migrate:** 8 active games — four Batch B games and these four Batch C games — remain to pass automated, human, and catalog sign-off gates
 **Catalog status:** All four targets remain Workshop until reviewed individually  
-**Arcade Archive:** The 19 legacy compatibility games remain unchanged and out of scope
+**Archive decision:** The 19 legacy compatibility games were retired and removed on 2026-08-11; they do not count toward the 20-game migration ledger
+**Planning status:** Implementation pass complete; human validation and production-readiness gates remain
 
 ## 1. Decision and implementation order
 
@@ -57,7 +59,7 @@ Batch C implementation may begin only when:
 - current 80x28 and 100x30 reference frames exist for all four games;
 - current keyboard paths have been recorded from source, not inferred from footer copy;
 - seeded start-to-result transcripts exist or are captured before mechanics-adjacent refactors;
-- the team agrees that the Arcade Archive is not part of this cohort.
+- archive retirement remains separate from the eight active-game validation gates.
 
 ## 3. Source-verified baseline
 
@@ -67,7 +69,7 @@ Current targeted automated baseline:
 
 ```text
 8 test files passed
-31 tests passed
+35 tests passed
 ```
 
 Command used:
@@ -80,10 +82,10 @@ This baseline proves selected deterministic engine, solver, grid, generator, and
 
 | Game | Existing strengths | Source-verified blockers |
 |---|---|---|
-| The Quiet Heist | Two-action planning loop; deterministic guard forecast; guard reason, destination, facing, and sight cells; checkpoint-backed undo; noise, camera jam, alarm, objective, and alternate-exit interactions; shared pause menu; three engine tests | Advertised arrow keys compare against `left`, `right`, `up`, and `down`, so normal `Arrow*` keys do not move; planning mutates the displayed state immediately while the renderer ignores its checkpoint, collapsing NOW and AFTER PLAN; current and forecast sight fields share one map without a clear temporal key; tutorial is only Job 1 with no teaching progression; key, display, and exit interactions are partly hard-coded instead of consistently reading `Job`; the map draws a hard-coded `H` affordance with no matching interaction; help replaces one notice; fixed ANSI colors, raw widths, glitch animation, a 50 ms turn-based render loop, and no renderer/controller/lifecycle coverage remain. |
-| Tiny Fleet | Deterministic simultaneous-order engine; one order required per living ship; player/enemy order isolation; observations separate own ships, exact contacts, and tracks; terrain, smoke, wrecks, objectives, reload, special actions, AI doctrines, reports, and campaign flow; shared pause menu; eight engine/grid tests | The main screen shows queued orders but has no deliberate full-fleet review/arm stage before sealing; resolution happens immediately and only a short report overlay remains, so movement/fire causality cannot be replayed; tracks are reduced to colon cells plus terse age/count text, weakening source and uncertainty; legal aim is not the same as predicted outcome, but the plotting surface does not explain that distinction; the footer advertises `I panel` while the controller cycles panels with Tab and has no `I` handler; fixed ANSI colors, raw widths, title glitch, continuous turn-based rendering, and no renderer/controller/lifecycle coverage remain. |
-| Dungeon Courier | Deterministic floor and contracts; real tutorial offer and one-delivery tutorial ending; pure `evaluateMove`/`previewText`; parcel-specific stress, condition, meter, guard, seal, noise, time, threats, shifting gates, inventory, upgrades, delivery reports, and complete three-delivery run; shared pause menu; six engine tests | The sidebar always evaluates and labels `PREVIEW EAST`, regardless of the player's next intended direction; movement commits on direction input, leaving no persistent selected step to inspect; the preview compresses rich `ActionEvaluation` fields into a truncated reason; route survey uses placeholder-looking `STABLE 31 / FAST 22+R` text rather than a causal path model; Escape toggles pause before help/inventory can consume it, contradicting their close instructions; controls are permanently stacked rather than contextual; fixed ANSI colors, raw string width, panel content truncated to map height, continuous turn-based rendering, and no renderer/controller/lifecycle coverage remain. |
-| The 13th Lift | Deterministic puzzle generator and solver; story/tutorial/after-hours modes; typed clues with speaker and current/previous source time; authentic, phantom, and anomalous landings; passenger constraints; route evaluation and decisive evidence; renderer, generator, solver, and engine tests; existing light/dark-aware warning, good, and danger colors; 80x24 compact support | Evidence renders only prose, hiding its stored speaker and source time; Enter commits directly from planning to transit, so there is no review/confirm stage; route evaluation is calculated before the transit presentation; stacked boxes can be silently cut by `lines.slice(0, rows)`; width helpers use JavaScript string length instead of terminal-cell width; help says `A,D` while the footer says `A,F`; Escape opens pause and closes an active overlay instead of closing the top layer first; two intervals plus wall-clock transit timing complicate determinism; `stop()` does not restore cursor, ANSI reset, or alternate buffer; controller/lifecycle coverage is absent. |
+| The Quiet Heist | Deterministic two-action planning; pure `planningComparison`; authored `jobLocations`; NOW/PLAN/FORECAST marks; semantic palette and terminal-cell helpers; real Arrow/WASD parity; event-driven rendering; bounded checkpoint snapshot; idempotent terminal cleanup; four engine tests | `createState()` starts at `briefing`, making the controller's title/start-mode branch unreachable; help still overwrites notice instead of owning an overlay; Enter commits without an armed review; there is no durable turn-result phase even though the renderer mentions one; restart and next-job direct assignments do not render in the event-driven controller; tutorial progress is not modeled; the decorative `H` remains; the renderer hard-caps at 28 lines instead of respecting `rows`; renderer/controller/lifecycle and full-job coverage are absent. |
+| Tiny Fleet | Deterministic simultaneous-order engine; observation boundary excludes hidden enemy coordinates; full-fleet `orderReview` phase already requires complete orders and a second confirmation; semantic palette and terminal-cell helpers; exact/estimated contact labels; terrain, smoke, wrecks, objectives, reload, special actions, reports, and campaign flow; nine engine/grid tests | There is no pure selected-order preview or LEGAL-versus-SAFE wording; resolution still collapses into a short report rather than immutable, stepable public replay frames; estimated regions remain visually weak; help overwrites notice; the selected info panel is not actually composed into the renderer; rendering still polls every 50 ms; the renderer hard-caps at 28 lines; renderer/controller/lifecycle and full-campaign coverage are absent. |
+| Dungeon Courier | Deterministic floor/contracts; tutorial ending; pure `evaluateMove`; persistent direction/hurry intent through `previewMove` and `commitMove`; parcel-specific stress, condition, meter, guard, seal, noise, time, threats, inventory, upgrades, and reports; eight engine tests | The preview shows only a compressed label/reason instead of the material `ActionEvaluation` deltas; route survey still uses `STABLE 31 / FAST 22+R`; survey modes mostly change labels rather than the map; inventory Escape is intercepted by pause before inventory can consume it; renderer still owns fixed ANSI colors and receives only the theme focus string; controls are not sufficiently contextual; rendering polls every 50 ms; stop omits ANSI reset; renderer/controller/lifecycle and complete-run coverage are absent. |
+| The 13th Lift | Deterministic generator/solver; typed clue provenance in state; story/tutorial/after-hours modes; implemented `routeReview` phase with two-stage Enter; route evaluation deferred until `confirmRoute`; overlay-first Escape for active reference overlays; transit double-resolution guard; renderer/generator/solver/engine tests; light/dark-aware colors; cursor/reset/alternate-buffer cleanup; 80x24 support | Evidence still hides speaker/source time; route-review Escape is intercepted by the global pause branch, so only Backspace reliably returns to editing; the controller starts transit timing only for legacy `commitRoute`, not the new `confirmRoute`, so automatic transit completion is disconnected; two render/game intervals and `Date.now()` remain; layout uses string length and silent `lines.slice(0, rows)` truncation; help says `A,D` while the footer says `A,F`; palette handling is partial rather than semantic; controller/lifecycle and complete-story coverage are absent. |
 
 ## 4. Cohort product contract
 
@@ -197,14 +199,14 @@ Every game receives:
 | Stage | Deliverable | Exit condition |
 |---:|---|---|
 | 0 | Record the Batch B completion/overlap decision and capture current reference frames/transcripts | The honest migration count and allowed overlap are documented. |
-| 1 | The Quiet Heist engine/controller boundary repair | Arrows work, authored coordinates drive interactions, temporal view selectors are pure, tutorial steps exist, and controller lifecycle is tested. |
+| 1 | The Quiet Heist completion-boundary repair | Start/mode selection is reachable, direct controller mutations render, authored coordinates remain authoritative, commit review/result phases exist, tutorial steps advance, and controller lifecycle is tested. |
 | 2 | The Quiet Heist visual migration | NOW, PLAN, post-commit sight, objectives, and action cost are readable on one stable architectural plan; automated gate and three first-time sessions pass. |
-| 3 | Tiny Fleet information-boundary and replay model | Observation fixtures prove no hidden-state leak; review/arm and deterministic resolution-step models exist. |
+| 3 | Tiny Fleet preview and replay model | Existing observation and review boundaries remain intact; pure order previews distinguish LEGAL from SAFE; deterministic public resolution-step models exist. |
 | 4 | Tiny Fleet visual migration | Contacts, uncertainty, full orders, conflicts, and replay are readable on one plotting table; automated gate and three first-time sessions pass. |
 | 5 | Stealth/naval pair checkpoint | Repeated confusion about temporal layers, certainty, or commit is fixed and retested before Dungeon Courier begins. |
-| 6 | Dungeon Courier intent/preview repair | Selected direction/action persists, the preview exposes causal deltas, Escape precedence is correct, and route surveys are computed rather than decorative. |
+| 6 | Dungeon Courier preview-depth and controller repair | Existing selected intent remains authoritative, the docket exposes causal deltas, Escape precedence is correct, route surveys are computed, and rendering/lifecycle become event-driven and semantic. |
 | 7 | Dungeon Courier visual migration | Parcel condition, route hazards, contextual verbs, satchel, shifts, and delivery results are understandable; automated gate and three first-time sessions pass. |
-| 8 | The 13th Lift evidence/commit/lifecycle repair | Clue provenance is explicit, route review is two-stage, transit is deterministic, overlays are layered correctly, and stop cleanup is complete. |
+| 8 | The 13th Lift evidence/transit/lifecycle repair | Existing two-stage review remains intact; clue provenance is explicit, review cancellation works, transit timing follows `confirmRoute`, rendering is deterministic, and controller lifecycle is tested. |
 | 9 | The 13th Lift visual migration | Annunciator, manifest, evidence, route tape, and audit fit without silent truncation in supported layouts; automated gate and three first-time sessions pass. |
 | 10 | Final active-catalog review | All four individual gates pass, applicable cross-game findings are retested, and the ledger may record 20 of 20 active games migrated. |
 
@@ -227,9 +229,12 @@ read current guards, camera, objective, and safe floor
 
 ### 6.2 Engine and data work
 
-1. Replace hard-coded key, display, and exit coordinates in interaction and contract resolution with the active `Job` fields.
-2. Remove the hard-coded `H` map affordance unless it becomes a named, authored, interactive location.
-3. Add a minimal tutorial model with explicit milestones:
+Already present and protected by regression tests: authored job coordinates, a bounded checkpoint snapshot, `planningComparison`, semantic palette rendering, terminal-cell clipping, real Arrow/WASD input, event-driven rendering, and terminal restoration.
+
+1. Make `createState()` enter the visible start phase, and make tutorial/campaign selection establish the intended job and mode before briefing.
+2. Keep key, display, and exit behavior driven by the active `Job`; add regression coverage for both authored jobs.
+3. Remove the hard-coded `H` map affordance unless it becomes a named, authored, interactive location.
+4. Add a minimal tutorial model with explicit milestones:
    - read current sight;
    - queue one safe move;
    - compare planned position and future sight;
@@ -237,21 +242,22 @@ read current guards, camera, objective, and safe floor
    - use a decoy or jammer;
    - commit;
    - take the key, open the display, and exit.
-4. Replace the recursive full `GameState` checkpoint with a bounded planning snapshot or plan model that cannot contain another checkpoint.
-5. Add pure selectors, named by behavior rather than presentation:
+5. Preserve the bounded planning snapshot and decide explicitly whether undo means "undo the whole uncommitted turn" or "remove the last queued action"; copy and tests must describe the same contract.
+6. Extend the existing pure comparison selectors with:
    - `currentPlanningState(state)`;
    - `plannedState(state)`;
    - `currentSecurityView(state)`;
    - `postCommitSecurityView(state)`;
    - `planningComparison(state)`;
    - `selectedContextAction(state)`.
-6. Make the comparison expose current/planned player position, current/planned equipment and noise, AP cost, current sight, post-commit sight, guard intents, camera status, legal/blocked reasons, and objective delta.
-7. Preserve the core two-action balance. Do not add free movement, pathfinding automation, or a rewind after commit.
+7. Make the comparison expose current/planned player position, current/planned equipment and noise, AP cost, current sight, post-commit sight, guard intents, camera status, legal/blocked reasons, and objective delta.
+8. Add an armed commit review and a durable result projection; the authoritative commit runs once, then the result remains until acknowledged.
+9. Preserve the core two-action balance. Do not add free movement, pathfinding automation, or a rewind after commit.
 
 ### 6.3 Controller work
 
-- Normalize `ArrowLeft`, `ArrowRight`, `ArrowUp`, and `ArrowDown` correctly while preserving WASD.
-- Render after accepted input or bounded transition, not every 50 ms.
+- Preserve the working `ArrowLeft`, `ArrowRight`, `ArrowUp`, and `ArrowDown` plus WASD mapping with controller tests.
+- Render after every accepted input and every direct state assignment, including restart and next job.
 - Make `?` open a real help overlay rather than replacing notice text.
 - Apply top-layer Escape order: cancel armed commit/local overlay, close help, then open pause.
 - Advertise `U` and Backspace for undo if both are supported; otherwise choose one and make footer, help, and tests agree.
@@ -336,6 +342,8 @@ read own ships, terrain, objective, and contact certainty
 
 ### 7.2 Observation and information-boundary work
 
+Already present and protected by regression tests: `deriveObservation`, hidden-coordinate isolation, semantic palette rendering, exact-versus-estimated labels, and a complete-order `orderReview` phase with second-confirmation sealing.
+
 1. Keep `deriveObservation` as the public rendering boundary and add a renderer-facing view model that contains no enemy truth beyond the observation.
 2. Audit every player-visible selector and report for leaks from `state.ships`, `state.orders.enemy`, true positions, target identities, or AI doctrine.
 3. Model contact presentation explicitly:
@@ -356,9 +364,9 @@ read own ships, terrain, objective, and contact certainty
 
 ### 7.3 Review, commit, and replay model
 
-1. Add an explicit `reviewOrders` or `ordersArmed` state after every living ship has one order.
-2. First Enter opens the sealed-order docket. It must show every living player ship, its complete order, target/path, and warnings.
-3. Second Enter seals and resolves. Backspace/Escape returns to editing without changing orders.
+1. Preserve the existing `orderReview` state and its missing-order guard.
+2. Expand the sealed-order docket so it shows every living player ship, its complete order, target/path, legality, and conditional warnings.
+3. Keep first Enter as review and second Enter as seal; Backspace/Escape must return to editing without changing orders.
 4. Preserve one order per living ship and current simultaneous resolution semantics.
 5. Capture an immutable `ResolutionFrame[]` or equivalent event projection during the single authoritative resolve. Do not call the resolver again for replay.
 6. Replay steps should cover, as applicable:
@@ -374,9 +382,9 @@ read own ships, terrain, objective, and contact certainty
 
 ### 7.4 Controller work
 
-- Make the panel key truthful: either implement `I` for panel cycling or advertise Tab only. Footer, help, and controller tests must match.
+- Compose the existing `contacts`/`log`/`mission` panel state visibly, and keep Tab as the one advertised cycling command unless `I` is deliberately added everywhere.
 - Keep arrows for aim and 1-3 for ship selection; clarify that WASD chooses helm orders rather than moving a cursor.
-- Add contextual controls for editing, review, replay, and after-action phases.
+- Replace notice-based help with a real overlay and add contextual controls for editing, review, replay, and after-action phases.
 - Remove the 50 ms title/render loop from turn-based play.
 - Add help with an explicit legend for exact contact, estimated region, last known point, smoke, wreck, objective, and order ghost.
 - Apply top-layer Escape precedence and shared lifecycle cleanup.
@@ -447,10 +455,11 @@ read the parcel rule and current condition
 
 ### 8.2 Intent and preview work
 
-1. Add controller-owned or engine-owned selected intent: direction plus normal/hurry mode, or brace/wait/interact/tool.
-2. Direction input selects and previews a step; a deliberate action key commits it. If direct movement is retained as an accessibility option, the default tutorial must still teach preview-before-commit and the UI must expose the active mode.
-3. Remove the hard-coded east preview. `panelLines` must receive the actual selected intent.
-4. Present all material `ActionEvaluation` fields:
+Already present and protected by regression tests: persistent `previewDirection`/`previewHurried`, pure `evaluateMove`, non-mutating `previewMove`, and explicit `commitMove`.
+
+1. Extend selected intent beyond movement where useful: brace, wait, interact, and tool actions should expose the same deliberate preview/commit language when they have delayed consequences.
+2. Preserve direction input as preview and Enter/Space as commit. If direct movement remains through the legacy `move` command, keep it outside the default controller path or disclose it as an accessibility mode.
+3. Present all material `ActionEvaluation` fields instead of compressing them into one reason:
    - target and legal/blocked reason;
    - time cost;
    - stress delta before guard;
@@ -474,8 +483,9 @@ read the parcel rule and current condition
 
 - Replace the permanent two-line control wall with a context line such as `EAST: STEP`, `EAST: HURRY`, `HERE: DELIVER`, `HERE: BENCH`, or `TOOL 2: CHALK`.
 - Keep a small stable utility strip for satchel, survey, help, and pause.
-- Make Escape close help, then inventory, then a selected intent, before it opens pause.
+- Make Escape close help, then inventory, then a selected intent, before it opens pause; the current inventory path must not be intercepted by the global pause branch.
 - Ensure the inventory footer's `I/Esc` behavior matches the controller.
+- Pass the complete `TerminalThemePalette` to a pure renderer; remove fixed ANSI role colors.
 - Stop rendering every 50 ms; render on input/state change.
 - Reset ANSI state as part of the idempotent lifecycle cleanup.
 - Preserve seed on retry and expose the replay promise only where it is true.
@@ -546,6 +556,8 @@ read riders, destinations, memo, and evidence provenance
 
 ### 9.2 Evidence and manifest work
 
+Already present and protected by regression tests: typed clue provenance in state, a `routeReview` phase, first-Enter review/second-Enter confirmation, evaluation deferred until `confirmRoute`, and an engine-side transit double-resolution guard.
+
 1. Render every clue with its speaker and source time using explicit labels such as `NOW / MIRA` or `PREVIOUS SHIFT / PORTER`.
 2. Link selected passenger, destination, constraints, and clue IDs in one focused manifest region.
 3. Translate typed constraints into compact, consistent route requirements: before, by stop, last off, and shared stop.
@@ -555,20 +567,20 @@ read riders, destinations, memo, and evidence provenance
 
 ### 9.3 Two-stage route commit
 
-1. Add a `routeReview` phase or explicit armed state.
-2. Planning Enter opens a route tape containing ordered stops, visible landing interpretations, rider coverage, unresolved constraints, and known warnings.
-3. Confirming Enter departs. Escape or Backspace returns to planning without losing the route.
+1. Preserve the existing `routeReview` phase and remove or formally deprecate the legacy direct `commitRoute` path once compatibility is understood.
+2. Expand the route tape to contain ordered stops, visible landing interpretations, rider coverage, unresolved constraints, and known warnings.
+3. Confirming Enter departs. Escape and Backspace must both return to planning without losing the route; fix the current global-Escape interception.
 4. Empty routes remain rejected before review.
-5. Do not calculate or store the true-world `lastEvaluation` until departure is confirmed.
+5. Preserve the invariant that true-world `lastEvaluation` is absent until departure is confirmed.
 6. Keep intercom hint confirmation separate from route confirmation, with top-layer Escape precedence.
 
 ### 9.4 Transit and lifecycle work
 
-1. Replace `Date.now()`-owned transit with one deterministic controller transition or an explicit `advanceTransit` command driven by fakeable time.
+1. Connect transit timing to `confirmRoute` rather than legacy `commitRoute`, then replace `Date.now()` ownership with one deterministic controller transition or an explicit `advanceTransit` command driven by fakeable time.
 2. Remove the duplicate 75 ms and 50 ms rendering loops. Render on state changes plus at most one bounded transit timer.
 3. Prevent Enter and the timer from resolving transit twice.
 4. Capture any displayed transit steps from the committed route; do not recompute route truth for animation.
-5. Make `stop()` idempotently clear all timers/listeners, show the cursor, reset ANSI, and exit the alternate buffer.
+5. Preserve the existing cursor/reset/alternate-buffer cleanup and prove it with repeated-stop tests while timers are simplified.
 6. Make active overlay close precede pause; `ESC` in hint confirmation must actually cancel as its text promises.
 
 ### 9.5 Signature composition
@@ -752,7 +764,7 @@ If Graphify remains unavailable, record that infrastructure blocker in the imple
 - [ ] Graphify is updated after implementation or its unavailable CLI is explicitly recorded.
 - [ ] The ledger reaches 20 of 20 active games only if Batch B and Batch C gates both pass.
 - [ ] All four remain Workshop unless separately promoted through evidence review.
-- [ ] The 19-game Arcade Archive remains unchanged.
+- [ ] The retired archive is absent from source, package exports, menu, CLI, README, and playtest coverage.
 
 ## 14. Migration ledger and what follows
 
@@ -763,7 +775,7 @@ If Graphify remains unavailable, record that infrastructure blocker in the imple
 | Batch A remainder | Ghost Shift, Dice Tribunal, Time Capsule, Night Frequency | Automated migration complete; human validation still tracked separately | Unchanged except recorded validation/fixes |
 | Batch B systems | Blackout Grid, Containment Protocol, Orbital Post, Botany Lab | First implementation packet complete; migration sign-off still pending | Must be fully validated for the 20/20 claim |
 | This Batch C cohort | The Quiet Heist, Tiny Fleet, Dungeon Courier, The 13th Lift | Not migrated | Migrated only after individual automated and human gates pass |
-| Arcade Archive | 19 legacy compatibility games | Out of scope | Unchanged |
+| Retired archive | 19 former compatibility games | Removed from the shipped project on 2026-08-11 | Remains absent |
 
 After this cohort and the remaining Batch B work pass their gates, Gamr may record **20 of 20 active games migrated**. That is the end of the active-game visual migration program, not automatic proof that Gamr is ready for 1.0 production.
 
@@ -772,8 +784,73 @@ The next milestone is a production-candidate hardening pass:
 1. close unresolved human-validation findings across all 20 active games;
 2. run cross-terminal, cross-platform, theme, resize, lifecycle, and package-install coverage;
 3. review Workshop/Preview/Stable labels game by game using evidence;
-4. verify the active catalog and Arcade Archive separation, direct legacy launch compatibility, and bundle/export posture;
+4. verify the 20-game active catalog, absence of retired archive launch/export paths, and bundle/export posture;
 5. complete accessibility, documentation, release, crash, telemetry/privacy, and support-readiness checks;
 6. cut a release candidate only when there are no open critical journey or lifecycle blockers.
 
-Do not migrate the 19 legacy games as a hidden Batch D. They remain accessible through the separate Arcade Archive and compatibility entry points. Revisit them only through an explicit archive strategy decision after active-catalog usage and production evidence are available.
+Do not recreate the 19 retired games as a hidden Batch D. Any future reinterpretation requires a new original-game proposal after active-catalog production evidence is available.
+
+## 15. Implementation handoff
+
+### 15.1 Scope decision
+
+This is the implementation plan for the **four active games that have not yet started a migration pass**:
+
+1. The Quiet Heist
+2. Tiny Fleet
+3. Dungeon Courier
+4. The 13th Lift
+
+Batch B is a parallel completion dependency, not part of this four-game code scope. Its unresolved work must be closed before the repository claims 20 of 20 migrated. Human validation remains a separate gate from code completion.
+
+### 15.2 Work packets and file ownership
+
+| Packet | Primary files | Required result | Verification before merge |
+|---|---|---|---|
+| C0 - fixtures and harness | Each target's existing `*.test.ts`; new `render.test.ts`, `controller.test.ts`, and deterministic fixtures where missing | Current behavior is locked before structural changes; each advertised input has a testable route | Existing 35 tests remain green; new failing tests reproduce the named blockers |
+| C1 - Quiet Heist state flow | `the-quiet-heist/types.ts`, `engine.ts`, `index.ts` | Reachable title/mode selection, tutorial milestones, armed commit, durable result, direct-state render correctness | Engine transcript, input parity, restart/next-job, overlay precedence, lifecycle tests |
+| C2 - Quiet Heist composition | `the-quiet-heist/render.ts` | Stable architectural plan with distinct NOW/PLAN/AFTER COMMIT layers and contextual controls | 80x28/100x30, themes, ANSI-stripped temporal-layer assertions, full tutorial job |
+| C3 - Tiny Fleet preview/replay | `tiny-fleet/types.ts`, `engine.ts`, `index.ts`, `ai.ts` only if public replay requires it | Pure public previews, LEGAL/SAFE distinction, immutable public resolution frames, event-driven controller | Hidden-state serialization audit, review/confirm/cancel, replay determinism, lifecycle |
+| C4 - Tiny Fleet composition | `tiny-fleet/render.ts` | Plotting table, order docket, visible panel state, exact/estimated contact language, stepable incident strip | 80x28/100x30, ASCII/themes, complete training round, no truth leakage |
+| C5 - Dungeon Courier causal docket | `dungeon-courier/types.ts`, `engine.ts`, `index.ts` | Full selected-intent deltas, computed route summaries, correct overlay precedence, event-driven lifecycle | Preview/commit parity matrix, inventory/help/intent Escape tests, full tutorial delivery |
+| C6 - Dungeon Courier composition | `dungeon-courier/render.ts` | Parcel label, route map, satchel, survey marks, and contextual action docket using semantic palette | 80x28/100x30, every survey mode, eight parcel families, themes/ASCII |
+| C7 - Lift evidence/transit | `the-13th-lift/types.ts`, `engine.ts`, `index.ts` | Review cancellation, `confirmRoute`-owned deterministic transit, legacy path decision, lifecycle tests | Review/confirm/cancel, no early evaluation, no double resolution, fake-time cleanup |
+| C8 - Lift composition | `the-13th-lift/render.ts` | Provenance-aware evidence ledger, route tape, rider focus, pagination/compact layout without silent truncation | 80x24/80x28/100x30, Paper/Contrast, Unicode/ASCII, story and invalid-route transcripts |
+| C9 - cohort gate | Playtest profiles, catalog/readiness documentation, generated evidence only | Four seeded completion paths, first-time-player findings recorded, repeated confusion fixed | Targeted/full tests, typecheck, build, CLI, package smoke, terminal matrix, Graphify update |
+
+### 15.3 Commit and review boundaries
+
+- Keep engine/type changes separate from renderer composition where practical.
+- Land regression tests with the behavior they protect, not in a final test-only sweep.
+- Do not mix Batch B completion, Archive changes, catalog promotion, or unrelated shared-theme redesign into a Batch C game packet.
+- A shared helper may be added only when at least two games need the same behavior and the helper does not impose a common screen composition.
+- Preserve seed semantics across retry. A new-seed action must be labeled separately from replay/retry.
+- Do not mark a game migrated when only its renderer is complete; controller, lifecycle, complete-path, layout, and human gates are part of the migration definition.
+
+### 15.4 Per-game execution rhythm
+
+For each game, use the same implementation rhythm:
+
+1. Add failing regression tests for current blockers.
+2. Repair state and controller boundaries without redesigning the screen.
+3. Add pure renderer-facing selectors and deterministic phase fixtures.
+4. Replace the renderer with the game's signature composition.
+5. Add controller, lifecycle, resize, theme, ASCII, and full-path tests.
+6. Run the game-specific automated gate.
+7. Conduct three first-time-player sessions and fix repeated confusion.
+8. Re-run prior Batch C games before starting the next one.
+
+The implementation order remains The Quiet Heist -> Tiny Fleet -> pair checkpoint -> Dungeon Courier -> The 13th Lift -> final active-catalog review.
+
+### 15.5 Implementation status — 2026-08-11
+
+The first automated implementation pass is complete for all four games:
+
+- **The Quiet Heist:** reachable tutorial/campaign start, explicit review-before-commit, durable report state, help overlay, restart/next-job handling, and temporal-layer rendering.
+- **Tiny Fleet:** pure order previews with certainty/reason labels, state-owned help, bounded public replay frames, review/replay navigation, and event-driven rendering.
+- **Dungeon Courier:** computed route summaries, selected-action route guidance, cell-width-safe framing, contextual help/inventory precedence, and event-driven rendering.
+- **The 13th Lift:** deterministic timer-owned transit, route tape review/cancel flow, provenance-preserving evidence presentation, visible overflow continuation, lifecycle cleanup, and robust Space-key handling.
+
+Verification completed: `npm test` (58 files / 282 tests), `npm run typecheck`, `npm run build`, `git diff --check`, and one seeded black-box progress playtest for each game. All four seeded playtests passed their required milestones. The profiles intentionally remain `black-box-progress`; they are evidence that the new journeys are reachable, not a claim of full migration sign-off.
+
+Remaining gates before marking these games migrated are the renderer/controller/resize/theme test expansion, complete successful tutorial/campaign transcripts, three first-time-player sessions per game, repeated-confusion fixes, cross-terminal review, and Batch B closure. Package and CLI smoke checks pass after archive retirement. Graphify refresh was attempted but the `graphify` executable is unavailable in this environment.

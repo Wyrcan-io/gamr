@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createBattle, createState, deriveObservation, validateOrder } from './engine';
+import { applyCommand, createBattle, createState, deriveObservation, previewSelectedOrder, validateOrder } from './engine';
 import type { GameState } from './types';
 
 function planning(seed = 12): GameState {
@@ -96,6 +96,26 @@ describe('Tiny Fleet engine', () => {
     expect(state.phase).toBe('orderReview');
     state = applyCommand(state, { type: 'sealOrders' });
     expect(state.phase).toBe('roundReport');
+  });
+
+  it('keeps the selected order preview pure and replays public reports once', () => {
+    let state = planning();
+    state = applyCommand(state, { type: 'queueOrder', shipId: 'S1', order: { type: 'ahead' } });
+    const before = JSON.stringify(state);
+    const preview = previewSelectedOrder(state);
+    expect(preview.legal).toBe(true);
+    expect(preview.certainty).toBe('CONDITIONAL');
+    expect(JSON.stringify(state)).toBe(before);
+    state = applyCommand(state, { type: 'queueOrder', shipId: 'E1', order: { type: 'hold' } });
+    state = applyCommand(state, { type: 'queueOrder', shipId: 'F1', order: { type: 'hold' } });
+    state = applyCommand(state, { type: 'openOrderReview' });
+    state = applyCommand(state, { type: 'sealOrders' });
+    state = applyCommand(state, { type: 'openReplay' });
+    expect(state.phase).toBe('replay');
+    const resolved = JSON.stringify(state.ships);
+    for (let i = 0; i < state.reports.length + 1; i += 1) state = applyCommand(state, { type: 'advanceReplay' });
+    expect(JSON.stringify(state.ships)).toBe(resolved);
+    expect(state.phase).toBe('planning');
   });
 });
 

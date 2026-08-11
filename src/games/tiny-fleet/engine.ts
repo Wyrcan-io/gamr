@@ -27,7 +27,7 @@ function buildState(seed: number, scenarioIndex: number, mode: BattleMode): Game
     ships: [...player, ...enemy, ...neutral], wrecks: [], smoke: [], orders: { player: {}, enemy: {} }, intelligence: emptyIntel(),
     sweepReveals: { player: [], enemy: [] }, flashReveals: { player: [], enemy: [] }, objective: clone(scenario.objective), reports: [], log: [],
     notice: 'READ THE BRIEFING. THEN ASSIGN ONE ORDER TO EACH SHIP.', outcome: null, flags: 0, campaignFlags: [], campaignComplete: false,
-    selectedShipId: player[0]?.id ?? '', cursor: { ...(player[0]?.pos ?? { x: 0, y: 0 }) }, panel: 'contacts',
+    selectedShipId: player[0]?.id ?? '', cursor: { ...(player[0]?.pos ?? { x: 0, y: 0 }) }, panel: 'contacts', replayIndex: 0, helpOpen: false,
   };
 }
 
@@ -113,6 +113,15 @@ function validation(state: GameState, side: SideId, shipId: string, order: ShipO
 }
 
 export function validateOrder(state: GameState, side: SideId, shipId: string, order: ShipOrder): ValidationResult { return validation(state, side, shipId, order); }
+
+export interface OrderPreview { label: string; legal: boolean; certainty: 'SAFE' | 'CONDITIONAL'; reason: string; }
+export function previewSelectedOrder(state: GameState): OrderPreview {
+  const order = state.orders.player[state.selectedShipId];
+  if (!order) return { label: 'NO ORDER QUEUED', legal: false, certainty: 'CONDITIONAL', reason: 'Assign an order before opening the docket.' };
+  const result = validation(state, 'player', state.selectedShipId, order);
+  const conditional = order.type === 'fire' || order.type === 'ahead' || order.type === 'port' || order.type === 'starboard' || order.type === 'about';
+  return { label: orderLabel(order), legal: result.valid, certainty: conditional ? 'CONDITIONAL' : 'SAFE', reason: result.valid && conditional ? 'LEGAL, OUTCOME DEPENDS ON SIMULTANEOUS RESOLUTION.' : result.reason };
+}
 
 function directionAfter(current: Direction, order: ShipOrder): Direction {
   if (order.type === 'port') return turn(current, 3); if (order.type === 'starboard') return turn(current, 1); if (order.type === 'about') return turn(current, 2); return current;
@@ -262,6 +271,8 @@ function prepareEnemy(state: GameState): void {
 
 export function applyCommand(input: GameState, command: Command): GameState {
   const state = clone(input);
+  if (command.type === 'toggleHelp') { state.helpOpen = !state.helpOpen; return state; }
+  if (state.helpOpen) return state;
   if (command.type === 'start') { state.mode = command.mode; state.phase = 'briefing'; state.notice = 'MISSION BRIEFING READY.'; return state; }
   if (command.type === 'restart') { const restart = buildState(state.seed, state.scenarioIndex, state.mode); restart.campaignFlags = [...state.campaignFlags]; restart.phase = state.mode === 'campaign' ? 'briefing' : 'briefing'; return restart; }
   if (command.type === 'nextBattle') {
@@ -293,6 +304,13 @@ export function applyCommand(input: GameState, command: Command): GameState {
   }
   if (command.type === 'sealOrders' && state.phase === 'orderReview') { state.phase = 'roundReport'; resolveRound(state); return state; }
   if (command.type === 'dismissReport' && state.phase === 'roundReport') {
+    if (state.outcome) state.phase = 'battleReport';
+    else { state.phase = 'planning'; state.orders = { player: {}, enemy: {} }; prepareEnemy(state); state.notice = 'NEW ROUND. READ THE CONTACTS, THEN SEAL THREE ORDERS.'; }
+    return state;
+  }
+  if (command.type === 'openReplay' && state.phase === 'roundReport') { state.phase = 'replay'; state.replayIndex = 0; state.notice = 'PUBLIC REPLAY OPEN. ENTER STEP THROUGH THE RESOLUTION.'; return state; }
+  if (command.type === 'advanceReplay' && state.phase === 'replay') {
+    if (state.replayIndex < Math.max(0, state.reports.length - 1)) { state.replayIndex += 1; return state; }
     if (state.outcome) state.phase = 'battleReport';
     else { state.phase = 'planning'; state.orders = { player: {}, enemy: {} }; prepareEnemy(state); state.notice = 'NEW ROUND. READ THE CONTACTS, THEN SEAL THREE ORDERS.'; }
     return state;

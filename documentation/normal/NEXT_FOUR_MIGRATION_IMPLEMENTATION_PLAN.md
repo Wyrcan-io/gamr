@@ -1,5 +1,7 @@
 # Gamr next four migration implementation plan
 
+> **Archive status update — 2026-08-11:** Sections that preserve or test the 19-game Arcade Archive are superseded. Those compatibility games and their public launch/export surfaces have been removed; the supported catalog now contains 20 active games.
+
 **Created:** 2026-08-09  
 **Scope:** Signal//Noise, Last Train Home, Market of Mirrors, and Rogue Ledger  
 **Current migration state:** 4 of 20 active games migrated  

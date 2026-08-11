@@ -510,6 +510,25 @@ export function previewText(state: GameState, direction: Direction, hurried = fa
   return evaluateMove(state, direction, hurried);
 }
 
+export interface RouteSummary { steps: number; stress: number; conditionRisk: number; strategy: 'KNOWN ROUTE' | 'ESTIMATED ROUTE'; }
+export function routeSummary(state: GameState): RouteSummary {
+  if (!state.floor || !state.contract) return { steps: 0, stress: 0, conditionRisk: 0, strategy: 'ESTIMATED ROUTE' };
+  const start = state.courier.pos; const goal = state.floor.recipient;
+  const key = (point: Point) => `${point.x},${point.y}`;
+  const queue: Array<{ point: Point; steps: number; stress: number }> = [{ point: start, steps: 0, stress: 0 }];
+  const seen = new Set([key(start)]);
+  while (queue.length) {
+    const current = queue.shift()!;
+    if (samePoint(current.point, goal)) return { steps: current.steps, stress: current.stress, conditionRisk: Math.max(0, current.stress - state.contract.parcel.guard), strategy: 'KNOWN ROUTE' };
+    for (const direction of ['N', 'E', 'S', 'W'] as Direction[]) {
+      const delta = DELTAS[direction]; const next = { x: current.point.x + delta.x, y: current.point.y + delta.y };
+      if (seen.has(key(next)) || !isWalkable(state.floor, next)) continue;
+      seen.add(key(next)); const tile = tileAt(state.floor, next); queue.push({ point: next, steps: current.steps + 1, stress: current.stress + tileStress(tile) });
+    }
+  }
+  return { steps: 0, stress: 0, conditionRisk: 0, strategy: 'ESTIMATED ROUTE' };
+}
+
 export function tileGlyph(tile: TileState, floor: FloorState, point: Point): string {
   if (tile.kind === 'wall') return '#';
   if (tile.kind === 'recipient') return 'D';

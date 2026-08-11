@@ -1,5 +1,6 @@
 import { ITEMS, PARCELS, SEAL_LABELS } from './content';
-import { getUpgradeChoices, offerLabel, parcelMeterLabel, previewText, tileGlyph, visibleThreatAt } from './engine';
+import { getUpgradeChoices, offerLabel, parcelMeterLabel, previewText, routeSummary, tileGlyph, visibleThreatAt } from './engine';
+import { clipToWidth, displayWidth, padToWidth } from '../../ui/terminal';
 import type { Direction, GameState, Point, TileState } from './types';
 
 const RESET = '\x1b[0m';
@@ -14,12 +15,12 @@ const MIN_COLS = 80;
 const MIN_ROWS = 28;
 
 function plain(value: string, max = 46): string {
-  return value.replace(/\x1b\[[0-9;]*m/g, '').slice(0, max).padEnd(max, ' ');
+  return padToWidth(clipToWidth(value.replace(/\x1b\[[0-9;]*m/g, ''), max, ''), max);
 }
 
 function centered(cols: number, value: string): string {
   const text = value.replace(/\x1b\[[0-9;]*m/g, '');
-  return ' '.repeat(Math.max(0, Math.floor((cols - text.length) / 2))) + value;
+  return ' '.repeat(Math.max(0, Math.floor((cols - displayWidth(text)) / 2))) + value;
 }
 
 function bar(value: number, max: number, width = 5): string {
@@ -131,7 +132,7 @@ function panelLines(state: GameState): string[] {
     `${CYAN}${BOLD}PREVIEW ${state.previewDirection}${state.previewHurried ? ' / HURRY' : ''}${RESET}`,
     preview ? `${preview.legal ? GREEN : RED}${preview.label} ${preview.legal ? preview.reason : preview.reason}${RESET}` : `${DIM}Open traversal to preview.${RESET}`,
     `${CYAN}${BOLD}ROUTE / SHIFT${RESET}`,
-    state.surveyMode === 'routes' ? `${GREEN}STABLE 31  FAST 22+R${RESET}` : state.surveyMode === 'shift' ? `GATE ${state.floor!.gateOpen ? 'OPEN' : 'CLOSED'}  IN ${state.floor!.shiftIn}` : state.surveyMode === 'threats' ? 'P: LOOP ARROWS ACTIVE' : 'TAB: SURVEY OVERLAYS',
+    state.surveyMode === 'routes' ? (() => { const route = routeSummary(state); return `${GREEN}${route.strategy}  ${route.steps} STEPS  STRAIN ${route.stress}  RISK ${route.conditionRisk}${RESET}`; })() : state.surveyMode === 'shift' ? `GATE ${state.floor!.gateOpen ? 'OPEN' : 'CLOSED'}  IN ${state.floor!.shiftIn}` : state.surveyMode === 'threats' ? 'P: LOOP ARROWS ACTIVE' : 'TAB: SURVEY OVERLAYS',
   ];
 }
 

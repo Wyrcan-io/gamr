@@ -2,7 +2,7 @@
  * @wyrcan/gamr
  *
  * Terminal games for xterm.js and CLI.
- * 20 active games plus 19 legacy runners: snake, tetris, 2048, pong, asteroids, and more.
+ * A curated catalog of 20 original terminal games.
  *
  * Library usage (xterm.js):
  *   import { games, setTheme } from '@wyrcan/gamr';
@@ -17,7 +17,6 @@ export {
   // Game registry
   games,
   allGames,
-  archiveGames,
   getGame,
   getRandomGame,
   runGame,
@@ -80,25 +79,6 @@ export {
   type SimpleMenuItem,
 
   // Individual game runners
-  run2048Game,
-  runAsteroidsGame,
-  runBreakoutGame,
-  runCourierGame,
-  runCrackGame,
-  runFroggerGame,
-  runHangmanGame,
-  runMinesweeperGame,
-  runPongGame,
-  runRunnerGame,
-  runSimonGame,
-  runSnakeGame,
-  runSpaceInvadersGame,
-  runTetrisGame,
-  runTowerGame,
-  runTronGame,
-  runTypingTest,
-  runWordleGame,
-  runHyperFighterGame,
   runPacketPanicGame,
   runDeadLetterDepartmentGame,
   runSignalNoiseGame,

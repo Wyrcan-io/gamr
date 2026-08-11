@@ -64,7 +64,11 @@ function ledgerRows(state: GameState, compare: ReturnType<typeof planningCompari
   return rows;
 }
 
-function playing(state: GameState, cols: number, palette: TerminalThemePalette): string {
+function helpFrame(cols: number, palette: TerminalThemePalette): string {
+  return ['\x1b[2J\x1b[H', row('g/ THE QUIET HEIST / FIELD CARD', cols, `${palette.focus}${BOLD}`), '', row('NOW is the authoritative floor before this turn.', cols - 4, palette.ink), row('PLAN is your queued movement or tool use.', cols - 4, palette.ink), row('AFTER is the guard/camera sight after ENTER resolves.', cols - 4, palette.ink), row('ARROWS/WASD move   I interact   X decoy   J jam', cols - 4, palette.muted), row('U/BACKSPACE undo   ENTER review/commit   ESC close', cols - 4, palette.muted)].join('\r\n');
+}
+
+function playing(state: GameState, cols: number, rows: number, palette: TerminalThemePalette): string {
   const compare = planningComparison(state);
   const leftWidth = 35;
   const rightWidth = Math.max(36, cols - leftWidth - 5);
@@ -74,14 +78,16 @@ function playing(state: GameState, cols: number, palette: TerminalThemePalette):
   const count = Math.max(left.length, right.length);
   for (let i = 0; i < count; i += 1) lines.push(`${padToWidth(left[i] ?? '', leftWidth)}  ${padToWidth(right[i] ?? '', rightWidth)}`);
   lines.push('', row('ARROWS/WASD move  I interact  X decoy  J jam  U/BACKSPACE undo  ENTER commit  ? help  ESC pause', cols, palette.muted));
+  if (state.phase === 'review') lines.push(row('[TURN REVIEW] Enter commits the queued actions. Backspace returns to planning.', cols, palette.warning));
   if (state.phase === 'report') lines.push(row('[TURN RESOLVED] Read the changed ledger, then press ENTER to plan.', cols, palette.warning));
   if (state.phase === 'ending' || state.phase === 'gameOver') lines.push(row(state.phase === 'ending' ? '[+] HEIST COMPLETE' : '[!] SECURITY REPORT', cols, state.phase === 'ending' ? palette.good : palette.danger));
-  return lines.slice(0, 28).join('\r\n');
+  return lines.slice(0, Math.max(1, rows)).join('\r\n');
 }
 
 export function renderFrame(state: GameState, cols: number, rows: number, palette: TerminalThemePalette = getCurrentThemePalette()): string {
   if (cols < QUIET_HEIST_MIN_COLS || rows < QUIET_HEIST_MIN_ROWS) return resize(cols, rows, palette);
+  if (state.helpOpen) return helpFrame(cols, palette);
   if (state.phase === 'start') return start(cols, palette);
   if (state.phase === 'briefing') return briefingFrame(state, cols, palette);
-  return playing(state, cols, palette);
+  return playing(state, cols, rows, palette);
 }

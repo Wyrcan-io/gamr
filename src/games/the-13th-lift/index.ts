@@ -27,9 +27,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
   let paused = false;
   let pauseSelection = 0;
   let state: GameState = createState();
-  let transitStartedAt = 0;
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
-  let gameInterval: ReturnType<typeof setInterval> | undefined;
+  let transitTimer: ReturnType<typeof setTimeout> | undefined;
   let keyListener: { dispose: () => void } | undefined;
 
   const controller: The13thLiftController = {
@@ -41,7 +39,11 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     if (!running) return;
     const result = applyCommand(state, command);
     state = result.state;
-    if (command.type === 'commitRoute' && state.phase === 'transit') transitStartedAt = Date.now();
+    if (command.type === 'confirmRoute' && state.phase === 'transit') {
+      if (transitTimer) clearTimeout(transitTimer);
+      transitTimer = setTimeout(() => { transitTimer = undefined; dispatch({ type: 'finishTransit' }); }, 350);
+    }
+    render();
   };
 
   const quit = (): void => {
@@ -69,6 +71,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, domEvent);
     if (result.newSelection !== pauseSelection) {
       pauseSelection = result.newSelection;
+      render();
       return true;
     }
     if (result.confirmed) {
@@ -80,6 +83,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
         case 4: nextGame(); break;
         default: break;
       }
+      render();
       return true;
     }
     if (key === 'r') { dispatch({ type: 'restart' }); paused = false; return true; }
@@ -93,8 +97,10 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     domEvent.preventDefault();
     domEvent.stopPropagation();
     const key = domEvent.key.toLowerCase();
+    const isSpace = key === ' ' || key === 'spacebar' || domEvent.code === 'Space';
     if (key === 'escape') {
       if (state.activeOverlay !== 'none') { dispatch({ type: 'toggleOverlay', overlay: 'none' }); return; }
+      if (state.phase === 'routeReview') { dispatch({ type: 'toggleStop' }); return; }
       paused = !paused;
       pauseSelection = 0;
       return;
@@ -105,7 +111,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
       if (key === 'q') { quit(); return; }
       if (key === 't') { dispatch({ type: 'startTutorial' }); return; }
       if (key === 'a') { dispatch({ type: 'startAfterHours' }); return; }
-      if (domEvent.key === 'Enter' || domEvent.key === ' ') { dispatch({ type: 'startCampaign' }); return; }
+      if (domEvent.key === 'Enter' || isSpace) { dispatch({ type: 'startCampaign' }); return; }
       return;
     }
     if (state.phase === 'gameOver' || state.phase === 'ending') {
@@ -144,7 +150,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
     if (state.phase === 'routeReview' && (domEvent.key === 'Backspace' || key === 'escape')) { dispatch({ type: 'toggleStop' }); return; }
     if (domEvent.key === 'ArrowLeft' || key === 'a' || domEvent.key === 'ArrowUp' || key === 'w') dispatch({ type: 'moveButtonCursor', delta: -1 });
     else if (domEvent.key === 'ArrowRight' || key === 'f' || domEvent.key === 'ArrowDown' || key === 's') dispatch({ type: 'moveButtonCursor', delta: 1 });
-    else if (domEvent.key === ' ') dispatch({ type: 'toggleStop' });
+    else if (isSpace) dispatch({ type: 'toggleStop' });
     else if (domEvent.key === 'Backspace' || domEvent.key === 'Delete') dispatch({ type: 'undoStop' });
     else if (domEvent.key === 'Tab') dispatch({ type: 'cyclePassenger', delta: domEvent.shiftKey ? -1 : 1 });
     else if (key === 'd') dispatch({ type: 'toggleOverlay', overlay: 'directory' });
@@ -156,15 +162,6 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(render, 75);
-    gameInterval = setInterval(() => {
-      if (!running) return;
-      if (state.phase === 'transit' && transitStartedAt > 0 && Date.now() - transitStartedAt >= 350) {
-        transitStartedAt = 0;
-        dispatch({ type: 'finishTransit' });
-      }
-      render();
-    }, 50);
     keyListener = terminal.onKey(({ domEvent }) => handleKey(domEvent));
     render();
   }, 50);
@@ -172,8 +169,7 @@ export function runThe13thLiftGame(terminal: Terminal): The13thLiftController {
   const originalStop = controller.stop;
   controller.stop = () => {
     if (!running) return;
-    if (renderInterval) clearInterval(renderInterval);
-    if (gameInterval) clearInterval(gameInterval);
+    if (transitTimer) clearTimeout(transitTimer);
     keyListener?.dispose();
     terminal.write('\x1b[?25h\x1b[0m\x1b[?1049l');
     originalStop();

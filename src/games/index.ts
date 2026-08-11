@@ -5,7 +5,7 @@
  *
  * Usage:
  * 1. Set the theme: setTheme('carbon')
- * 2. Run a game: games.snake.run(terminal)
+ * 2. Run a game: games[0].run(terminal)
  * 3. Handle game events: listen for GAME_EVENTS on window
  */
 
@@ -72,26 +72,7 @@ export type {
   SimpleMenuItem,
 } from './shared/menu';
 
-// Import game modules
-import { run2048Game } from './2048';
-import { runAsteroidsGame } from './asteroids';
-import { runBreakoutGame } from './breakout';
-import { runCourierGame } from './chopper';
-import { runCrackGame } from './crack';
-import { runFroggerGame } from './frogger';
-import { runHangmanGame } from './hangman';
-import { runMinesweeperGame } from './minesweeper';
-import { runPongGame } from './pong';
-import { runRunnerGame } from './runner';
-import { runSimonGame } from './simon';
-import { runSnakeGame } from './snake';
-import { runSpaceInvadersGame } from './spaceinvaders';
-import { runTetrisGame } from './tetris';
-import { runTowerGame } from './tower';
-import { runTronGame } from './tron';
-import { runTypingTest } from './typingtest';
-import { runWordleGame } from './wordle';
-import { runHyperFighterGame } from './hyper-fighter';
+// Import active game modules
 import { runPacketPanicGame } from './packet-panic';
 import { runDeadLetterDepartmentGame } from './dead-letter-department';
 import { runSignalNoiseGame } from './signal-noise';
@@ -112,7 +93,6 @@ import { runDungeonCourierGame } from './dungeon-courier';
 import { runNightFrequencyGame } from './night-frequency';
 import { runBotanyLabGame } from './botany-lab';
 import { runThe13thLiftGame } from './the-13th-lift';
-import { archivedGames } from './archived';
 
 /**
  * Game registry with metadata
@@ -132,8 +112,7 @@ export interface GameInfo {
 }
 
 export const games: GameInfo[] = [
-  // Active TUI lineup. The older game files and runner exports remain available
-  // for later reactivation, but are intentionally hidden from the game menu.
+  // Canonical active catalog. Retired compatibility games are no longer shipped.
   { id: 'stack-trace', name: 'Stack Trace', description: 'Repair the blocks. Pass every test.', maturity: 'featured', pace: 'turn-based', difficulty: 2, session: '10–15 min', run: runStackTraceGame },
   { id: 'five-minute-kingdom', name: 'Five-Minute Kingdom', description: 'Draft a tiny kingdom. Make every square count.', maturity: 'featured', pace: 'turn-based', difficulty: 1, session: '5 min', run: runFiveMinuteKingdomGame },
   { id: 'market-of-mirrors', name: 'Market of Mirrors', description: 'Trade strange goods. Plant the rumor. Sell the story.', maturity: 'workshop', pace: 'turn-based', difficulty: 3, session: '10–15 min', run: runMarketOfMirrorsGame },
@@ -164,10 +143,8 @@ for (const game of games) {
   game.readiness ??= game.maturity === 'workshop' ? 'workshop' : 'preview';
 }
 
-export const allGames: GameInfo[] = [...games, ...archivedGames];
-
-/** Compatibility collection, intentionally separate from the active catalog. */
-export { archivedGames as archiveGames };
+/** Alias retained for callers that need the complete, active-only catalog. */
+export const allGames: GameInfo[] = [...games];
 
 /**
  * Get a game by ID
@@ -196,25 +173,6 @@ export function runGame(
 
 // Also export individual game runners for direct imports
 export {
-  run2048Game,
-  runAsteroidsGame,
-  runBreakoutGame,
-  runCourierGame,
-  runCrackGame,
-  runFroggerGame,
-  runHangmanGame,
-  runMinesweeperGame,
-  runPongGame,
-  runRunnerGame,
-  runSimonGame,
-  runSnakeGame,
-  runSpaceInvadersGame,
-  runTetrisGame,
-  runTowerGame,
-  runTronGame,
-  runTypingTest,
-  runWordleGame,
-  runHyperFighterGame,
   runPacketPanicGame,
   runDeadLetterDepartmentGame,
   runSignalNoiseGame,

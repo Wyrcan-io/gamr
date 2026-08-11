@@ -41,21 +41,21 @@ describe('Small Machines Index', () => {
     expect(output).toContain('g/ index');
     expect(output).toContain('FEATURED');
     expect(output).toContain('Stack Trace');
-    expect(output).toContain('Arcade Archive');
+    expect(output).not.toContain('Arcade Archive');
     expect(output).not.toContain('Vibe Code Your Own Game');
     controller.stop();
   });
 
-  it('opens the archive route and launches an archived game', () => {
+  it('opens the active catalog route and launches an active game', () => {
     vi.useFakeTimers();
     const { terminal, press } = fakeTerminal();
     const onGameSelect = vi.fn();
     showGamesMenu(terminal, { onGameSelect });
     vi.advanceTimersByTime(60);
 
-    press('x');
+    press('a');
     press('Enter');
-    expect(onGameSelect).toHaveBeenCalledWith('tetris');
+    expect(onGameSelect).toHaveBeenCalledWith('stack-trace');
   });
 
   it('keeps Featured placement separate from readiness', () => {

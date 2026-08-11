@@ -35,7 +35,7 @@ function center(value: string, width: number): string {
 
 function box(title: string, body: string[], width: number, theme: RenderTheme, titleColor = theme.accent): string[] {
   const inner = Math.max(10, width - 2);
-  const lines = [`┌─ ${color(theme, titleColor, title)} ${'─'.repeat(Math.max(0, inner - title.length - 3))}┐`];
+  const lines = [`┌─ ${color(theme, titleColor, title)} ${'─'.repeat(Math.max(0, inner - displayWidth(title) - 3))}┐`];
   for (const line of body) lines.push(`│${fit(line, inner)}│`);
   lines.push(`└${'─'.repeat(inner)}┘`);
   return lines;
@@ -100,7 +100,7 @@ function renderAudit(state: GameState, width: number, theme: RenderTheme): strin
 function renderOverlay(state: GameState, width: number, theme: RenderTheme): string[] {
   if (state.activeOverlay === 'none') return [];
   if (state.activeOverlay === 'hint-confirm') return box('INTERCOM', ['Spend one charge for a safe-route stop?', `[Y] confirm   [N / ESC] cancel`, `${state.intercomCharges} charge(s) remain.`], width, theme, theme.warning);
-  if (state.activeOverlay === 'help') return box('CONTROLS', ['ARROWS / A,D  move panel cursor', 'SPACE        queue or remove stop', 'BACKSPACE    undo last stop', 'TAB          inspect next rider', 'D / R / L    directory / rules / log', 'I            request intercom hint', 'ENTER        commit / advance', 'ESC          pause'], width, theme);
+  if (state.activeOverlay === 'help') return box('CONTROLS', ['ARROWS / A,F  move panel cursor', 'SPACE        queue or remove stop', 'BACKSPACE    undo last stop', 'TAB          inspect next rider', 'D / R / L    directory / rules / log', 'I            request intercom hint', 'ENTER        review / depart / advance', 'ESC          close top layer / pause'], width, theme);
   if (state.activeOverlay === 'directory') {
     const lines = state.puzzle?.visibleLandings.map(landing => `${landing.canonicalLabel.padStart(2)}  ${landing.department}`) ?? ['The directory is blank.'];
     return box('DIRECTORY / CANONICAL LANDINGS', lines, width, theme);
@@ -143,5 +143,6 @@ export function renderGame(state: GameState, cols: number, rows: number, theme: 
   }
   lines.push('');
   lines.push(center(color(theme, theme.muted, 'ARROWS / A,F move   SPACE queue   TAB rider   ENTER go   ? help   ESC pause'), width));
-  return output + lines.slice(0, rows).join('\n');
+  const visible = lines.length <= rows ? lines : [...lines.slice(0, Math.max(1, rows - 1)), center(color(theme, theme.muted, '… MORE — RESIZE OR OPEN LOG'), width)];
+  return output + visible.join('\n');
 }

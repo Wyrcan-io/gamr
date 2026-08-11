@@ -42,7 +42,7 @@ describe('virtual terminal screen', () => {
 });
 
 describe('playtest registry', () => {
-  it('covers every current active and archived game', () => {
+  it('covers every active game', () => {
     const registry = createPlaytestRegistry(allGames);
     expect(missingPlaytestSpecs(allGames, registry)).toEqual([]);
     expect(registry.size).toBe(allGames.length);
@@ -88,26 +88,6 @@ describe('playtest runner', () => {
     expect(report.coverage).toBe('seeded-completion');
     expect(report.milestones['first-clear']).toBe(true);
   }, 10000);
-
-  it('reaches the Wordle ending through typed guesses', async () => {
-    const report = await new PlaytestRunner({ defaultWaitMs: 20 }).run('wordle', {
-      seed: 9,
-      maxActions: 45,
-      maxElapsedMs: 8000,
-    });
-    expect(report.status).toBe('passed');
-    expect(report.milestones['cipher-ending']).toBe(true);
-  }, 15000);
-
-  it('exercises a real-time Snake session through game over', async () => {
-    const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('snake', {
-      seed: 11,
-      maxActions: 40,
-      maxElapsedMs: 7000,
-    });
-    expect(report.status).toBe('passed');
-    expect(report.milestones['snake-ending']).toBe(true);
-  }, 15000);
 
   it('starts Packet Panic and accepts route-building input', async () => {
     const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('packet-panic', {

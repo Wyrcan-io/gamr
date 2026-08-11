@@ -5,7 +5,7 @@
 **Current automated migration state:** 12 of 20 active games migrated  
 **Cohort milestone:** 16 of 20 active games migrated after implementation and validation  
 **Catalog status:** All four targets remain Workshop until reviewed individually  
-**Arcade Archive:** The 19 legacy compatibility games remain unchanged and out of scope
+**Archive decision:** Superseded on 2026-08-11; the 19 legacy compatibility games were retired and removed from the shipped catalog
 
 ## 1. Decision and implementation order
 
@@ -552,7 +552,7 @@ If `graphify update .` remains unavailable, record the infrastructure blocker in
 - [ ] Graphify is updated after implementation or the unavailable CLI is explicitly recorded.
 - [ ] The migration ledger says exactly 16 of 20 active games migrated.
 - [ ] All four remain Workshop unless separately promoted through evidence review.
-- [ ] The 19-game Arcade Archive remains unchanged.
+- [ ] The retired archive is absent from source, package exports, menu, CLI, README, and playtest coverage.
 
 ## 14. Migration ledger and what follows
 
@@ -563,7 +563,7 @@ If `graphify update .` remains unavailable, record the infrastructure blocker in
 | Batch A remainder | Ghost Shift, Dice Tribunal, Time Capsule, Night Frequency | Automated migration complete; human validation pending | Unchanged except recorded validation/fixes |
 | This Batch B cohort | Blackout Grid, Containment Protocol, Orbital Post, Botany Lab | Not migrated | Migrated; remain Workshop pending separate promotion |
 | Batch C remaining | The Quiet Heist, Tiny Fleet, Dungeon Courier, The 13th Lift | Not migrated | Still not migrated |
-| Arcade Archive | 19 legacy compatibility games | Out of scope | Unchanged |
+| Retired archive | 19 former compatibility games | Removed from the shipped project on 2026-08-11 | Remains absent |
 
 After this cohort is implemented and validated, Gamr reaches **16 of 20 active games migrated**, with four active games remaining.
 

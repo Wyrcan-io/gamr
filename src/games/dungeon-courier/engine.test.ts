@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createState, evaluateMove } from './engine';
+import { applyCommand, createState, evaluateMove, routeSummary } from './engine';
 import type { Direction, GameState } from './types';
 
 function startStandard(seed = 12345): GameState {
@@ -86,5 +86,13 @@ describe('Dungeon Courier engine', () => {
     expect(state.floor?.tick).toBe(5);
     expect(state.eventLog.length).toBeLessThanOrEqual(5);
     expect(state.courier.pos.x).toBe(7);
+  });
+
+  it('computes a deterministic route summary from the authored floor', () => {
+    const state = startStandard(21);
+    const first = routeSummary(state);
+    expect(routeSummary(state)).toEqual(first);
+    expect(first.steps).toBeGreaterThan(0);
+    expect(first.strategy).toBe('KNOWN ROUTE');
   });
 });

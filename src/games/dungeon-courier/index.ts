@@ -13,34 +13,35 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
   let paused = false;
   let pauseSelection = 0;
   let state: GameState = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
   const controller: DungeonCourierController = { stop: () => { running = false; }, get isRunning() { return running; } };
 
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
-  const run = (command: Command): void => { state = applyCommand(state, command).state; };
-  const restart = (): void => { state = applyCommand(state, { type: 'restart', seed: state.seed }).state; paused = false; pauseSelection = 0; };
+  const run = (command: Command): void => { state = applyCommand(state, command).state; render(); };
+  const restart = (): void => { state = applyCommand(state, { type: 'restart', seed: state.seed }).state; paused = false; pauseSelection = 0; render(); };
 
   const handlePause = (key: string, event: KeyboardEvent): boolean => {
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event);
     pauseSelection = result.newSelection;
-    if (!result.confirmed) return true;
+    if (!result.confirmed) { render(); return true; }
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) restart();
     else if (pauseSelection === 2) quit();
     else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
     else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
-    return true;
+    if (running) render(); return true;
   };
 
   const handleKey = (event: KeyboardEvent): void => {
     const key = event.key.toLowerCase();
     event.preventDefault(); event.stopPropagation();
-    if (key === 'escape' && state.helpOpen) { run({ type: 'toggleHelp' }); return; }
+    if (state.helpOpen) { if (key === 'h' || key === 'escape' || key === '?' || key === 'enter') run({ type: 'toggleHelp' }); return; }
+    if (key === 'h' || key === '?') { run({ type: 'toggleHelp' }); return; }
+    if (state.phase === 'inventory' && (key === 'i' || key === 'escape')) { run({ type: 'toggleInventory' }); return; }
+    if (key === 'escape' && state.phase === 'traversal') { state = { ...state, notice: 'PRESS ENTER TO COMMIT THE SELECTED STEP, OR CHOOSE ANOTHER DIRECTION.' }; paused = !paused; pauseSelection = 0; render(); return; }
     if (key === 'escape' && !['start', 'ending', 'gameOver'].includes(state.phase)) { paused = !paused; pauseSelection = 0; return; }
     if (handlePause(key, event)) return;
-    if (state.helpOpen) { if (key === 'h' || key === 'escape') run({ type: 'toggleHelp' }); return; }
     if (state.phase === 'start') { if (key === 'q') quit(); else if (key === 't') run({ type: 'startTutorial' }); else if (key === 'p' || key === 'enter') run({ type: 'startRun' }); return; }
     if (state.phase === 'contract') { if (key === '1' || key === '2' || key === '3') run({ type: 'chooseOffer', index: Number(key) - 1 }); else if (key === 'enter') run({ type: 'chooseOffer', index: state.selectedOffer }); return; }
     if (state.phase === 'briefing') { if (key === 'enter' || key === ' ') run({ type: 'dismissBriefing' }); return; }
@@ -78,16 +79,14 @@ export function runDungeonCourierGame(terminal: Terminal): DungeonCourierControl
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     keyListener?.dispose();
-    terminal.write('\x1b[?25h\x1b[?1049l');
+    terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     originalStop();
   };
 
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
     render();
   }, 50);

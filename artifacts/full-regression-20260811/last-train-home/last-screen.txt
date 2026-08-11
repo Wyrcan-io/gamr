@@ -1,0 +1,25 @@
+  g/ LAST TRAIN HOME       RIVER LINE  SCENARIO 1/2
+
+  TURN 03/10  PEOPLE 0/60  SUPPLIES 0/8  AP 1/2
+
+
+                                                         TIMETABLE
+
+                                                           A MOVING
+                                                           46 people  0 load
+
+      O ─── A ────── B ┬─ ───────── O ────── H             B MOVING
+            │                                              28 people  4 load
+            │
+           └─ ─── C                                        C MOVING
+                                                           0 people  12 load
+
+
+
+  NEXT COMMIT                              EVENT TAPE
+  A MOVE -> 4,5                            [+] REPAIR CREW REINFORCED MARSH.
+  B MOVE -> 7,5                            [ ] TRAIN B HELD FOR ONE TURN.
+  C BLOCK                                  [ ] SWITCH SET E AT JUNCTION.
+                                                         ~ T3 FLOOD @11,5
+                                                         ~ T5 FLOOD @3,6
+  INDUCTION COMPLETE  ENTER  continue.

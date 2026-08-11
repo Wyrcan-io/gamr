@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "gameId": "tiny-fleet",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start fleet training"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "2",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "2",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": ".",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": ".",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "2",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "f",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "seal a public fleet turn"
+    }
+  ]
+}

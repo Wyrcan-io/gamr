@@ -1,0 +1,23 @@
+g/ FIVE-MINUTE KINGDOM
+
+A cadastral drafting desk for small kingdoms.
+
+TURN 9/9  |  GLORY 21  |  FAVOUR 0  |  LAWS 0/3  |  SEED 20260812
+
+--------------------------------------------------------------------------------
+
+THE LAST PLACEMENT
+
+FINAL GLORY  21
+
+LAWS  none
+
+
+FINAL SOURCES
+
+[+] +12  Kingdom diversity
+
+[+] +0  Unused favour
+
+
+[Enter] seal chronicle   [Esc] pause   [Q] quit

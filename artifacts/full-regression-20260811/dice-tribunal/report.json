@@ -1,0 +1,111 @@
+{
+  "gameId": "dice-tribunal",
+  "status": "passed",
+  "coverage": "generic-smoke",
+  "seed": 20260811,
+  "actionCount": 1,
+  "elapsedMs": 139,
+  "milestones": {
+    "rendered": true,
+    "responded": true
+  },
+  "failures": [],
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ],
+  "observations": [
+    {
+      "frame": 3,
+      "at": 20260884,
+      "cols": 80,
+      "rows": 28,
+      "text": "\n\ng/ DICE TRIBUNAL\n\nROLL THE EVIDENCE. RISK THE REROLL. REWRITE PRECEDENT.\n\n\nA courtroom filing game where every die has a legal job.\n\n\n[P] CAMPAIGN    [T] TUTORIAL    [Q] QUIT\n\n\nThe clerk will show the arithmetic before you file.",
+      "lines": [
+        "",
+        "",
+        "g/ DICE TRIBUNAL",
+        "",
+        "ROLL THE EVIDENCE. RISK THE REROLL. REWRITE PRECEDENT.",
+        "",
+        "",
+        "A courtroom filing game where every die has a legal job.",
+        "",
+        "",
+        "[P] CAMPAIGN    [T] TUTORIAL    [Q] QUIT",
+        "",
+        "",
+        "The clerk will show the arithmetic before you file.",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 0,
+      "elapsedMs": 73
+    },
+    {
+      "frame": 5,
+      "at": 20260950,
+      "cols": 80,
+      "rows": 28,
+      "text": "\ng/ DICE TRIBUNAL   CIRCUIT 1  CASE 1/9\n                                                                          STANDI\nNG 12/12  FEES 2  CHOOSE YOUR ADVOCATE. THE COURT WILL REMEMBER YOUR\n\n                                                                    -- CHOOSE AD\nVOCATE -------------------------------------------------------\n                                                              > 1. ADA BRIEF //\nPUBLIC DEFENDER\n                                                            The first CLARIFY ea\nch hearing gains +1 Argument.\n                                                    2. C. GULL // SEASIDE COUNSE\nL\n                                                The first excess Objection block\n each hearing becomes up to 2 Argument\n                                        3. THREE FERRETS // ONE BAR CARD\n\n                                    Once per hearing, a third reroll is allowed;\n a final Gaffe from it add\n                            4. AUTOMATON 12-B // PRECEDENT ENGINE\n\n                        The first exhibit whose ranks exactly meet every slot ga\nins +3 Argumen\n\n              Arrows / 1-4 select  Enter confirms",
+      "lines": [
+        "",
+        "g/ DICE TRIBUNAL   CIRCUIT 1  CASE 1/9",
+        "                                                                          STANDI",
+        "NG 12/12  FEES 2  CHOOSE YOUR ADVOCATE. THE COURT WILL REMEMBER YOUR",
+        "",
+        "                                                                    -- CHOOSE AD",
+        "VOCATE -------------------------------------------------------",
+        "                                                              > 1. ADA BRIEF //",
+        "PUBLIC DEFENDER",
+        "                                                            The first CLARIFY ea",
+        "ch hearing gains +1 Argument.",
+        "                                                    2. C. GULL // SEASIDE COUNSE",
+        "L",
+        "                                                The first excess Objection block",
+        " each hearing becomes up to 2 Argument",
+        "                                        3. THREE FERRETS // ONE BAR CARD",
+        "",
+        "                                    Once per hearing, a third reroll is allowed;",
+        " a final Gaffe from it add",
+        "                            4. AUTOMATON 12-B // PRECEDENT ENGINE",
+        "",
+        "                        The first exhibit whose ranks exactly meet every slot ga",
+        "ins +3 Argumen",
+        "",
+        "              Arrows / 1-4 select  Enter confirms",
+        "",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 1,
+      "elapsedMs": 139,
+      "lastAction": {
+        "key": "Enter",
+        "waitMs": 60,
+        "label": "start game"
+      }
+    }
+  ],
+  "terminalText": "\ng/ DICE TRIBUNAL   CIRCUIT 1  CASE 1/9\n                                                                          STANDI\nNG 12/12  FEES 2  CHOOSE YOUR ADVOCATE. THE COURT WILL REMEMBER YOUR\n\n                                                                    -- CHOOSE AD\nVOCATE -------------------------------------------------------\n                                                              > 1. ADA BRIEF //\nPUBLIC DEFENDER\n                                                            The first CLARIFY ea\nch hearing gains +1 Argument.\n                                                    2. C. GULL // SEASIDE COUNSE\nL\n                                                The first excess Objection block\n each hearing becomes up to 2 Argument\n                                        3. THREE FERRETS // ONE BAR CARD\n\n                                    Once per hearing, a third reroll is allowed;\n a final Gaffe from it add\n                            4. AUTOMATON 12-B // PRECEDENT ENGINE\n\n                        The first exhibit whose ranks exactly meet every slot ga\nins +3 Argumen\n\n              Arrows / 1-4 select  Enter confirms",
+  "replay": "{\n  \"version\": 1,\n  \"gameId\": \"dice-tribunal\",\n  \"seed\": 20260811,\n  \"actions\": [\n    {\n      \"key\": \"Enter\",\n      \"waitMs\": 60,\n      \"label\": \"start game\"\n    }\n  ]\n}"
+}

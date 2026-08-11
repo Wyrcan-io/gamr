@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "gameId": "five-minute-kingdom",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 90,
+      "label": "open deed market"
+    },
+    {
+      "key": "1",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "1",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "1",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "1",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "1",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "2",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "2",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "2",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    },
+    {
+      "key": "2",
+      "waitMs": 120,
+      "label": "choose a legal deed"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "open the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "confirm the projection"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 120,
+      "label": "advance the kingdom ledger"
+    }
+  ]
+}

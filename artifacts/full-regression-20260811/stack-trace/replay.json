@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "gameId": "stack-trace",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "start campaign"
+    },
+    {
+      "key": "2",
+      "waitMs": 70,
+      "label": "repair first tape"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "repair first tape"
+    },
+    {
+      "key": "r",
+      "waitMs": 70,
+      "label": "repair first tape"
+    }
+  ]
+}

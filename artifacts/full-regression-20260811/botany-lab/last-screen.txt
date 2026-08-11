@@ -1,0 +1,28 @@
+                               ◈ BOTANY // LAB ◈
+  CYCLE 06/06  FUND 6/4  SEALS ◆◆◆  ⚗ 2
+  LIGHT 2/3  WATER 1/3  ◉ FILTER 8/9
+  ┌─────────────────────┐ ┌─────────────────────┐ ┌─ CONTRACTS ─────────────┐
+  │A1 EMPTY CHAMBER     │ │A2 EMPTY CHAMBER     │ │ ○ Lantern Sample         │
+  │       ◇             │ │       ◇             │ │ GLOW ≥ 3 MASS ≥ 3 +2     │
+  │     EMPTY           │ │     EMPTY           │
+  │   SEED READY        │ │   SEED READY        │ │ ○ Dual-Use Specimen      │
+  │NO SPECIMEN          │ │NO SPECIMEN          │ │ MASS ≥ 6 BLOOM ≥ 3 GLOW …│
+  │☼ BLUE ~ MIST        │ │◉ RED · DRY          │
+  │⌁ 0/8  ·             │ │⌁ 0/8  ·             │ │ ○ Sterile Bouquet        │
+  └─────────────────────┘ └─────────────────────┘ │ BLOOM ≥ 4 STERILE +3     │
+
+  ┌─────────────────────┐ ┌─────────────────────┐ ├─ SELECTED ──────────────┤
+  │B1 EMPTY CHAMBER     │ │B2 EMPTY CHAMBER     │ │ EMPTY — SPACE TO SEED   │
+  │       ◇             │ │       ◇             │ │ Choose a vial from rack. │
+  │     EMPTY           │ │     EMPTY           │ │                         │
+  │   SEED READY        │ │   SEED READY        │ │                         │
+  │NO SPECIMEN          │ │NO SPECIMEN          │ │                         │
+  │· OFF · DRY          │ │· OFF · DRY          │ └─────────────────────────┘
+  │⌁ 0/8  ·             │ │⌁ 0/8  ·             │
+  └─────────────────────┘ └─────────────────────┘ ├─ FORECAST ──────────────┤
+                                                  │ SHIFT COMPLETE — 6 FUNDI…│
+  EVENT  DELIVERED MOTH-9 — CEREMONIAL BLOOM +3 FUNDI…                      │
+  PENDING — NONE                                  │                         │
+  SPACE ACTION  C CLOSE SHIFT  H HELP             │                         │
+                                                  └─────────────────────────┘
+  ↑↓←→ SELECT  L LAMP  W WATER  ENTER COMMIT  ESC PAUSE

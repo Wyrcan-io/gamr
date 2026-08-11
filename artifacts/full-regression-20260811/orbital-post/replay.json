@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "gameId": "orbital-post",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "c",
+      "waitMs": 70,
+      "label": "start orbital dispatch"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "clear the checkout shift"
+    }
+  ]
+}

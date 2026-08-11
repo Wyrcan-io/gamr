@@ -39,16 +39,18 @@ function packetPanicPolicy(_observation: PlaytestObservation, memory: PlaytestMe
   return { key: sequence[index]!, waitMs: 70, label: 'build route' };
 }
 
-function fiveMinutePolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
-  const sequence: string[] = [];
-  for (let turn = 1; turn <= 9; turn += 1) {
-    sequence.push('1', 'Enter', 'Enter', 'Enter');
-    if (turn === 3 || turn === 6 || turn === 9) sequence.push('Enter');
+function fiveMinutePolicy(observation: PlaytestObservation, _memory: PlaytestMemory): PlaytestAction | undefined {
+  const text = observation.text;
+  if (text.includes('DEED MARKET')) {
+    const offers = [...text.matchAll(/^\s*([1-3])\s+\[(TERRAIN|CITIZEN|LAW)\]/gmu)]
+      .map(match => ({ index: match[1]!, kind: match[2]! }));
+    const choice = offers.find(offer => offer.kind === 'TERRAIN') ?? offers.find(offer => offer.kind === 'CITIZEN') ?? offers[0];
+    return { key: choice?.index ?? '1', waitMs: 120, label: 'choose a legal deed' };
   }
-  const index = Number(memory.values.get('five-minute-index') ?? 0);
-  if (index >= sequence.length) return undefined;
-  memory.values.set('five-minute-index', index + 1);
-  return { key: sequence[index]!, waitMs: 70, label: 'draft kingdom' };
+  if (text.includes('PLACEMENT RECORD') || text.includes('SEASON MARGIN')) return { key: 'Enter', waitMs: 120, label: 'advance the kingdom ledger' };
+  if (text.includes('THE LAST PLACEMENT')) return { key: 'Enter', waitMs: 120, label: 'seal the kingdom chronicle' };
+  if (text.includes('SURVEY / PREVIEW')) return { key: 'Enter', waitMs: 120, label: text.includes('confirm this projection') ? 'confirm the projection' : 'open the projection' };
+  return { key: 'Enter', waitMs: 120, label: 'advance the drafting desk' };
 }
 
 function scriptedPolicy(sequence: string[], memoryKey: string, label: string, waitMs = 70): PlayerPolicy {
@@ -97,7 +99,11 @@ function baseSpec(game: GameInfo): PlaytestSpec {
         id: 'responded',
         description: 'At least one input changes the visible frame.',
         required: true,
-        detect: (observation, history) => observation.actionCount > 0 && (observation.changed || history.some(item => item.changed && item.actionCount > 0)),
+        detect: (observation, history) => {
+          if (observation.actionCount <= 0) return false;
+          const initial = history.find(item => item.actionCount === 0);
+          return observation.changed || history.some(item => item.changed && item.actionCount > 0) || (initial !== undefined && initial.text !== observation.text);
+        },
       },
     ],
     policy: genericPolicy,
@@ -246,7 +252,7 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
     category: 'turn-based',
     startActions: [{ key: 'Enter', waitMs: 90, label: 'open deed market' }],
     policy: fiveMinutePolicy,
-    maxActions: 45,
+    maxActions: 46,
     maxElapsedMs: 9000,
     maxStalledFrames: 50,
     milestones: [

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "gameId": "packet-panic",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 100,
+      "label": "start network shift"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "build route"
+    }
+  ]
+}

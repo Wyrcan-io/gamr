@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "gameId": "dead-letter-department",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 70
+    },
+    {
+      "key": "Enter",
+      "waitMs": 30
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "desk progression"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "desk progression"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "desk progression"
+    }
+  ]
+}

@@ -1,0 +1,542 @@
+{
+  "version": 1,
+  "gameId": "dungeon-courier",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start parcel tutorial"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "e",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "deliver the intact tutorial parcel"
+    }
+  ]
+}

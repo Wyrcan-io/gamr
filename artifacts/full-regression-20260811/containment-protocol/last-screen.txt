@@ -1,0 +1,12 @@
+
+g/ CONTAINMENT PROTOCOL
+
+                       HANDOFF ACCEPTED
+
+                                       INTEGRITY 6/6  SCORE 160
+
+                                                               SHIFT COMPLETE. H
+ANDOFF ACCEPTED.
+
+                                                           R restart shift   N n
+ext game   Q quit

@@ -1,0 +1,24 @@
+                                THE 13TH LIFT
+                                                         TUTORIAL  SHIFT 1  RIDE
+ 1  CONTINUITY ◆◆◆◆◆  SCORE 350
+                                                     DOORS CLOSED. THE SHAFT IS
+MOVING.
+
+       ┌─ ARRIVAL AUDIT ────────────────────────────────────────────────────────
+────┐
+     │6 → MAILROOM
+  │
+   │7 → ACCOUNTS +1 DELIVERED
+│
+ │10 → SECURITY +1 DELIVERED                                                  │
+                                                                               │
+                                                                            │
+                                                                             │✓
+SERVICE ACCEPTED — ALL CONDITIONS MET.                                    │
+                                                                           │SERV
+ICE: Every requested landing and ordering condition is satisfied.       │
+                                                                         └──────
+──────────────────────────────────────────────────────────────────────┘
+
+                                                                        ARROWS /
+ A,F move   SPACE queue   TAB rider   ENTER go   ? help   ESC pause

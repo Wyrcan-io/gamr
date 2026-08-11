@@ -1,0 +1,19 @@
+  g/ SIGNAL//NOISE   CASE 01/06                 1 CORRECT  0 FAILED
+
+
+
+
+
+
+                               [+] CHANNEL STABLE
+
+
+                       RESPONSE ACCEPTED. CHANNEL STABLE.
+
+
+                      CASE SCORE 1000  CORRECT 1  FAILED 0
+
+
+
+
+                           ENTER  COMPLETE INDUCTION

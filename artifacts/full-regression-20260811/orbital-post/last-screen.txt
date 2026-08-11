@@ -1,0 +1,24 @@
+
+                             O R B I T A L   P O S T
+                                                    REMOTE RELAY // KESTREL STAT
+ION
+
+   ┌─ FLIGHT-DECK UPGRADE ─────────────────────────────────────────────────────┐
+
+│ SHIFT CLEARED. SELECT ONE FLIGHT-DECK UPGRADE.
+                                                └───────────────────────────────
+───────────────────────────────────────────┘
+
+                                            1. PRIORITY DESK
+                                                               Critical jobs com
+pleted on time grant +1 standing.
+
+                                 2. EVA TETHER KIT
+                                                     First EVA job in RECOVERY i
+gnores its +1 power cost.
+
+                         3. DOCK AUTOMATOR
+                                             First one-window cargo job each shi
+ft costs 0 power.
+
+                 Choose 1, 2, or 3. The next shift begins after installation.

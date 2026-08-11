@@ -1,0 +1,111 @@
+{
+  "gameId": "ghost-shift",
+  "status": "passed",
+  "coverage": "generic-smoke",
+  "seed": 20260811,
+  "actionCount": 1,
+  "elapsedMs": 146,
+  "milestones": {
+    "rendered": true,
+    "responded": true
+  },
+  "failures": [],
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ],
+  "observations": [
+    {
+      "frame": 3,
+      "at": 20260888,
+      "cols": 80,
+      "rows": 28,
+      "text": "\n\ng/ GHOST SHIFT\n\nSECURITY DESK // THE NIGHT SHIFT\n\n\nCatch the impossible route from cameras, badges, and time.\n\n\n[T] ORIENTATION     [C] CAMPAIGN     [Q] QUIT\n\n\nEvery operation spends one battery and advances the clock.\n\n\n\n\n\n\n\n\n\n\n\n\n\nArrows move  [ ] suspect  Enter detain  ? help",
+      "lines": [
+        "",
+        "",
+        "g/ GHOST SHIFT",
+        "",
+        "SECURITY DESK // THE NIGHT SHIFT",
+        "",
+        "",
+        "Catch the impossible route from cameras, badges, and time.",
+        "",
+        "",
+        "[T] ORIENTATION     [C] CAMPAIGN     [Q] QUIT",
+        "",
+        "",
+        "Every operation spends one battery and advances the clock.",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Arrows move  [ ] suspect  Enter detain  ? help"
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 0,
+      "elapsedMs": 77
+    },
+    {
+      "frame": 5,
+      "at": 20260956,
+      "cols": 80,
+      "rows": 28,
+      "text": "\ng/ GHOST SHIFT   ORIENTATION: THE UNLISTED BADGE\n                                                                          TURN 0\n1  BATTERY 99/12  CANDIDATES: 5  CASE 01: READ THE TASKING.\n\n                                                                    -- CCTV CONT\nACT SHEET ----------------\n                          -- SELECTED DESK ---------------------\n                                                                [ ] C01 [C] RECE\nPTION  NO FRAME         ROOM HALL\n                                                              [ ] C02 [C] PRINT\nBAY  NO FRAME\n                                                            [ ] C03 [C] HALL  NO\n FRAME\n                                                          [ ] C04 [C] SERVER  NO\n FRAME\n\n                                                        -- CHRONOLOGICAL EVIDENC\nE TAPE -------------------------------------------\n                                                  [ ] No evidence yet. Wake a ca\nmera or inspect a door event.\n\n                                            -- PERSONNEL FILES / CONTRADICTION C\nHAIN ---------------------------------\n                                        [?] NORA  TALL    0 proof / 0 contradict\nions\n                                  [?] SAM  BULKY   0 proof / 0 contradictions\nOne person is inside after close.  [Enter] begin                ence  BRIEFING:",
+      "lines": [
+        "",
+        "g/ GHOST SHIFT   ORIENTATION: THE UNLISTED BADGE",
+        "                                                                          TURN 0",
+        "1  BATTERY 99/12  CANDIDATES: 5  CASE 01: READ THE TASKING.",
+        "",
+        "                                                                    -- CCTV CONT",
+        "ACT SHEET ----------------",
+        "                          -- SELECTED DESK ---------------------",
+        "                                                                [ ] C01 [C] RECE",
+        "PTION  NO FRAME         ROOM HALL",
+        "                                                              [ ] C02 [C] PRINT",
+        "BAY  NO FRAME",
+        "                                                            [ ] C03 [C] HALL  NO",
+        " FRAME",
+        "                                                          [ ] C04 [C] SERVER  NO",
+        " FRAME",
+        "",
+        "                                                        -- CHRONOLOGICAL EVIDENC",
+        "E TAPE -------------------------------------------",
+        "                                                  [ ] No evidence yet. Wake a ca",
+        "mera or inspect a door event.",
+        "",
+        "                                            -- PERSONNEL FILES / CONTRADICTION C",
+        "HAIN ---------------------------------",
+        "                                        [?] NORA  TALL    0 proof / 0 contradict",
+        "ions",
+        "                                  [?] SAM  BULKY   0 proof / 0 contradictions",
+        "One person is inside after close.  [Enter] begin                ence  BRIEFING:"
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 1,
+      "elapsedMs": 145,
+      "lastAction": {
+        "key": "Enter",
+        "waitMs": 60,
+        "label": "start game"
+      }
+    }
+  ],
+  "terminalText": "\ng/ GHOST SHIFT   ORIENTATION: THE UNLISTED BADGE\n                                                                          TURN 0\n1  BATTERY 99/12  CANDIDATES: 5  CASE 01: READ THE TASKING.\n\n                                                                    -- CCTV CONT\nACT SHEET ----------------\n                          -- SELECTED DESK ---------------------\n                                                                [ ] C01 [C] RECE\nPTION  NO FRAME         ROOM HALL\n                                                              [ ] C02 [C] PRINT\nBAY  NO FRAME\n                                                            [ ] C03 [C] HALL  NO\n FRAME\n                                                          [ ] C04 [C] SERVER  NO\n FRAME\n\n                                                        -- CHRONOLOGICAL EVIDENC\nE TAPE -------------------------------------------\n                                                  [ ] No evidence yet. Wake a ca\nmera or inspect a door event.\n\n                                            -- PERSONNEL FILES / CONTRADICTION C\nHAIN ---------------------------------\n                                        [?] NORA  TALL    0 proof / 0 contradict\nions\n                                  [?] SAM  BULKY   0 proof / 0 contradictions\nOne person is inside after close.  [Enter] begin                ence  BRIEFING:",
+  "replay": "{\n  \"version\": 1,\n  \"gameId\": \"ghost-shift\",\n  \"seed\": 20260811,\n  \"actions\": [\n    {\n      \"key\": \"Enter\",\n      \"waitMs\": 60,\n      \"label\": \"start game\"\n    }\n  ]\n}"
+}

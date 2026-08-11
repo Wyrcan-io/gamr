@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "gameId": "dice-tribunal",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ]
+}

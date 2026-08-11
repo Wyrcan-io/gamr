@@ -1,0 +1,19 @@
+
+g/ TINY FLEET
+
+ROUND 04/6  DESTROY ALL THREE PRACTICE HULKS.  RESOLVING SEALED ORDERS...
+
+
+PLOTTING TABLE  [exact] [estimated] [unknown    AFTER-ACTION REPORT
+ 1 . . . . . . . . .                            [.] AEGIS FIRES D9 — HIT CONFI
+ 2 . . . # # . . . .                            [.] ATLAS FIRES E9 — HIT CONFI
+ 3 . . . . . . . . .                            [!] CONTACT LOST — CONFIRMED S
+ 4 . . . . . . . . .                            [!] CONTACT LOST — CONFIRMED S
+ 5 . . . . # . . . .                            [+] MISSION EXCELLENT — DESTRO
+ 6 . . . . . . . . .                            ENTER continue to battle repor
+ 7 . x . . . . . . .
+ 8 S . . . # # . . .
+ 9 . E F x x . . . .
+    A B C D E F G H I
+
+1-3 ship  arrows aim  WASD helm  F fire  X special  G brace  . hold  ENTER revie

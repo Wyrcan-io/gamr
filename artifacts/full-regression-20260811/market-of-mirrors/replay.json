@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "gameId": "market-of-mirrors",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "b",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "2",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "b",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "e",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "c",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "e",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "p",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "e",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete guided fair"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "gameId": "time-capsule",
+  "status": "passed",
+  "coverage": "generic-smoke",
+  "seed": 20260811,
+  "actionCount": 1,
+  "elapsedMs": 151,
+  "milestones": {
+    "rendered": true,
+    "responded": true
+  },
+  "failures": [],
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ],
+  "observations": [
+    {
+      "frame": 3,
+      "at": 20260896,
+      "cols": 80,
+      "rows": 28,
+      "text": "\n\n\n                           T I M E   C A P S U L E\n\n\n                             The day ends at noon. Three things may cross.\n\n                             [T] tutorial    [C] campaign    [Q] quit\n\n\n                             A deterministic narrative puzzle about what survive\ns.\n\n\n\n\n\n\n\n\n\n\n\n\n  Arrows select   ENTER choose   ESC pause",
+      "lines": [
+        "",
+        "",
+        "",
+        "                           T I M E   C A P S U L E",
+        "",
+        "",
+        "                             The day ends at noon. Three things may cross.",
+        "",
+        "                             [T] tutorial    [C] campaign    [Q] quit",
+        "",
+        "",
+        "                             A deterministic narrative puzzle about what survive",
+        "s.",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "  Arrows select   ENTER choose   ESC pause",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 0,
+      "elapsedMs": 85
+    },
+    {
+      "frame": 5,
+      "at": 20260962,
+      "cols": 80,
+      "rows": 28,
+      "text": "\n  THE LAST BELL\n  MERIDIAN CIVIC ARCHIVE // 11:55\n\n\n\n  At 11:55 the Meridian Archive prepares to open a century-old time capsule.\n        At noon the bell turns the ceremony into a destructive pulse.\n                   Keep three truths. Rewrite five minutes.\n\n\n\n                  ◉ MEMORY  ◆ OBJECT  ◇ CLUE\n\n\n                 [ENTER] BEGIN THE FIVE-MINUTE DAY\n\n\n\n\n\n\n\n\n\n  The clock advances only when you act.",
+      "lines": [
+        "",
+        "  THE LAST BELL",
+        "  MERIDIAN CIVIC ARCHIVE // 11:55",
+        "",
+        "",
+        "",
+        "  At 11:55 the Meridian Archive prepares to open a century-old time capsule.",
+        "        At noon the bell turns the ceremony into a destructive pulse.",
+        "                   Keep three truths. Rewrite five minutes.",
+        "",
+        "",
+        "",
+        "                  ◉ MEMORY  ◆ OBJECT  ◇ CLUE",
+        "",
+        "",
+        "                 [ENTER] BEGIN THE FIVE-MINUTE DAY",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "  The clock advances only when you act.",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 1,
+      "elapsedMs": 151,
+      "lastAction": {
+        "key": "Enter",
+        "waitMs": 60,
+        "label": "start game"
+      }
+    }
+  ],
+  "terminalText": "\n  THE LAST BELL\n  MERIDIAN CIVIC ARCHIVE // 11:55\n\n\n\n  At 11:55 the Meridian Archive prepares to open a century-old time capsule.\n        At noon the bell turns the ceremony into a destructive pulse.\n                   Keep three truths. Rewrite five minutes.\n\n\n\n                  ◉ MEMORY  ◆ OBJECT  ◇ CLUE\n\n\n                 [ENTER] BEGIN THE FIVE-MINUTE DAY\n\n\n\n\n\n\n\n\n\n  The clock advances only when you act.",
+  "replay": "{\n  \"version\": 1,\n  \"gameId\": \"time-capsule\",\n  \"seed\": 20260811,\n  \"actions\": [\n    {\n      \"key\": \"Enter\",\n      \"waitMs\": 60,\n      \"label\": \"start game\"\n    }\n  ]\n}"
+}

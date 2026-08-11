@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "gameId": "time-capsule",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ]
+}

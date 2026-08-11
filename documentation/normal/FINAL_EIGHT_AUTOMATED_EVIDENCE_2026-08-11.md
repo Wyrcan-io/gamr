@@ -22,6 +22,18 @@ All eight pending profiles passed their seeded-completion milestones:
 
 Machine-readable reports and terminal captures are in `artifacts/final-eight-20260811-clean/<game-id>/`.
 
+## Full catalog regression
+
+The follow-up regression covered all 20 active games at seed `20260811`; all 20 passed:
+
+| Group | Games | Result |
+| --- | ---: | --- |
+| Previously signed-off catalog | 12 | PASS |
+| Final migration cohort | 8 | PASS |
+| Active catalog total | 20 | PASS |
+
+The run also covered five existing profile failures found during the regression: Five-Minute Kingdom now completes its chronicle across timing/offer branches, and Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency now recognize visible response despite timer-driven redraws. Full-catalog terminal artifacts are in `artifacts/full-regression-20260811/<game-id>/`.
+
 ## Verification commands
 
 ```text
@@ -35,6 +47,9 @@ The playtest runner now uses a 30-second elapsed-time ceiling and 240 stalled-fr
 Graphify refresh was attempted with `graphify update .`, but the executable is unavailable in this environment; no current graph state is claimed.
 
 ## Implementation notes
+
+- The generic response milestone now compares against the initial frame, so timer-driven redraws cannot hide a valid input response.
+- Five-Minute Kingdom now chooses a legal visible deed and advances by the current rendered phase, making its seeded completion trace resilient to millisecond-level seed rollover.
 
 - Blackout Grid now has a verified restoration trace that closes both feeders, reaches both district loads, and holds the stability window.
 - Tiny Fleet’s signal-drill training scenario now places the practice hulks within the taught targeting lesson, allowing the seeded battle to reach its mission report.

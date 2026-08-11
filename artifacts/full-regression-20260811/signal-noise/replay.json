@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "gameId": "signal-noise",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "Tab",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "Tab",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve induction receiver"
+    }
+  ]
+}

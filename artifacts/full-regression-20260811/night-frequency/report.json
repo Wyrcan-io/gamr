@@ -1,0 +1,111 @@
+{
+  "gameId": "night-frequency",
+  "status": "passed",
+  "coverage": "generic-smoke",
+  "seed": 20260811,
+  "actionCount": 1,
+  "elapsedMs": 152,
+  "milestones": {
+    "rendered": true,
+    "responded": true
+  },
+  "failures": [],
+  "actions": [
+    {
+      "key": "Enter",
+      "waitMs": 60,
+      "label": "start game"
+    }
+  ],
+  "observations": [
+    {
+      "frame": 3,
+      "at": 20260895,
+      "cols": 80,
+      "rows": 28,
+      "text": "                              NIGHT FREQUENCY 91.7\n\n\n\n\n\n                 ●  THE CITY IS QUIET. THE SWITCHBOARD IS NOT.\n\n\n        Host a pirate radio show. Choose the voices. Prove the pattern.\n\n\n                A false emergency alert is scheduled for 03:17.\n\n\n\n                  P  PLAY CAMPAIGN     T  TUTORIAL     Q  QUIT\n\n\n\n                                 SEED 20260812",
+      "lines": [
+        "                              NIGHT FREQUENCY 91.7",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "                 ●  THE CITY IS QUIET. THE SWITCHBOARD IS NOT.",
+        "",
+        "",
+        "        Host a pirate radio show. Choose the voices. Prove the pattern.",
+        "",
+        "",
+        "                A false emergency alert is scheduled for 03:17.",
+        "",
+        "",
+        "",
+        "                  P  PLAY CAMPAIGN     T  TUTORIAL     Q  QUIT",
+        "",
+        "",
+        "",
+        "                                 SEED 20260812",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 0,
+      "elapsedMs": 84
+    },
+    {
+      "frame": 5,
+      "at": 20260963,
+      "cols": 80,
+      "rows": 28,
+      "text": "                              NIGHT FREQUENCY 91.7\n\n\n\n\n                        SHOW BRIEF // PROJECT NIGHTGLASS\n\n\n\n           At 03:17, Bellwether may receive a forged chlorine alert.\n\n        Take calls, protect sources, and keep the evidence independent.\n\n        What you air decides who can hear the truth — and who can help.\n\n\n\n\n                     THE CARRIER HOLDS. THE CITY DOES NOT.\n\n\n\n                            ENTER  OPEN SWITCHBOARD",
+      "lines": [
+        "                              NIGHT FREQUENCY 91.7",
+        "",
+        "",
+        "",
+        "",
+        "                        SHOW BRIEF // PROJECT NIGHTGLASS",
+        "",
+        "",
+        "",
+        "           At 03:17, Bellwether may receive a forged chlorine alert.",
+        "",
+        "        Take calls, protect sources, and keep the evidence independent.",
+        "",
+        "        What you air decides who can hear the truth — and who can help.",
+        "",
+        "",
+        "",
+        "",
+        "                     THE CARRIER HOLDS. THE CITY DOES NOT.",
+        "",
+        "",
+        "",
+        "                            ENTER  OPEN SWITCHBOARD",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "changed": false,
+      "alternateBuffer": true,
+      "actionCount": 1,
+      "elapsedMs": 152,
+      "lastAction": {
+        "key": "Enter",
+        "waitMs": 60,
+        "label": "start game"
+      }
+    }
+  ],
+  "terminalText": "                              NIGHT FREQUENCY 91.7\n\n\n\n\n                        SHOW BRIEF // PROJECT NIGHTGLASS\n\n\n\n           At 03:17, Bellwether may receive a forged chlorine alert.\n\n        Take calls, protect sources, and keep the evidence independent.\n\n        What you air decides who can hear the truth — and who can help.\n\n\n\n\n                     THE CARRIER HOLDS. THE CITY DOES NOT.\n\n\n\n                            ENTER  OPEN SWITCHBOARD",
+  "replay": "{\n  \"version\": 1,\n  \"gameId\": \"night-frequency\",\n  \"seed\": 20260811,\n  \"actions\": [\n    {\n      \"key\": \"Enter\",\n      \"waitMs\": 60,\n      \"label\": \"start game\"\n    }\n  ]\n}"
+}

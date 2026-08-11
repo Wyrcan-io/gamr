@@ -1,0 +1,28 @@
+g/ STACK TRACE
+
+CASE B01  /  TUTORIAL  /  BOOT SEQUENCE
+
+CONTRACT  Return X unchanged.
+
+
+-- PROGRAM TAPE -----------------   -- TEST LEDGER -----------------------------
+
+  L01  LOAD X                       [+] T01  X=  0 ->   0  got 0
+
+  L02  empty                        [+] T02  X=  5 ->   5  got 5
+
+  L03  RETURN                       [+] T03  X= -2 ->  -2  got -2
+
+  L04  empty
+
+
+-- BLOCK TRAY -------------------   -- TRACE INSPECTOR -------------------------
+
+(empty - all blocks placed)         T01  line 1  LOAD X
+
+FOCUS TRAY  *  M changes a mutabl   before []  after [0]
+
+
+RESULT [+]  ALL TESTS PASS ✓  LEAN REPAIR ACCEPTED.
+
+[Enter/N] next case   [R] replay current   [?] help   [Esc] pause   [Q] quit

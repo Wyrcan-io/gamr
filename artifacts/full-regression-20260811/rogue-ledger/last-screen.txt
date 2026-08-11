@@ -1,0 +1,21 @@
+  g/ ROGUE LEDGER      INDUCTION  Q1/4
+
+  CASH +120  PROFIT +0/0  AUDIT 0/12  STANDING 60
+
+
+
+
+                           [+] ANNUAL AUDIT COMPLETE
+
+
+
+                    INDUCTION COMPLETE. THE ROWS RECONCILE.
+
+
+
+                         CASH 120  STANDING 60  AUDIT 0
+
+
+
+
+                             R RESTART RUN   Q QUIT

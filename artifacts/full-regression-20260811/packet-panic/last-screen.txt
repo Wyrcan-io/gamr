@@ -1,0 +1,28 @@
+g/ PACKET PANIC
+
+A live topology desk: connect sources, protect Trace, deliver the quota.
+
+SCORE 000000  |  STANDARD  |  SECTOR 1/8  |  TRACE [------------------] 0%  |  M
+
+--------------------------------------------------------------------------------
+
+TOPOLOGY                                     OPERATOR PANEL
+
+     A   B   C   D   E   F   G   H   I   J   OPERATOR PANEL
+
+ 1  .   .   .   .   .   .   .   .   .   .    TOOL  LINK  ROT 0
+
+ 2 >C   .   .   .   .   .   .   .   .   .    INV   L19  B4  S0  F0
+
+ 3  .   .   .   .   .   .   .   .   .   .    FOCUS **  PURGE 1
+
+ 4  .   .   .   .   .   .   .   .   .   .    QUOTA 0/16
+
+ 5  .   .   .   .   .   .  [.]  .   .   .    STREAK 0
+
+ 6  .   .   .   .   .   .   .   .   .   .
+
+ 7  .   .   .   .   .   .   .   .   .   .    CURSOR G5
+
+ 8  .   .   .   .   .   .   .   .   .   .    Link: connect two straight ports.
+Arrows move | 1-4 tool | Enter place | R rotate | X salvage | F purge | Space fo

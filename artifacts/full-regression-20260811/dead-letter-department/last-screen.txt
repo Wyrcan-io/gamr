@@ -1,0 +1,28 @@
+g/ DEAD LETTER DEPARTMENT
+
+A sorting desk for mail that should not answer back.
+
+SHIFT 01/06  |  INBOX 01/06  |  TRUST [####] 4/4  |  STANDING 051
+
+--------------------------------------------------------------------------------
+
+[+] AUDIT ACCEPTED
+
+
+CHOSE     DISPATCH
+
+EXPECTED  DISPATCH
+
+RULE      clean-mail
+
+
+VISIBLE EVIDENCE
+
+status: ALL CHECKS PASS
+
+
+The letter satisfies every active authenticity rule and has no urgent
+
+deadline.
+
+[Enter] next letter   [L] bulletin   [?] help   [Esc] pause

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "gameId": "rogue-ledger",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "x",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "x",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "x",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "x",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete ledger induction"
+    }
+  ]
+}

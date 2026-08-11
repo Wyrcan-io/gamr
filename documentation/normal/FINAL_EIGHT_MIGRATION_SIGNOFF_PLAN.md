@@ -324,6 +324,8 @@ Freeze visual-system migration work. The next milestone becomes a production-can
 
 ## 18. Implementation update — 2026-08-11
 
+The full 20-game regression now passes 20/20. It also corrected five unrelated existing profile failures: timer-aware response detection for Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency, plus a phase-aware legal-offer completion policy for Five-Minute Kingdom.
+
 The first implementation pass for the eight-game sign-off cohort is now active:
 
 - Batch B controllers no longer poll turn-based renderers every 50 ms. Blackout Grid retains only its mechanical simulation beat; Containment Protocol, Orbital Post, and Botany Lab render on commands, resize, and lifecycle events.

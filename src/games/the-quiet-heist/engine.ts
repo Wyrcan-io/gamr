@@ -8,8 +8,7 @@ const jobs: Job[] = [
     start: { x: 1, y: 6 }, key: { x: 3, y: 5 }, display: { x: 9, y: 2 }, exits: { east: { x: 0, y: 0 }, service: { x: 11, y: 0 } },
     guards: [
       { id: 'G1', pos: { x: 7, y: 6 }, facing: 'W', mode: 'patrol', patrol: [{ x: 7, y: 6 }, { x: 10, y: 6 }, { x: 10, y: 3 }, { x: 7, y: 3 }], patrolIndex: 0 },
-      { id: 'G2', pos: { x: 6, y: 1 }, facing: 'S', mode: 'patrol', patrol: [{ x: 6, y: 1 }, { x: 6, y: 4 }, { x: 9, y: 4 }, { x: 9, y: 1 }], patrolIndex: 0 },
-    ], camera: { id: 'C1', pos: { x: 7, y: 2 }, direction: 'W', jammed: 0 }, decoys: 2, jammers: 1,
+    ], camera: { id: 'C1', pos: { x: 7, y: 2 }, direction: 'W', jammed: 0 }, decoys: 2, jammers: 2,
   },
   {
     title: 'JOB 02 // UNSCHEDULED LOAN',

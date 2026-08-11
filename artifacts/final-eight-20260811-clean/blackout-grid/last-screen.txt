@@ -1,0 +1,23 @@
+                            ◆ BLACKOUT GRID ◆
+
+  STAGE 01/05  STRAIN [■■■■··········] 30  STABLE 12/12  FOCUS ◆◆
+
+
+
+
+                         ✓ SHIFT COMPLETE — CITY STABLE
+
+
+                     SCORE 132   MAX STRAIN 33   MAX HEAT 0
+
+                        FEEDER TRIPS 0   SOURCE TRIPS 0
+
+
+                         TRAINING RESTORATION COMPLETE
+                     BLACK START STABILITY WINDOW COMPLETE
+          LIGHTNING-TRANSIENT — NORTH HOMES FEEDER PROTECTION TRIPPED
+
+
+
+
+                R: RESTART SAME SEED    Q: QUIT    N: NEXT GAME

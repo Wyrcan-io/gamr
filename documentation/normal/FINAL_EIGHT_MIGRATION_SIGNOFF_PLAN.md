@@ -331,6 +331,7 @@ The first implementation pass for the eight-game sign-off cohort is now active:
 - Containment Protocol now renders after every command, preserves same-seed restart, and disposes its listener/resize resources without a background render loop.
 - Orbital Post now renders after scheduler commands and reports, supports resize-driven redraw, and disposes the controller cleanly.
 - Botany Lab now renders after operations, overlay navigation, pause/help changes, resize, and lifecycle cleanup without decorative glitch animation.
-- All four Batch B games now have explicit `black-box-progress` profiles covering their briefing, working surface, and first meaningful report/forecast interaction.
+- All eight pending games now have `seeded-completion` profiles with successful taught-unit traces at seed `20260811`; machine-readable reports and terminal captures are recorded in [`FINAL_EIGHT_AUTOMATED_EVIDENCE_2026-08-11.md`](FINAL_EIGHT_AUTOMATED_EVIDENCE_2026-08-11.md).
+- The seeded traces exposed and corrected two tutorial-fixture issues: Fleet’s signal drill was not reachable within its targeting lesson, and Quiet Heist’s first job did not provide a reliable taught escape contingency.
 
-This is an implementation checkpoint, not the final 20/20 claim. Batch B profiles still need seeded-completion paths and human sessions; the four Batch C profiles remain black-box progress until their successful taught units and human evidence packets are complete.
+This remains an implementation and automated-evidence checkpoint, not the final 20/20 claim. The 24 first-time-player sessions, human validation, accessibility observations, repeated-confusion retests, and formal evidence review are still external gates. Graphify refresh was attempted with `graphify update .` on 2026-08-11, but the executable is unavailable in this environment; no current graph state is claimed.

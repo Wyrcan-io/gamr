@@ -14,7 +14,7 @@ export const SCENARIOS: Scenario[] = [
     terrain: grid(['.........', '...##....', '.........', '.........', '....#....', '.........', '.........', '....##...', '.........']), roundLimit: 6,
     objective: objective('eliminate', 'DESTROY ALL THREE PRACTICE HULKS.'),
     player: [ship('S1', 'scout', 0, 7, 'N'), ship('E1', 'escort', 1, 8, 'N'), ship('F1', 'flagship', 2, 8, 'N')],
-    enemy: [ship('P1', 'scout', 8, 1, 'S'), ship('P2', 'escort', 7, 0, 'S'), ship('P3', 'flagship', 6, 2, 'W')],
+    enemy: [ship('P1', 'scout', 1, 6, 'S'), ship('P2', 'escort', 3, 8, 'S'), ship('P3', 'flagship', 4, 8, 'W')],
     enemyDoctrine: 'training', signals: 'full', mastery: 'HIT ALL HULKS WITHOUT A FRIENDLY COLLISION.',
   },
   {

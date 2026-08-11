@@ -1,0 +1,22 @@
+                                THE 13TH LIFT
+                                                          TUTORIAL  SHIFT 1  RID
+E 2  CONTINUITY ◆◆◆◆◇  SCORE 0
+                                                        AFTER HOURS REPORT READY
+.
+
+ ┌─ AFTER HOURS REPORT ───────────────────────────────────────────────────────┐
+                                                                               │
+NIGHT OPERATOR LOG // 00:47                                                 │
+                                                                             │Th
+e directory says twelve floors. The button panel says thirteen.           │
+                                                                           │Pass
+engers are already waiting.                                             │
+                                                                         │
+                                                                      │
+                                                                       │[R] rest
+art   [Q] quit                                                      │
+                                                                     └──────────
+──────────────────────────────────────────────────────────────────┘
+
+                                                                    ARROWS / A,F
+ move   SPACE queue   TAB rider   ENTER go   ? help   ESC pause

@@ -1,0 +1,24 @@
+
+                             O R B I T A L   P O S T
+                                                    REMOTE RELAY // KESTREL STAT
+ION
+
+   ┌─ FLIGHT-DECK UPGRADE ─────────────────────────────────────────────────────┐
+
+│ SHIFT CLEARED. SELECT ONE FLIGHT-DECK UPGRADE.
+                                                └───────────────────────────────
+───────────────────────────────────────────┘
+
+                                            1. RESERVE CAPACITORS
+                                                                    Battery maxi
+mum +2.
+
+       2. WEATHER OPTICS
+                           Show an advisory fifth forecast cell.
+
+                                                                3. PRIORITY DESK
+
+   Critical jobs completed on time grant +1 standing.
+
+                                                     Choose 1, 2, or 3. The next
+ shift begins after installation.

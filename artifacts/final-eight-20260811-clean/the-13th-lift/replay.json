@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "gameId": "the-13th-lift",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start lift tutorial"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "complete the taught ride"
+    }
+  ]
+}

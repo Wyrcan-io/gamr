@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "gameId": "blackout-grid",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start grid training"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "open restoration briefing"
+    },
+    {
+      "key": "h",
+      "waitMs": 70,
+      "label": "open operator help"
+    },
+    {
+      "key": "h",
+      "waitMs": 70,
+      "label": "close operator help"
+    },
+    {
+      "key": "2",
+      "waitMs": 4200,
+      "label": "repair hospital feeder"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "close hospital feeder"
+    },
+    {
+      "key": "Tab",
+      "waitMs": 70,
+      "label": "select water feeder"
+    },
+    {
+      "key": "Tab",
+      "waitMs": 70,
+      "label": "select water feeder"
+    },
+    {
+      "key": "Tab",
+      "waitMs": 70,
+      "label": "select water feeder"
+    },
+    {
+      "key": "1",
+      "waitMs": 70,
+      "label": "close water feeder"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "locate hospital load"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "locate hospital load"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "locate hospital load"
+    },
+    {
+      "key": "3",
+      "waitMs": 4500,
+      "label": "restore hospital load"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "locate water load"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "locate water load"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "locate water load"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "locate water load"
+    },
+    {
+      "key": "3",
+      "waitMs": 8000,
+      "label": "restore water load"
+    }
+  ]
+}

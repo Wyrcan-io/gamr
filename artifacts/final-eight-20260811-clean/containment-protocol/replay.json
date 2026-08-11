@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "gameId": "containment-protocol",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start containment training"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "3",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "resolve the training anomaly"
+    }
+  ]
+}

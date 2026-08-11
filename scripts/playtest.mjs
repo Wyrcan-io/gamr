@@ -39,7 +39,7 @@ const gameIds = requested.length > 0 ? requested : selectedCatalog.map(game => g
 const runner = new PlaytestRunner({ registry });
 const reports = [];
 for (const gameId of gameIds) {
-  const report = await runner.run(gameId, { seed });
+  const report = await runner.run(gameId, { seed, maxStalledFrames: 240, maxElapsedMs: 30000 });
   reports.push(report);
   if (artifactRoot) {
     const runRoot = `${artifactRoot}/${gameId}`;

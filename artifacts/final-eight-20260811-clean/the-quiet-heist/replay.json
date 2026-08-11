@@ -1,0 +1,437 @@
+{
+  "version": 1,
+  "gameId": "the-quiet-heist",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start heist tutorial"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "i",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "j",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "x",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "i",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    },
+    {
+      "key": "i",
+      "waitMs": 70,
+      "label": "steal and escape the tutorial job"
+    }
+  ]
+}

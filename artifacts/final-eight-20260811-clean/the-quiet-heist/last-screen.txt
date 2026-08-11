@@ -1,0 +1,21 @@
+
+g/ THE QUIET HEIST   JOB 01 // BORROWED LIGHT
+
+TURN 18  AP 1/2  ALARM 0/3  ESCAPE VIA STREET EXIT
+
+
+ARCHITECT'S PLAN  [solid NOW] [num   SECURITY LEDGER
+ 1 @2. . . . . . . . . . >           NOW      B1  sight 7 cells
+ 2 . # # # . . # # # . . .           PLAN     A1  WALK → (1,1)
+ 3 . . . . # v v C . . # .           FORECAST G1->K7 PATROL
+ 4 . . . . # . . # . . . .           AFTER    sight 7 cells  CLEAR THROUGH CO
+ 5 . . . . # . . # . . . .           CAMERA   ACTIVE W
+ 6 . . . . # . . . . . . .
+ 7 . . . . . . v v v v G .           OBJECTIVE  ESCAPE VIA STREET EXIT
+ 8 # # # # # # # # # # # #           TURN 18  AP 1/2  ALARM 0/3  DECOYS 1  JA
+    A B C D E F G H I J K L          NOTICE    ASSET SECURED. YOU LEFT NO STO
+                                     RESULTS   commit advances guards; planni
+
+ARROWS/WASD move  I interact  X decoy  J jam  U/BACKSPACE undo  ENTER commit  ?
+
+[+] HEIST COMPLETE

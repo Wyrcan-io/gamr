@@ -60,6 +60,23 @@ function scriptedPolicy(sequence: string[], memoryKey: string, label: string, wa
   };
 }
 
+function actionScript(sequence: PlaytestAction[], memoryKey: string): PlayerPolicy {
+  return (_observation, memory) => {
+    const index = Number(memory.values.get(memoryKey) ?? 0);
+    if (index >= sequence.length) return undefined;
+    memory.values.set(memoryKey, index + 1);
+    return sequence[index];
+  };
+}
+
+function courierTraversal(directions: string[]): string[] {
+  return directions.flatMap(direction => [direction, 'Enter']);
+}
+
+function heistTurns(turns: string[][]): string[] {
+  return turns.flatMap(turn => [...turn, 'Enter', 'Enter', 'Enter']);
+}
+
 function baseSpec(game: GameInfo): PlaytestSpec {
   const category = game.pace === 'real-time' ? 'real-time' : 'turn-based';
   return {
@@ -139,59 +156,88 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
     ],
   },
   'blackout-grid': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'real-time',
     startActions: [{ key: 't', waitMs: 70, label: 'start grid training' }],
-    policy: scriptedPolicy(['Enter', '2', 'Space', 'h'], 'blackout-grid-index', 'operate the restoration desk'),
-    maxActions: 14,
-    maxElapsedMs: 7000,
+    policy: actionScript([
+      { key: 'Enter', waitMs: 70, label: 'open restoration briefing' },
+      { key: 'h', waitMs: 70, label: 'open operator help' },
+      { key: 'h', waitMs: 70, label: 'close operator help' },
+      { key: '2', waitMs: 4200, label: 'repair hospital feeder' },
+      { key: '1', waitMs: 70, label: 'close hospital feeder' },
+      { key: 'Tab', waitMs: 70, label: 'select water feeder' },
+      { key: 'Tab', waitMs: 70, label: 'select water feeder' },
+      { key: 'Tab', waitMs: 70, label: 'select water feeder' },
+      { key: '1', waitMs: 70, label: 'close water feeder' },
+      { key: 'ArrowRight', waitMs: 70, label: 'locate hospital load' },
+      { key: 'ArrowUp', waitMs: 70, label: 'locate hospital load' },
+      { key: 'ArrowUp', waitMs: 70, label: 'locate hospital load' },
+      { key: '3', waitMs: 4500, label: 'restore hospital load' },
+      { key: 'ArrowDown', waitMs: 70, label: 'locate water load' },
+      { key: 'ArrowDown', waitMs: 70, label: 'locate water load' },
+      { key: 'ArrowDown', waitMs: 70, label: 'locate water load' },
+      { key: 'ArrowDown', waitMs: 70, label: 'locate water load' },
+      { key: '3', waitMs: 8000, label: 'restore water load' },
+      { key: 'ArrowDown', waitMs: 2000, label: 'hold restored service' },
+    ], 'blackout-grid-completion'),
+    maxActions: 24,
+    maxElapsedMs: 25000,
     milestones: [
       { id: 'dispatch-briefing', description: 'The storm briefing identifies the restoration objective.', required: true, detect: textIncludes('DISPATCH BRIEFING', 'RESTORE') },
       { id: 'operations-grid', description: 'The one-line operations grid opens with a selected asset.', required: true, detect: textIncludes('OPERATIONS', 'SELECTED') },
       { id: 'focus-help', description: 'The operator help layer explains the radial grid and focus control.', required: true, detect: textIncludes('OPERATE A RADIAL CITY GRID', 'POWER FLOWS') },
+      { id: 'training-complete', description: 'The tutorial restoration reaches its durable completion report.', required: true, detect: textIncludes('TRAINING RESTORATION COMPLETE', 'CITY STABLE') },
     ],
   },
   'containment-protocol': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start containment training' }],
-    policy: scriptedPolicy(['Enter', '1', 's', 'Enter'], 'containment-index', 'configure and commit a cycle'),
-    maxActions: 12,
-    maxElapsedMs: 7000,
+    policy: scriptedPolicy(['Enter', '3', 'Enter', 'Enter', '3', 'Enter', 'Enter', '3', 'Enter', 'Enter', '3', 'Enter'], 'containment-completion-index', 'resolve the training anomaly'),
+    maxActions: 18,
+    maxElapsedMs: 9000,
     milestones: [
       { id: 'annex-briefing', description: 'The annex briefing explains the containment loop.', required: true, detect: textIncludes('BRIEFING', 'CONTAINMENT') },
       { id: 'working-annex', description: 'The four-room containment cross-section opens.', required: true, detect: textIncludes('ROOM A', 'ROOM B', 'PENDING') },
       { id: 'cycle-report', description: 'A committed configuration produces a durable cycle report.', required: true, detect: textIncludes('RESOLVED', 'ENTER TO CONTINUE', 'LAST GLASS') },
+      { id: 'training-complete', description: 'The four-cycle tutorial reaches the accepted handoff ending.', required: true, detect: textIncludes('HANDOFF ACCEPTED', 'CAMPAIGN COMPLETE') },
     ],
   },
   'orbital-post': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 'c', waitMs: 70, label: 'start orbital dispatch' }],
-    policy: scriptedPolicy(['Enter', 's', 'Space', 'Enter', 'Enter'], 'orbital-post-index', 'schedule and resolve a relay window'),
-    maxActions: 14,
-    maxElapsedMs: 7000,
+    policy: scriptedPolicy(['Enter', 's', 'ArrowDown', 's', ' ', 'Enter', 'Enter', 'ArrowDown', 's', ' ', 'Enter', 'Enter', ' ', 'Enter', 'Enter', ' ', 'Enter', 'Enter', ' ', 'Enter', 'Enter', ' ', 'Enter', 'Enter'], 'orbital-post-completion-index', 'clear the checkout shift'),
+    maxActions: 30,
+    maxElapsedMs: 11000,
     milestones: [
       { id: 'flight-briefing', description: 'The flight briefing explains weather, battery, and relay work.', required: true, detect: textIncludes('BRIEFING', 'WEATHER') },
       { id: 'horizon-planning', description: 'The orbit horizon opens with relay lanes and a selected job.', required: true, detect: textIncludes('HORIZON', 'RELAY', 'SCHEDULE') },
       { id: 'window-report', description: 'A resolved window produces a durable scheduler report.', required: true, detect: textIncludes('WINDOW', 'RESOLVED', 'REPORT') },
+      { id: 'shift-clear', description: 'All required relay jobs complete and the shift audit clears.', required: true, detect: textIncludes('SHIFT CLEARED', 'SELECT ONE FLIGHT-DECK UPGRADE', 'CAMPAIGN COMPLETE') },
     ],
   },
   'botany-lab': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start botany training' }],
-    policy: scriptedPolicy(['Enter', 'Enter', ' ', 'ArrowDown', 'Enter', 'Enter'], 'botany-lab-index', 'seed and forecast a chamber'),
-    maxActions: 16,
-    maxElapsedMs: 7000,
+    policy: scriptedPolicy([
+      'Enter', 'ArrowRight', 'l', 'w', 'w', ' ', 's', 'Enter',
+      'ArrowDown', 'l', 'l', 'l', 'w', 'w', 'ArrowLeft', 'l', 'l', 'l', 'w', 'w', 'ArrowUp',
+      'Enter', 'Enter', 'Enter', ' ', 's', 's', 's', 'Enter', 'Enter', 'Enter',
+      'ArrowRight', ' ', 's', 's', 's', 'Enter', 'Enter', 'Enter', 'Enter',
+    ], 'botany-completion-index', 'grow and deliver the training contracts'),
+    maxActions: 48,
+    maxElapsedMs: 11000,
     milestones: [
       { id: 'greenhouse-briefing', description: 'The training briefing explains shared light, water, and forecast rules.', required: true, detect: textIncludes('TRAINING PROTOCOL', 'SHARED') },
       { id: 'greenhouse-bench', description: 'The greenhouse bench opens with chambers and contracts.', required: true, detect: textIncludes('BOTANY', 'CONTRACTS', 'CYCLE') },
       { id: 'growth-forecast', description: 'A selected seed operation exposes a cycle forecast.', required: true, detect: textIncludes('FORECAST', 'PENDING') },
+      { id: 'shift-complete', description: 'Two valid specimen deliveries reach the training funding target.', required: true, detect: textIncludes('SHIFT COMPLETE', 'FUNDING SECURED') },
     ],
   },
   'five-minute-kingdom': {
@@ -268,59 +314,95 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
     ],
   },
   'the-quiet-heist': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start heist tutorial' }],
-    policy: scriptedPolicy(['Enter', 'ArrowRight', 'Enter', 'Enter', 'Enter'], 'quiet-heist-index', 'review a planned turn'),
-    maxActions: 14,
-    maxElapsedMs: 7000,
+    policy: scriptedPolicy([
+      'Enter',
+      ...heistTurns([
+        ['ArrowUp', 'ArrowRight'],
+        ['ArrowRight', 'i'],
+        ['ArrowDown', 'ArrowRight'],
+        ['ArrowRight'],
+        ['ArrowUp', 'ArrowRight'],
+        ['j'],
+        ['ArrowRight', 'ArrowDown'],
+        ['ArrowRight', 'x'],
+        ['ArrowRight', 'ArrowUp'],
+        ['ArrowUp', 'ArrowUp'],
+        ['ArrowUp', 'ArrowRight'],
+        ['i'],
+        ['ArrowUp', 'ArrowUp'],
+        ['ArrowLeft', 'ArrowLeft'],
+        ['ArrowLeft', 'ArrowLeft'],
+        ['ArrowLeft', 'ArrowLeft'],
+        ['ArrowLeft', 'ArrowLeft'],
+        ['ArrowLeft', 'i'],
+      ]),
+    ], 'quiet-heist-completion-index', 'steal and escape the tutorial job'),
+    maxActions: 95,
+    maxElapsedMs: 12000,
     milestones: [
       { id: 'architect-plan', description: 'The architectural plan opens with temporal layers.', required: true, detect: textIncludes('ARCHITECT\'S PLAN', 'SECURITY LEDGER') },
       { id: 'turn-review', description: 'A queued turn can be reviewed before guards move.', required: true, detect: textIncludes('TURN REVIEW', 'ENTER COMMITS') },
       { id: 'turn-result', description: 'The committed turn produces a durable result report.', required: true, detect: textIncludes('TURN RESOLVED', 'REPORT ACKNOWLEDGED') },
+      { id: 'job-complete', description: 'The brass night key and display case are secured before a valid escape.', required: true, detect: textIncludes('ASSET SECURED', 'LEFT NO STORY BEHIND') },
     ],
   },
   'tiny-fleet': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start fleet training' }],
-    policy: scriptedPolicy(['Enter', 'w', '2', '.', '3', '.', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter'], 'tiny-fleet-index', 'seal a public fleet turn'),
-    maxActions: 22,
+    policy: scriptedPolicy([
+      'Enter',
+      '1', 'ArrowRight', 'ArrowUp', 'f',
+      '2', 'ArrowRight', 'ArrowRight', 'ArrowDown', 'ArrowDown', 'f',
+      '3', 'ArrowRight', 'ArrowRight', 'f',
+      'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter',
+      '1', 'ArrowRight', 'ArrowUp', 'f', '2', 'ArrowRight', 'ArrowRight', 'f', '3', '.',
+      'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter',
+      '1', '.', '2', 'ArrowRight', 'ArrowRight', 'f', '3', 'ArrowRight', 'ArrowRight', 'f',
+      'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter', 'Enter',
+    ], 'tiny-fleet-index', 'seal a public fleet turn'),
+    maxActions: 70,
     maxElapsedMs: 8000,
     milestones: [
       { id: 'plotting-table', description: 'The fleet plotting table opens with contacts and order chits.', required: true, detect: textIncludes('PLOTTING TABLE', 'ORDER CHITS') },
       { id: 'sealed-docket', description: 'All living ships are visible in a sealed order docket.', required: true, detect: textIncludes('SEALED ORDER DOCKET', 'ENTER SEAL') },
       { id: 'public-replay', description: 'The resolved turn opens a public replay strip.', required: true, detect: textIncludes('PUBLIC REPLAY', 'ROUND RESOLUTION') },
+      { id: 'training-complete', description: 'The practice battle reaches a durable mission-complete report.', required: true, detect: textIncludes('MISSION COMPLETE', 'MISSION EXCELLENT', 'BATTLE REPORT') },
     ],
   },
   'dungeon-courier': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start parcel tutorial' }],
-    policy: scriptedPolicy(['1', 'Enter', 'ArrowRight', 'Enter', 'Tab', 'h', 'h'], 'dungeon-courier-index', 'preview a parcel route'),
-    maxActions: 18,
-    maxElapsedMs: 8000,
+    policy: scriptedPolicy(['1', 'Enter', ...courierTraversal([...Array(3).fill('ArrowRight'), ...Array(10).fill('ArrowDown'), ...Array(38).fill('ArrowRight')]), 'e', 'Enter'], 'dungeon-courier-completion-index', 'deliver the intact tutorial parcel'),
+    maxActions: 125,
+    maxElapsedMs: 12000,
     milestones: [
       { id: 'contract-desk', description: 'The parcel contract desk offers a teaching label.', required: true, detect: textIncludes('CHOOSE A CONTRACT', 'PORCELAIN') },
       { id: 'parcel-briefing', description: 'The selected parcel explains its handling rule.', required: true, detect: textIncludes('DELIVERY BRIEFING', 'CONDITION', 'SEAL') },
       { id: 'action-preview', description: 'A selected direction exposes its causal action preview.', required: true, detect: textIncludes('PREVIEW', 'STRAIN', 'CLEAR') },
+      { id: 'delivery-complete', description: 'The tutorial parcel reaches the recipient intact and the run report closes.', required: true, detect: textIncludes('RUN COMPLETE', 'EVERY LABEL REACHED THE RIGHT HANDS') },
     ],
   },
   'the-13th-lift': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'turn-based',
     startActions: [{ key: 't', waitMs: 70, label: 'start lift tutorial' }],
-    policy: scriptedPolicy(['Enter', 'Space', 'ArrowRight', 'Space', 'Enter', 'Enter', 'Enter', 'Enter'], 'thirteenth-lift-index', 'review a route tape'),
-    maxActions: 18,
-    maxElapsedMs: 8000,
+    policy: scriptedPolicy(['Enter', ' ', 'ArrowRight', ' ', 'ArrowRight', 'ArrowRight', 'ArrowRight', ' ', 'Enter', 'Enter', 'Enter', 'Enter'], 'thirteenth-lift-completion-index', 'complete the taught ride'),
+    maxActions: 24,
+    maxElapsedMs: 9000,
     milestones: [
       { id: 'rider-manifest', description: 'The lift opens a rider manifest and evidence ledger.', required: true, detect: textIncludes('RIDERS / REQUESTS', 'EVIDENCE') },
       { id: 'route-review', description: 'The queued stops open a route tape before departure.', required: true, detect: textIncludes('ROUTE TAPE / REVIEW', 'CONFIRM DEPARTURE') },
       { id: 'arrival-audit', description: 'The ride reaches a durable arrival audit.', required: true, detect: textIncludes('ARRIVAL AUDIT', 'INCIDENT AUDIT') },
+      { id: 'ride-complete', description: 'The accepted tutorial audit is acknowledged into a durable service report.', required: true, detect: textIncludes('SERVICE ACCEPTED', 'AFTER HOURS REPORT', 'ENDING') },
     ],
   },
 };

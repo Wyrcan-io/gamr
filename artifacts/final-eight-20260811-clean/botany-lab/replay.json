@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "gameId": "botany-lab",
+  "seed": 20260811,
+  "actions": [
+    {
+      "key": "t",
+      "waitMs": 70,
+      "label": "start botany training"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "ArrowDown",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "ArrowLeft",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "l",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "w",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "ArrowUp",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "ArrowRight",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": " ",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "s",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    },
+    {
+      "key": "Enter",
+      "waitMs": 70,
+      "label": "grow and deliver the training contracts"
+    }
+  ]
+}

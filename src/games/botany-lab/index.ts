@@ -34,9 +34,8 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
   let pauseSelection = 0;
   let overlay: OverlayMenu = null;
   let overlaySelection = 0;
-  let glitchFrame = 0;
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
+  let resizeListener: { dispose: () => void } | undefined;
 
   const controller: BotanyLabController = {
     stop: () => { running = false; },
@@ -71,6 +70,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
     if (!result.accepted && result.reason) {
       state.lastEvents = [{ kind: 'warning', text: result.reason }];
     }
+    render();
   };
 
   const pauseInput = (key: string, event: KeyboardEvent): boolean => {
@@ -82,7 +82,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
     const navigation = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event);
     if (navigation.newSelection !== pauseSelection) {
       pauseSelection = navigation.newSelection;
-      return true;
+      render(); return true;
     }
     if (!navigation.confirmed && key !== 'escape') return true;
     if (key === 'escape' || (navigation.confirmed && pauseSelection === 0)) {
@@ -94,6 +94,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
       else if (pauseSelection === 3) gamesMenu();
       else if (pauseSelection === 4) nextGame();
     }
+    render();
     return true;
   };
 
@@ -105,11 +106,11 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
     const navigation = navigateMenu(overlaySelection, count, key, event);
     if (navigation.newSelection !== overlaySelection) {
       overlaySelection = navigation.newSelection;
-      return true;
+      render(); return true;
     }
     if (!navigation.confirmed) {
       if (key === 'escape' || key === 'backspace') { overlay = null; overlaySelection = 0; }
-      return true;
+      render(); return true;
     }
     if (overlay === 'action') {
       const option = selectedActionOptions()[overlaySelection];
@@ -150,6 +151,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
     if (key === 'escape' && state.phase === 'running' && !state.helpOpen && !overlay) {
       paused = true;
       pauseSelection = 0;
+      render();
       return;
     }
     if (overlay && handleOverlay(key, event)) return;
@@ -175,7 +177,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
       return;
     }
     if (key === 'h' || key === '?') { command({ type: 'toggleHelp' }); return; }
-    if (key === ' ') { overlay = 'action'; overlaySelection = 0; return; }
+    if (key === ' ') { overlay = 'action'; overlaySelection = 0; render(); return; }
     if (key === 'backspace') { command({ type: 'cancelOperation' }); return; }
     if (key === 'enter') { command({ type: 'commitCycle' }); return; }
     if (key === 'c') { command({ type: 'closeShiftEarly' }); return; }
@@ -188,8 +190,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
   };
 
   const render = (): void => {
-    glitchFrame += 1;
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), glitchFrame);
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), 0);
     if (terminal.cols >= 80 && terminal.rows >= 28) {
       if (paused) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: 11, showShortcuts: false });
       if (overlay) output += menuOutput(state, overlay, terminal.cols, overlaySelection);
@@ -201,8 +202,8 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     keyListener?.dispose();
+    resizeListener?.dispose();
     terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     baseStop();
   };
@@ -210,8 +211,8 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
+    resizeListener = terminal.onResize(() => render());
     render();
   }, 50);
 

@@ -13,23 +13,23 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
   let paused = false;
   let pauseSelection = 0;
   let state: GameState = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
+  let resizeListener: { dispose: () => void } | undefined;
   const controller: OrbitalPostController = { stop: () => { running = false; }, get isRunning() { return running; } };
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
-  const run = (command: Command): void => { state = applyCommand(state, command).state; };
-  const restartShift = (): void => { run({ type: 'restartShift' }); paused = false; pauseSelection = 0; };
+  const run = (command: Command): void => { state = applyCommand(state, command).state; render(); };
+  const restartShift = (): void => { run({ type: 'restartShift' }); paused = false; pauseSelection = 0; render(); };
   const handlePause = (key: string, event: KeyboardEvent): boolean => {
     if (!paused) return false;
     const result = navigateMenu(pauseSelection, PAUSE_MENU_ITEMS.length, key, event);
     pauseSelection = result.newSelection;
-    if (!result.confirmed) return true;
+    if (!result.confirmed) { if (key === 'escape') paused = false; render(); return true; }
     if (pauseSelection === 0) paused = false;
     else if (pauseSelection === 1) restartShift();
     else if (pauseSelection === 2) quit();
     else if (pauseSelection === 3) { controller.stop(); dispatchGamesMenu(terminal); }
     else if (pauseSelection === 4) { controller.stop(); dispatchGameSwitch(terminal); }
-    return true;
+    render(); return true;
   };
   const selectQueue = (delta: number): void => {
     const jobs = getQueueJobs(state);
@@ -40,7 +40,7 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
   };
   const handleKey = (event: KeyboardEvent): void => {
     const key = event.key.toLowerCase(); event.preventDefault(); event.stopPropagation();
-    if (key === 'escape' && !['start', 'ending', 'gameOver', 'shiftReport', 'windowReport', 'upgrade', 'cancelConfirm'].includes(state.phase)) { paused = !paused; pauseSelection = 0; return; }
+    if (key === 'escape' && !['start', 'ending', 'gameOver', 'shiftReport', 'windowReport', 'upgrade', 'cancelConfirm'].includes(state.phase)) { paused = !paused; pauseSelection = 0; render(); return; }
     if (handlePause(key, event)) return;
     if (state.phase === 'start') { if (key === 'q') quit(); else if (key === 'c' || key === 'enter') run({ type: 'startRun', mode: 'campaign' }); else if (key === 'o') run({ type: 'startRun', mode: 'openOrbit' }); return; }
     if (state.phase === 'briefing') { if (key === 'enter' || key === ' ') run({ type: 'dismissBriefing' }); else if (key === 'h') run({ type: 'toggleHelp' }); return; }
@@ -67,7 +67,7 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
     terminal.write(output);
   };
   const originalStop = controller.stop;
-  controller.stop = () => { if (!running) return; running = false; if (renderInterval) clearInterval(renderInterval); keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l'); originalStop(); };
-  setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); renderInterval = setInterval(() => { if (running) render(); }, 50); keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); }); render(); }, 50);
+  controller.stop = () => { if (!running) return; running = false; keyListener?.dispose(); resizeListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); originalStop(); };
+  setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); }); resizeListener = terminal.onResize(() => render()); render(); }, 50);
   return controller;
 }

@@ -24,12 +24,11 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   let paused = false;
   let helpOpen = false;
   let pauseSelection = 0;
-  let glitchFrame = 0;
   let message = '';
   let state: GameState = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let simulationInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
+  let resizeListener: { dispose: () => void } | undefined;
 
   const controller: BlackoutGridController = {
     stop: () => { running = false; },
@@ -41,6 +40,7 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
     const result = applyCommand(state, command);
     state = result.state;
     message = result.accepted ? '' : (result.reason ?? 'ACTION UNAVAILABLE');
+    render();
   };
 
   function handlePause(key: string, domEvent: KeyboardEvent): boolean {
@@ -59,7 +59,7 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   function handleKey(domEvent: KeyboardEvent): void {
     const key = domEvent.key.toLowerCase();
     domEvent.preventDefault(); domEvent.stopPropagation();
-    if (key === 'escape' && !['start', 'won', 'gameOver'].includes(state.phase)) { paused = !paused; pauseSelection = 0; return; }
+    if (key === 'escape' && !['start', 'won', 'gameOver'].includes(state.phase)) { paused = !paused; pauseSelection = 0; render(); return; }
     if (handlePause(key, domEvent)) return;
     if (state.phase === 'start') {
       if (key === 'q') quit(); else if (key === 't') runCommand({ type: 'startTutorial' }); else if (key === 'p' || key === 'enter') runCommand({ type: 'startStandard' });
@@ -71,7 +71,7 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
       return;
     }
     if (state.phase === 'won' || state.phase === 'gameOver') { if (key === 'r') runCommand({ type: 'restartSameSeed' }); else if (key === 'q') quit(); else if (key === 'n') { controller.stop(); dispatchGameSwitch(terminal); } return; }
-    if (key === 'h') { helpOpen = !helpOpen; return; }
+    if (key === 'h' || key === '?') { helpOpen = !helpOpen; render(); return; }
     if (key === 'tab') { runCommand({ type: 'cycleSelection', direction: domEvent.shiftKey ? -1 : 1 }); return; }
     if (key === 'arrowleft' || key === 'a') runCommand({ type: 'moveSelection', dx: -1, dy: 0 });
     else if (key === 'arrowright' || key === 'd') runCommand({ type: 'moveSelection', dx: 1, dy: 0 });
@@ -88,11 +88,12 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
     if (!running || paused || helpOpen || state.phase !== 'running') return;
     const result = advance(state);
     if (result.events.length) message = result.events[result.events.length - 1].text;
+    render();
   }
 
   function render(): void {
     if (!running) return;
-    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), glitchFrame++, upgradeChoices(state).map(choice => choice.name), message);
+    let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), 0, upgradeChoices(state).map(choice => choice.name), message);
     if (helpOpen && terminal.cols >= 80 && terminal.rows >= 28) {
       const x = Math.max(3, Math.floor(terminal.cols / 2) - 30);
       output += `\x1b[8;${x}H\x1b[7m  HELP — OPERATE A RADIAL CITY GRID  \x1b[0m`;
@@ -107,9 +108,9 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
     if (simulationInterval) clearInterval(simulationInterval);
     keyListener?.dispose();
+    resizeListener?.dispose();
     terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     originalStop();
   };
@@ -117,9 +118,9 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(render, 50);
     simulationInterval = setInterval(simulationBeat, 500);
     keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
+    resizeListener = terminal.onResize(() => render());
     render();
   }, 50);
   return controller;

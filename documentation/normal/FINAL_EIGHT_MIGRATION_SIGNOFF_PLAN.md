@@ -321,3 +321,16 @@ The ledger may change one row to `migrated` only when its packet is complete and
 ## 17. What happens after 20/20
 
 Freeze visual-system migration work. The next milestone becomes a production-candidate hardening pass across the 20-game catalog: cross-platform terminals, install/update behavior, accessibility, crash recovery, package/API review, documentation, readiness labels, release notes, and support policy. New games or replacement classics wait until that release-candidate gate is complete.
+
+## 18. Implementation update — 2026-08-11
+
+The first implementation pass for the eight-game sign-off cohort is now active:
+
+- Batch B controllers no longer poll turn-based renderers every 50 ms. Blackout Grid retains only its mechanical simulation beat; Containment Protocol, Orbital Post, and Botany Lab render on commands, resize, and lifecycle events.
+- Blackout Grid now renders after operator commands and help/pause transitions, disposes resize/listener resources, and keeps same-seed restart behavior explicit.
+- Containment Protocol now renders after every command, preserves same-seed restart, and disposes its listener/resize resources without a background render loop.
+- Orbital Post now renders after scheduler commands and reports, supports resize-driven redraw, and disposes the controller cleanly.
+- Botany Lab now renders after operations, overlay navigation, pause/help changes, resize, and lifecycle cleanup without decorative glitch animation.
+- All four Batch B games now have explicit `black-box-progress` profiles covering their briefing, working surface, and first meaningful report/forecast interaction.
+
+This is an implementation checkpoint, not the final 20/20 claim. Batch B profiles still need seeded-completion paths and human sessions; the four Batch C profiles remain black-box progress until their successful taught units and human evidence packets are complete.

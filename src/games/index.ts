@@ -12,6 +12,8 @@
 // Re-export utilities
 export {
   setTheme,
+  setReducedMotion,
+  prefersReducedMotion,
   getTheme,
   getCurrentThemeColor,
   getCurrentThemePalette,

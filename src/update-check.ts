@@ -1,29 +1,26 @@
 /**
- * Auto-update checker for @wyrcan/gamr
+ * Privacy-friendly update checking for @wyrcan/gamr.
  *
- * Checks the npm registry for newer versions, caches results for 24h,
- * and provides both passive (print notice) and interactive (offer update) modes.
+ * Normal game startup reads only the local cache and refreshes it in the
+ * background. Interactive developer flows may await the refresh before
+ * offering an update. Offline failures are cached briefly so repeated starts
+ * do not repeatedly pay the network timeout.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { execSync } from 'child_process';
-import { homedir } from 'os';
-import { fileURLToPath } from 'url';
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const PACKAGE_NAME = '@wyrcan/gamr';
-const CACHE_DIR = resolve(homedir(), '.gamr');
+const CACHE_DIR = process.env.GAMR_CACHE_DIR
+  ? resolve(process.env.GAMR_CACHE_DIR)
+  : resolve(homedir(), '.gamr');
 const CACHE_FILE = resolve(CACHE_DIR, 'update-check.json');
-const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
-const FETCH_TIMEOUT_MS = 3000; // Don't block startup for slow networks
-
-// ---------------------------------------------------------------------------
-// Version helpers
-// ---------------------------------------------------------------------------
+const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const FAILURE_RETRY_MS = 60 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 3000;
 
 interface ParsedVersion {
   major: number;
@@ -32,8 +29,8 @@ interface ParsedVersion {
   prerelease: string[];
 }
 
-function parseVersion(v: string): ParsedVersion {
-  const match = v.trim().replace(/^v/, '').match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?/);
+function parseVersion(value: string): ParsedVersion {
+  const match = value.trim().replace(/^v/, '').match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?/);
   if (!match) return { major: 0, minor: 0, patch: 0, prerelease: [] };
   return {
     major: Number(match[1]),
@@ -44,17 +41,17 @@ function parseVersion(v: string): ParsedVersion {
 }
 
 export function isNewerVersion(latest: string, current: string): boolean {
-  const l = parseVersion(latest);
-  const c = parseVersion(current);
+  const leftVersion = parseVersion(latest);
+  const rightVersion = parseVersion(current);
   for (const key of ['major', 'minor', 'patch'] as const) {
-    if (l[key] !== c[key]) return l[key] > c[key];
+    if (leftVersion[key] !== rightVersion[key]) return leftVersion[key] > rightVersion[key];
   }
-  if (l.prerelease.length === 0 || c.prerelease.length === 0) {
-    return l.prerelease.length === 0 && c.prerelease.length > 0;
+  if (leftVersion.prerelease.length === 0 || rightVersion.prerelease.length === 0) {
+    return leftVersion.prerelease.length === 0 && rightVersion.prerelease.length > 0;
   }
-  for (let i = 0; i < Math.max(l.prerelease.length, c.prerelease.length); i += 1) {
-    const left = l.prerelease[i];
-    const right = c.prerelease[i];
+  for (let index = 0; index < Math.max(leftVersion.prerelease.length, rightVersion.prerelease.length); index += 1) {
+    const left = leftVersion.prerelease[index];
+    const right = rightVersion.prerelease[index];
     if (left === undefined) return false;
     if (right === undefined) return true;
     if (left === right) continue;
@@ -69,161 +66,168 @@ export function isNewerVersion(latest: string, current: string): boolean {
 }
 
 function updateChecksDisabled(): boolean {
-  return process.env.GAMR_DISABLE_UPDATE_CHECK === '1';
+  return process.env.GAMR_DISABLE_UPDATE_CHECK === '1' || process.env.CI === 'true';
 }
 
-// ---------------------------------------------------------------------------
-// Current version — read from package.json at build time via tsup define,
-// falling back to reading package.json at runtime
-// ---------------------------------------------------------------------------
-
-function getCurrentVersion(): string {
+export function getCurrentVersion(): string {
   try {
-    // Walk up from this file to find package.json
-    let dir = dirname(fileURLToPath(import.meta.url));
-    for (let i = 0; i < 5; i++) {
-      const pkgPath = resolve(dir, 'package.json');
-      if (existsSync(pkgPath)) {
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-        if (pkg.name === PACKAGE_NAME) return pkg.version;
+    let directory = dirname(fileURLToPath(import.meta.url));
+    for (let index = 0; index < 5; index += 1) {
+      const packagePath = resolve(directory, 'package.json');
+      if (existsSync(packagePath)) {
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as { name?: string; version?: string };
+        if (packageJson.name === PACKAGE_NAME && packageJson.version) return packageJson.version;
       }
-      dir = resolve(dir, '..');
+      directory = resolve(directory, '..');
     }
-  } catch { /* ignore */ }
+  } catch { /* Invalid or inaccessible package metadata is non-fatal. */ }
   return '0.0.0';
 }
 
-// ---------------------------------------------------------------------------
-// Cache
-// ---------------------------------------------------------------------------
-
-interface CacheData {
+export interface UpdateCacheData {
   checkedAt: number;
-  latest: string;
+  latest: string | null;
+  failed?: boolean;
 }
 
-function readCache(): CacheData | null {
+function readCache(): UpdateCacheData | null {
   try {
     if (!existsSync(CACHE_FILE)) return null;
-    const data = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
-    if (typeof data.checkedAt === 'number' && typeof data.latest === 'string') {
-      return data as CacheData;
+    const data = JSON.parse(readFileSync(CACHE_FILE, 'utf8')) as Record<string, unknown>;
+    if (
+      typeof data.checkedAt === 'number'
+      && (typeof data.latest === 'string' || data.latest === null)
+      && (data.failed === undefined || typeof data.failed === 'boolean')
+    ) {
+      return data as unknown as UpdateCacheData;
     }
-  } catch { /* corrupt cache, ignore */ }
+  } catch { /* Corrupt or inaccessible caches are ignored. */ }
   return null;
 }
 
-function writeCache(latest: string) {
+function writeCache(cache: UpdateCacheData): void {
   try {
-    if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(CACHE_FILE, JSON.stringify({ checkedAt: Date.now(), latest }), { mode: 0o600 });
-  } catch { /* ignore write errors */ }
+    if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 });
+    writeFileSync(CACHE_FILE, JSON.stringify(cache), { mode: 0o600 });
+  } catch { /* Cache writes must never stop the CLI. */ }
 }
 
-// ---------------------------------------------------------------------------
-// Registry fetch
-// ---------------------------------------------------------------------------
+export function shouldRefreshUpdateCache(cache: UpdateCacheData | null, now = Date.now()): boolean {
+  if (!cache) return true;
+  const interval = cache.failed ? FAILURE_RETRY_MS : CHECK_INTERVAL_MS;
+  return now - cache.checkedAt >= interval;
+}
 
 async function fetchLatestVersion(): Promise<string | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-    const res = await fetch(
+    const response = await fetch(
       `https://registry.npmjs.org/${encodeURIComponent(PACKAGE_NAME)}/latest`,
       { signal: controller.signal },
     );
-    clearTimeout(timeout);
-
-    if (!res.ok) return null;
-    const data = await res.json() as { version?: string };
-    return data.version ?? null;
+    if (!response.ok) return null;
+    const data = await response.json() as { version?: unknown };
+    return typeof data.version === 'string' ? data.version : null;
   } catch {
-    return null; // Offline, timeout, etc.
+    return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
-
-// ---------------------------------------------------------------------------
-// Core: get update info
-// ---------------------------------------------------------------------------
 
 interface UpdateInfo {
   current: string;
   latest: string;
 }
 
+function infoFromCache(cache: UpdateCacheData | null, current: string): UpdateInfo | null {
+  if (!cache?.latest || !isNewerVersion(cache.latest, current)) return null;
+  return { current, latest: cache.latest };
+}
+
 async function getUpdateInfo(): Promise<UpdateInfo | null> {
   if (updateChecksDisabled()) return null;
   const current = getCurrentVersion();
-
-  // Check cache first
   const cache = readCache();
-  if (cache && Date.now() - cache.checkedAt < CHECK_INTERVAL_MS) {
-    if (isNewerVersion(cache.latest, current)) {
-      return { current, latest: cache.latest };
-    }
-    return null;
-  }
+  if (!shouldRefreshUpdateCache(cache)) return infoFromCache(cache, current);
 
-  // Fetch from registry
   const latest = await fetchLatestVersion();
-  if (!latest) return null;
-
-  writeCache(latest);
-
-  if (isNewerVersion(latest, current)) {
-    return { current, latest };
+  if (!latest) {
+    writeCache({ checkedAt: Date.now(), latest: cache?.latest ?? null, failed: true });
+    return infoFromCache(cache, current);
   }
-  return null;
+
+  writeCache({ checkedAt: Date.now(), latest, failed: false });
+  return isNewerVersion(latest, current) ? { current, latest } : null;
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
+export function formatUpdateNotice(current: string, latest: string): string {
+  if (process.env.NO_COLOR) {
+    return `  Update available: ${current} → ${latest}\n  Run \`npm update -g ${PACKAGE_NAME}\` to update\n`;
+  }
+  return `\x1b[33m  Update available: ${current} → ${latest}\x1b[0m\n\x1b[2m  Run \`npm update -g ${PACKAGE_NAME}\` to update\x1b[0m\n`;
+}
 
-/**
- * Passive check — returns a formatted notice string, or null if up to date.
- * Used before game launches: just print and move on.
- */
+function formatNotice(info: UpdateInfo | null): string | null {
+  if (!info) return null;
+  return formatUpdateNotice(info.current, info.latest);
+}
+
+/** Read the local cache only. This function never performs network I/O. */
+export function getCachedUpdateNotice(): string | null {
+  if (updateChecksDisabled()) return null;
+  return formatNotice(infoFromCache(readCache(), getCurrentVersion()));
+}
+
+/** Refresh the cache in the background with an offline retry backoff. */
+export async function refreshUpdateCache(): Promise<void> {
+  if (updateChecksDisabled()) return;
+  const cache = readCache();
+  if (!shouldRefreshUpdateCache(cache)) return;
+  const latest = await fetchLatestVersion();
+  writeCache({
+    checkedAt: Date.now(),
+    latest: latest ?? cache?.latest ?? null,
+    failed: !latest,
+  });
+}
+
+/** Awaited update check retained for API callers and the developer flow. */
 export async function checkForUpdatePassive(): Promise<string | null> {
   try {
-    const info = await getUpdateInfo();
-    if (!info) return null;
-    return `\x1b[33m  Update available: ${info.current} → ${info.latest}\x1b[0m\n\x1b[2m  Run \`npm update -g ${PACKAGE_NAME}\` to update\x1b[0m\n`;
+    return formatNotice(await getUpdateInfo());
   } catch {
     return null;
   }
 }
 
-/**
- * Interactive check — uses @clack/prompts to offer an inline update.
- * Used in the vibe command flow.
- */
 export async function checkForUpdateInteractive(): Promise<void> {
   try {
     const info = await getUpdateInfo();
     if (!info) return;
 
-    // Dynamic import so @clack/prompts isn't loaded for game paths
-    const p = await import('@clack/prompts');
-
-    const shouldUpdate = await p.confirm({
+    const prompts = await import('@clack/prompts');
+    const shouldUpdate = await prompts.confirm({
       message: `Update available: ${info.current} → ${info.latest}. Update now?`,
     });
-
-    if (p.isCancel(shouldUpdate) || !shouldUpdate) {
-      p.log.info(`Run \`npm update -g ${PACKAGE_NAME}\` to update later.`);
+    if (prompts.isCancel(shouldUpdate) || !shouldUpdate) {
+      prompts.log.info(`Run \`npm update -g ${PACKAGE_NAME}\` to update later.`);
       return;
     }
 
-    const s = p.spinner();
-    s.start('Updating...');
+    const spinner = prompts.spinner();
+    spinner.start('Updating...');
     try {
-      execSync(`npm update -g ${PACKAGE_NAME}`, { stdio: 'ignore' });
-      s.stop(`Updated to ${info.latest}!`);
+      const command = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+      execFileSync(command, ['update', '-g', PACKAGE_NAME], {
+        stdio: 'ignore',
+        shell: process.platform === 'win32',
+      });
+      spinner.stop(`Updated to ${info.latest}!`);
     } catch {
-      s.stop('Update failed.');
-      p.log.warn(`Try manually: npm update -g ${PACKAGE_NAME}`);
+      spinner.stop('Update failed.');
+      prompts.log.warn(`Try manually: npm update -g ${PACKAGE_NAME}`);
     }
-  } catch { /* fail silently */ }
+  } catch { /* Update checks are never fatal. */ }
 }

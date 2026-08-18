@@ -16,27 +16,12 @@ function genericPolicy(_observation: PlaytestObservation, memory: PlaytestMemory
   return { key: keys[index % keys.length]!, waitMs: 35, label: 'generic exploration' };
 }
 
-function deadLetterPolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction {
-  const keys = ['Enter', 'Enter', '1', 'Enter', '2', 'Enter', '3', 'Enter', '4', 'Enter'];
-  const index = Number(memory.values.get('dead-letter-index') ?? 0);
-  memory.values.set('dead-letter-index', index + 1);
-  return { key: keys[index % keys.length]!, waitMs: 70, label: 'desk progression' };
-}
-
 function stackTracePolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
   const sequence = ['2', 'Enter', 'r'];
   const index = Number(memory.values.get('stack-trace-index') ?? 0);
   if (index >= sequence.length) return undefined;
   memory.values.set('stack-trace-index', index + 1);
   return { key: sequence[index]!, waitMs: 70, label: 'repair first tape' };
-}
-
-function packetPanicPolicy(_observation: PlaytestObservation, memory: PlaytestMemory): PlaytestAction | undefined {
-  const sequence = ['1', 'Enter', 'ArrowRight', '1', 'Enter', 'ArrowRight', '2', 'Enter', 'ArrowDown', '1', 'Enter'];
-  const index = Number(memory.values.get('packet-panic-index') ?? 0);
-  if (index >= sequence.length) return undefined;
-  memory.values.set('packet-panic-index', index + 1);
-  return { key: sequence[index]!, waitMs: 70, label: 'build route' };
 }
 
 function fiveMinutePolicy(observation: PlaytestObservation, _memory: PlaytestMemory): PlaytestAction | undefined {
@@ -79,6 +64,22 @@ function heistTurns(turns: string[][]): string[] {
   return turns.flatMap(turn => [...turn, 'Enter', 'Enter', 'Enter']);
 }
 
+function packetTutorialActions(): PlaytestAction[] {
+  const keys = [
+    ...Array.from({ length: 5 }, () => 'ArrowLeft'),
+    ...Array.from({ length: 3 }, () => 'ArrowUp'),
+    'Enter',
+    ...Array.from({ length: 10 }, () => ['ArrowRight', 'Enter']).flat(),
+    'ArrowRight', '2', 'r', 'r', 'Enter',
+    'ArrowDown', '1', 'r', 'Enter',
+    ...Array.from({ length: 4 }, () => ['ArrowDown', 'Enter']).flat(),
+  ];
+  return [
+    ...keys.map(key => ({ key, waitMs: 70, label: 'build the tutorial route' })),
+    { key: 'ArrowUp', waitMs: 10_000, label: 'observe three routed packets' },
+  ];
+}
+
 function baseSpec(game: GameInfo): PlaytestSpec {
   const category = game.pace === 'real-time' ? 'real-time' : 'turn-based';
   return {
@@ -112,10 +113,12 @@ function baseSpec(game: GameInfo): PlaytestSpec {
 
 const overrides: Record<string, Partial<PlaytestSpec>> = {
   'dead-letter-department': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
-    startActions: [{ key: 'Enter', waitMs: 70 }, { key: 'Enter', waitMs: 30 }],
-    policy: deadLetterPolicy,
+    profileVersion: 2,
+    coverage: 'seeded-completion',
+    startActions: [{ key: 't', waitMs: 70, label: 'start desk induction' }],
+    policy: scriptedPolicy(['Enter', '1', 'Enter', '2', 'Enter', '3', 'Enter', '1', 'Enter', '2', 'Enter', '3', 'Enter', 'Enter'], 'dead-letter-completion', 'complete desk induction'),
+    maxActions: 20,
+    maxElapsedMs: 7000,
     milestones: [
       {
         id: 'desk-open',
@@ -125,10 +128,11 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
       },
       {
         id: 'audit-reached',
-        description: 'A letter is evaluated and an audit result is shown.',
+        description: 'A letter is evaluated and an accepted audit result is shown.',
         required: true,
-        detect: textIncludes('audit', 'accepted', 'audit flag'),
+        detect: textIncludes('audit accepted'),
       },
+      { id: 'induction-complete', description: 'All six induction letters are processed.', required: true, detect: textIncludes('first week complete', 'induction complete') },
     ],
   },
   'stack-trace': {
@@ -144,21 +148,66 @@ const overrides: Record<string, Partial<PlaytestSpec>> = {
     ],
   },
   'packet-panic': {
-    profileVersion: 1,
-    coverage: 'black-box-progress',
+    profileVersion: 2,
+    coverage: 'seeded-completion',
     category: 'real-time',
-    startActions: [{ key: 'Enter', waitMs: 100, label: 'start network shift' }],
-    policy: packetPanicPolicy,
-    maxActions: 18,
-    maxElapsedMs: 6000,
+    startActions: [{ key: 't', waitMs: 100, label: 'start network tutorial' }],
+    policy: actionScript(packetTutorialActions(), 'packet-panic-completion'),
+    maxActions: 55,
+    maxElapsedMs: 16_000,
     milestones: [
       { id: 'operator-panel', description: 'The network operator panel is active.', required: true, detect: textIncludes('operator panel', 'topology') },
       {
         id: 'router-action',
-        description: 'A router action is accepted or the tutorial advances.',
+        description: 'The tutorial route accepts router placement.',
         required: true,
-        detect: observation => observation.actionCount > 1 && (textIncludes('link placed', 'bend placed', 'split placed', 'firewall placed', 'router rotated', 'packet delivered')(observation) || /---|L[-|]/u.test(observation.text)),
+        detect: observation => observation.actionCount > 1 && textIncludes('link placed', 'bend placed', 'router rotated')(observation),
       },
+      { id: 'tutorial-complete', description: 'Three packets traverse the authored route and complete training.', required: true, detect: textIncludes('tutorial complete') },
+    ],
+  },
+  'ghost-shift': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    startActions: [{ key: 't', waitMs: 70, label: 'start security orientation' }],
+    policy: scriptedPolicy(['Enter', '?', '?', 'c'], 'ghost-shift-progression', 'inspect the security desk'),
+    maxActions: 8,
+    milestones: [
+      { id: 'desk-open', description: 'The CCTV and personnel desk opens.', required: true, detect: textIncludes('cctv contact sheet', 'personnel files') },
+      { id: 'desk-help', description: 'The versioned profile reaches the desk notes.', required: true, detect: textIncludes('desk notes', 'wakes the camera') },
+    ],
+  },
+  'dice-tribunal': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    startActions: [{ key: 't', waitMs: 70, label: 'start court tutorial' }],
+    policy: scriptedPolicy(['Enter'], 'dice-tribunal-progression', 'choose an advocate'),
+    maxActions: 5,
+    milestones: [
+      { id: 'docket-open', description: 'The tutorial opens a disclosed docket.', required: true, detect: textIncludes('docket', 'disclosed burden') },
+      { id: 'case-file', description: 'Filing the tutorial docket opens its bench interpretation.', required: true, detect: textIncludes('case file', 'bench interpretation') },
+    ],
+  },
+  'time-capsule': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    startActions: [{ key: 't', waitMs: 70, label: 'start archive tutorial' }],
+    policy: scriptedPolicy(['Enter'], 'time-capsule-progression', 'enter the archive'),
+    maxActions: 5,
+    milestones: [
+      { id: 'last-bell', description: 'The archive briefing is visible.', required: true, detect: textIncludes('the last bell', '11:55') },
+      { id: 'archive-map', description: 'The archive map and capsule anchors open.', required: true, detect: textIncludes('archive map', 'capsule anchors') },
+    ],
+  },
+  'night-frequency': {
+    profileVersion: 1,
+    coverage: 'black-box-progress',
+    startActions: [{ key: 't', waitMs: 70, label: 'start first-night induction' }],
+    policy: scriptedPolicy(['Enter'], 'night-frequency-progression', 'open the broadcast desk'),
+    maxActions: 5,
+    milestones: [
+      { id: 'first-night', description: 'The first-night induction brief appears.', required: true, detect: textIncludes('induction', 'first night') },
+      { id: 'broadcast-desk', description: 'The caller desk and dossier open.', required: true, detect: textIncludes('dossier', '1/2', 'select') },
     ],
   },
   'blackout-grid': {

@@ -13,7 +13,7 @@ import {
   salvageRouter,
   upgradeChoices,
 } from './engine';
-import { getCurrentThemePalette } from '../utils';
+import { getCurrentThemePalette, prefersReducedMotion } from '../utils';
 import { dispatchGameQuit, dispatchGameSwitch, dispatchGamesMenu } from '../gameTransitions';
 import { PAUSE_MENU_ITEMS, navigateMenu, renderSimpleMenu } from '../shared/menu';
 import {
@@ -47,7 +47,7 @@ const SIMULATION_MS = 250;
 
 export function runPacketPanicGame(terminal: Terminal, options: PacketPanicOptions = {}): PacketPanicController {
   const now = options.now ?? (() => Date.now());
-  const reducedMotion = options.reducedMotion ?? false;
+  const reducedMotion = options.reducedMotion ?? prefersReducedMotion();
   let running = true;
   let gameStarted = false;
   let paused = false;

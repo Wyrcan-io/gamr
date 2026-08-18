@@ -12,7 +12,7 @@ export interface DiceTribunalController { stop: () => void; isRunning: boolean; 
 
 export function runDiceTribunalGame(terminal: Terminal): DiceTribunalController {
   let running = true; let paused = false; let pauseSelection = 0; let selection = 0; let help = false;
-  let state: GameState = createState(Date.now()); let renderInterval: ReturnType<typeof setInterval> | undefined; let gameInterval: ReturnType<typeof setInterval> | undefined; let keyListener: { dispose: () => void } | undefined;
+  let state: GameState = createState(Date.now()); let gameInterval: ReturnType<typeof setInterval> | undefined; let keyListener: { dispose: () => void } | undefined; let resizeListener: { dispose: () => void } | undefined; let startupTimer: ReturnType<typeof setTimeout> | undefined;
   let particles: Particle[] = []; let popups: ScorePopup[] = []; const shake = createShakeState();
   const controller: DiceTribunalController = { stop: () => { running = false; }, get isRunning() { return running; } };
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
@@ -49,8 +49,8 @@ export function runDiceTribunalGame(terminal: Terminal): DiceTribunalController 
   }
   function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { selection, helpOpen: help, paused }); if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); terminal.write(output); }
   const originalStop = controller.stop;
-  controller.stop = () => { if (!running) return; running = false; if (renderInterval) clearInterval(renderInterval); if (gameInterval) clearInterval(gameInterval); keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l'); originalStop(); };
-  setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); renderInterval = setInterval(() => { if (running) render(); }, 50); gameInterval = setInterval(() => { if (!running) return; updateParticles(particles); updatePopups(popups); }, 50); keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); }); render(); }, 50);
+  controller.stop = () => { if (!running) return; running = false; if (startupTimer) clearTimeout(startupTimer); if (gameInterval) clearInterval(gameInterval); keyListener?.dispose(); resizeListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l'); originalStop(); };
+  startupTimer = setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); gameInterval = setInterval(() => { if (!running || (!particles.length && !popups.length && shake.frames <= 0)) return; updateParticles(particles); updatePopups(popups); render(); }, 50); keyListener = terminal.onKey(({ domEvent }) => { if (!running) return; handleKey(domEvent); if (running) render(); }); resizeListener = terminal.onResize(() => { if (running) render(); }); render(); }, 50);
   return controller;
 }
 

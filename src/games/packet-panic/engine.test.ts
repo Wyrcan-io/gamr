@@ -48,6 +48,7 @@ describe('Packet Panic deterministic simulation', () => {
     expect(position).toBeDefined();
     expect(placeRouter(standard, { x: position!.x, y: position!.y }, 'link')).toBe(true);
     expect(standard.tutorialStep).toBe(0);
+    expect(standard.quota).toBe(16);
   });
 
   it('routes a packet through a simple L-shaped network', () => {
@@ -66,6 +67,8 @@ describe('Packet Panic deterministic simulation', () => {
     for (let i = 0; i < 40; i++) delivered += advance(state).delivered.length;
     expect(delivered).toBeGreaterThan(0);
     expect(state.trace).toBeLessThan(100);
+    expect(state.phase).toBe('won');
+    expect(state.lastEvent).toBe('TUTORIAL COMPLETE');
   });
 
   it('progresses the opening tutorial through observable placement steps', () => {

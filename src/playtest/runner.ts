@@ -70,6 +70,7 @@ export class PlaytestRunner {
       .every(milestone => milestones[milestone.id]);
 
     const record = (): PlaytestObservation => {
+      const previous = observations.at(-1);
       const current = observation(terminal, actions.length, startedAt, lastAction);
       observations.push(current);
       options.onObservation?.(current);
@@ -77,7 +78,8 @@ export class PlaytestRunner {
         if (!milestones[milestone.id] && milestone.detect(current, observations)) milestones[milestone.id] = true;
       }
       const waitedForFrame = (lastAction?.waitMs ?? this.defaultWaitMs) >= 30;
-      stalledFrames = current.changed ? 0 : waitedForFrame ? stalledFrames + 1 : stalledFrames;
+      const visibleProgress = current.changed || previous === undefined || previous.text !== current.text;
+      stalledFrames = visibleProgress ? 0 : waitedForFrame ? stalledFrames + 1 : stalledFrames;
       return current;
     };
 

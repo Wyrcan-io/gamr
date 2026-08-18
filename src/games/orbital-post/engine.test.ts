@@ -30,7 +30,7 @@ describe('Orbital Post engine', () => {
   it('rejects a placement that overlaps a reserved lane', () => {
     let state = working();
     const jobs = getQueueJobs(state);
-    const medical = jobs.find(job => job.templateId === undefined && job.title === 'MEDICAL INTAKE') ?? jobs[0]!;
+    const medical = jobs.find(job => job.title === 'MEDICAL INTAKE') ?? jobs[0]!;
     state = applyCommand(state, { type: 'selectJob', jobId: medical.id }).state;
     state = applyCommand(state, { type: 'scheduleJob' }).state;
     const secondCargo = getQueueJobs(state).find(job => job.id !== medical.id && job.lanes.includes('dock'))!;

@@ -32,7 +32,7 @@ gamr
 npm install @wyrcan/gamr
 ```
 
-Gamr is an ESM package and supports Node.js 22 or newer. The CLI performs a best-effort npm registry update check on startup; set `GAMR_DISABLE_UPDATE_CHECK=1` in offline, automated, or privacy-sensitive environments.
+Gamr is an ESM package and supports Node.js 22 or newer. Informational commands never perform a network update check. Interactive launches show any cached notice immediately and refresh the cache in the background; failed checks back off for one hour. Set `GAMR_DISABLE_UPDATE_CHECK=1` in offline, automated, or privacy-sensitive environments.
 
 ## CLI Usage
 
@@ -40,6 +40,7 @@ Gamr is an ESM package and supports Node.js 22 or newer. The CLI performs a best
 gamr                    # Interactive game menu
 gamr <game>             # Launch a game directly
 gamr --theme <theme>    # Set color theme
+gamr --reduced-motion   # Disable animated transitions and optional effects
 gamr --list             # List all games
 gamr --help             # Show help
 ```
@@ -48,13 +49,22 @@ gamr --help             # Show help
 
 The current editions are `carbon` (default), `paper`, `indigo`, `lichen`, and `contrast`. Older theme IDs remain accepted as compatibility aliases while the new semantic theme system rolls out.
 
+### Terminal and accessibility contract
+
+- Interactive games require at least `80x24`; the launcher requires `60x20`.
+- Output is UTF-8 and uses box-drawing and symbol glyphs. Use a terminal font with those glyphs; an ASCII-only mode is not currently claimed.
+- Set a non-empty [`NO_COLOR`](https://no-color.org/) value to suppress ANSI color and style sequences in the CLI.
+- Use `--reduced-motion` or `GAMR_REDUCED_MOTION=1` to skip shared animated transitions, particles, flashes, and shake effects.
+- Statuses include textual or shape markers in addition to color. Full screen-reader support is not currently claimed because interactive games use cursor positioning and the alternate screen.
+
 ## Library Usage (xterm.js)
 
 ```typescript
-import { games, setTheme, runGame } from '@wyrcan/gamr';
+import { games, setReducedMotion, setTheme, runGame } from '@wyrcan/gamr';
 
 // Set the color theme
 setTheme('carbon');
+setReducedMotion(true); // Optional application-level accessibility preference
 
 // Run a game in an xterm.js Terminal instance
 const controller = runGame('stack-trace', terminal);

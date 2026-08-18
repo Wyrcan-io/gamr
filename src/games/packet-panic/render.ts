@@ -125,7 +125,7 @@ function endFrame(state: GameState, cols: number, palette: TerminalThemePalette)
   const won = state.phase === 'won';
   const lines = [
     ...header(state, cols, palette),
-    line(won ? '[+] SHIFT COMPLETE' : '[!] NETWORK BREACHED', cols, `${won ? palette.good : palette.danger}${BOLD}`),
+    line(won ? state.mode === 'tutorial' ? '[+] TUTORIAL COMPLETE' : '[+] SHIFT COMPLETE' : '[!] NETWORK BREACHED', cols, `${won ? palette.good : palette.danger}${BOLD}`),
     '',
     line(`FINAL SCORE  ${state.score}`, cols, palette.ink),
     line(`MAX TRACE    ${state.maxTrace}`, cols, palette.ink),

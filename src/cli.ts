@@ -41,7 +41,7 @@ if (typeof globalThis.window === 'undefined') {
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 // Now safe to import game code
-import { games, allGames, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
+import { games, allGames, setReducedMotion, setTheme, showGamesMenu, type GameInfo, GAME_EVENTS } from './games';
 import { getUiThemeModes, isValidThemeMode, type PhosphorMode } from './themes';
 
 // ---------------------------------------------------------------------------
@@ -132,6 +132,7 @@ function createNodeTerminal(): NodeTerminal {
   const keyListeners: ((event: KeyEvent) => void)[] = [];
   const dataListeners: ((data: string) => void)[] = [];
   const resizeListeners: ((size: { cols: number; rows: number }) => void)[] = [];
+  const noColor = Boolean(process.env.NO_COLOR);
 
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
@@ -187,7 +188,7 @@ function createNodeTerminal(): NodeTerminal {
     process.stdin.pause();
     process.stdout.write('\x1b[?1049l');
     process.stdout.write('\x1b[?25h');
-    process.stdout.write('\x1b[0m');
+    if (!noColor) process.stdout.write('\x1b[0m');
   }
 
   // Synchronized output: wrap writes with DEC sync sequences so the
@@ -195,10 +196,11 @@ function createNodeTerminal(): NodeTerminal {
   // Supported by Warp, iTerm2, kitty, foot, WezTerm, etc.
   const SYNC_START = '\x1b[?2026h';
   const SYNC_END = '\x1b[?2026l';
+  const withoutColor = (data: string): string => noColor ? data.replace(/\x1b\[[0-9;]*m/gu, '') : data;
 
   const terminal: NodeTerminal = {
     write: (data: string) => {
-      process.stdout.write(SYNC_START + data + SYNC_END);
+      process.stdout.write(SYNC_START + withoutColor(data) + SYNC_END);
     },
     get cols() { return process.stdout.columns || 80; },
     get rows() { return process.stdout.rows || 24; },
@@ -304,7 +306,7 @@ function launchVibeFromMenu() {
   }
   process.stdin.pause();
   process.stdout.write('\x1b[?25h');
-  process.stdout.write('\x1b[0m');
+  if (!process.env.NO_COLOR) process.stdout.write('\x1b[0m');
 
   const cliPath = fileURLToPath(import.meta.url);
   const child = spawn(process.execPath, [cliPath, 'vibe'], {
@@ -342,6 +344,7 @@ function printHelp() {
     gamr vibe <name>        Vibe code a game (creates it if new)
     gamr remove <name>      Remove a game
     gamr --theme <theme>    Set color theme
+    gamr --reduced-motion   Disable animated transitions and effects
     gamr --list             List all games
     gamr --help             Show this help
 
@@ -363,19 +366,19 @@ function printHelp() {
 `);
 }
 
-function main() {
+function main(): boolean {
   const args = process.argv.slice(2);
 
   if (args.includes('--help') || args.includes('-h')) {
     printHelp();
-    return;
+    return false;
   }
 
   if (args.includes('--list') || args.includes('-l')) {
     for (const game of games) {
       console.log(`  ${game.id.padEnd(16)} ${game.description}`);
     }
-    return;
+    return false;
   }
 
   let theme: PhosphorMode = 'carbon';
@@ -386,12 +389,17 @@ function main() {
       console.error(`Unknown theme: ${requestedTheme}`);
       console.error(`Available themes: ${getUiThemeModes().join(', ')}`);
       process.exitCode = 1;
-      return;
+      return false;
     }
     theme = requestedTheme;
     args.splice(themeIdx, 2);
   }
   setTheme(theme);
+
+  const reducedMotionIndex = args.indexOf('--reduced-motion');
+  const reducedMotion = reducedMotionIndex !== -1 || process.env.GAMR_REDUCED_MOTION === '1';
+  if (reducedMotionIndex !== -1) args.splice(reducedMotionIndex, 1);
+  setReducedMotion(reducedMotion);
 
   // Validate direct game launches before creating a terminal that resumes stdin.
   const gameName = args[0];
@@ -402,7 +410,7 @@ function main() {
     console.error(`Unknown game: ${gameName}`);
     console.error(`Available active games: ${games.map(g => g.id).join(', ')}`);
     process.exitCode = 1;
-    return;
+    return false;
   }
 
   const terminal = createNodeTerminal();
@@ -411,10 +419,11 @@ function main() {
   // Direct game launch: gamr snake
   if (game) {
     launchGame(terminal, game);
-    return;
+    return true;
   }
 
   openMenu(terminal);
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -426,9 +435,11 @@ if (cliArgs[0] === 'vibe' || cliArgs[0] === 'create') {
 } else if (cliArgs[0] === 'remove') {
   import('./create').then(m => m.removeCommand(cliArgs.slice(1)));
 } else {
-  // Passive update check — print notice if outdated, then launch game
-  import('./update-check').then(m => m.checkForUpdatePassive()).then(notice => {
+  // Cached notices are local. Refresh only after an interactive runtime starts.
+  import('./update-check').then(m => {
+    const notice = m.getCachedUpdateNotice();
     if (notice) process.stdout.write(notice);
-    main();
-  }).catch(() => main());
+    const interactive = main();
+    if (interactive) void m.refreshUpdateCache();
+  }, () => main());
 }

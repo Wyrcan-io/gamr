@@ -33,31 +33,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: node scripts/verify-release.mjs
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
-      - run: npm run pack:smoke
+      - name: Run the complete publication gate
+        run: npm run prepublishOnly
       - name: Publish with npm trusted publishing
-        run: npm publish --access public
-
-  notify-site:
-    name: Notify site after npm publish
-    needs: publish
-    if: ${{ needs.publish.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      SITE_REPO_PAT: ${{ secrets.SITE_REPO_PAT }}
-    steps:
-      - name: Skip site notification when no token is configured
-        if: ${{ env.SITE_REPO_PAT == '' }}
-        run: echo "SITE_REPO_PAT is not configured; skipping site notification."
-      - name: Trigger site update
-        if: ${{ env.SITE_REPO_PAT != '' }}
-        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
-        with:
-          token: ${{ env.SITE_REPO_PAT }}
-          repository: abhirup/gamr-site
-          event-type: gamr-updated
-          client-payload: '{"version": "${{ github.ref_name }}"}'
+        run: npm publish --access public --ignore-scripts

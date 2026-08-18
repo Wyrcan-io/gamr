@@ -24,6 +24,8 @@ export {
 
   // Theme utilities
   setTheme,
+  setReducedMotion,
+  prefersReducedMotion,
   getTheme,
   getCurrentThemeColor,
   getCurrentThemePalette,

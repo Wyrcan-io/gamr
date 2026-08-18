@@ -3,7 +3,7 @@ import { applyCommand, createState } from './engine';
 import { evidenceById, judgeById } from './content';
 import { previewHearing } from './evaluator';
 
-function result<T>(state: ReturnType<typeof createState>, command: Parameters<typeof applyCommand>[1]): ReturnType<typeof createState> {
+function result(state: ReturnType<typeof createState>, command: Parameters<typeof applyCommand>[1]): ReturnType<typeof createState> {
   const next = applyCommand(state, command);
   expect(next.error).toBeUndefined();
   return next.state;

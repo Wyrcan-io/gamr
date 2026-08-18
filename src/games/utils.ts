@@ -72,6 +72,7 @@ const TERMINAL_PALETTES: Record<'carbon' | 'paper' | 'indigo' | 'lichen' | 'cont
  * Current theme mode - configured by the consuming application
  */
 let currentTheme: PhosphorMode = 'carbon';
+let reducedMotion = false;
 
 /**
  * Set the current theme mode
@@ -86,6 +87,16 @@ export function setTheme(mode: PhosphorMode): void {
  */
 export function getTheme(): PhosphorMode {
   return currentTheme;
+}
+
+/** Configure whether optional motion effects should be skipped. */
+export function setReducedMotion(value: boolean): void {
+  reducedMotion = value;
+}
+
+/** Return the process/application-level motion preference. */
+export function prefersReducedMotion(): boolean {
+  return reducedMotion;
 }
 
 /** Resolve semantic terminal roles for a specific theme mode. */

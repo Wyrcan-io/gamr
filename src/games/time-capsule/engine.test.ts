@@ -81,7 +81,7 @@ describe('Time Capsule persistence engine', () => {
     state.capsuleDraft = { memory: null, object: null, clue: null };
     state.loop.discoveriesThisLoop = ['obj-ceramic-link'];
     state = applyCommand(state, { type: 'stageAnchor', kind: 'object', anchorId: 'obj-ceramic-link' }).state;
-    expect(state.capsuleDraft.object).toBeNull();
+    expect(state.capsuleDraft?.object).toBeNull();
     expect(state.notice).toContain('OBJECT');
   });
 

@@ -198,7 +198,7 @@ export function createState(seed: number = Date.now(), sector: number = 1, upgra
     seed: seed >>> 0, sector, mode, tick: 0, phase: mode === 'tutorial' && sector === 1 ? 'tutorial' : 'playing',
     board, sources, destinations, packets: {}, inventory, upgrades: [...upgrades],
     score: 0, streak: 0, trace: 0, maxTrace: 0, deliveredThisSector: 0,
-    quota: quotaForSector(sector), focusCharges: 2 + (upgrades.includes('focus') ? 1 : 0),
+    quota: mode === 'tutorial' ? 3 : quotaForSector(sector), focusCharges: 2 + (upgrades.includes('focus') ? 1 : 0),
     focusUntilTick: 0, purgeCharges: 1 + (upgrades.includes('clean') ? 1 : 0),
     cursor: { x: Math.floor(BOARD_WIDTH / 2), y: Math.floor(BOARD_HEIGHT / 2) },
     nextPacketId: 1, lastEvent: 'PLACE A LINK TO START THE FLOW', eventTicks: 30, tutorialStep: 0,
@@ -491,9 +491,9 @@ export function advance(state: GameState): TickResult {
     state.lastEvent = 'NETWORK BREACHED';
     state.eventTicks = 40;
   } else if (state.deliveredThisSector >= state.quota) {
-    if (state.sector >= 8) state.phase = 'won';
+    if (state.mode === 'tutorial' || state.sector >= 8) state.phase = 'won';
     else state.phase = 'upgrade';
-    state.lastEvent = state.phase === 'won' ? 'SHIFT COMPLETE' : 'SECTOR CLEAR — CHOOSE UPGRADE';
+    state.lastEvent = state.mode === 'tutorial' ? 'TUTORIAL COMPLETE' : state.phase === 'won' ? 'SHIFT COMPLETE' : 'SECTOR CLEAR — CHOOSE UPGRADE';
     state.eventTicks = 40;
   }
   if (result.delivered.length) progressTutorial(state);

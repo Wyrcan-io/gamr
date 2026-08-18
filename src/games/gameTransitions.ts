@@ -6,7 +6,7 @@
  */
 
 import type { Terminal } from '@xterm/xterm';
-import { getCurrentThemeColor } from './utils';
+import { getCurrentThemeColor, prefersReducedMotion } from './utils';
 
 // Transition timing constants
 const BOOT_DURATION = 800;  // ms for boot sequence
@@ -83,6 +83,10 @@ function sleep(ms: number): Promise<void> {
  * Boot transition - plays before game starts
  */
 export async function playBootTransition(terminal: Terminal): Promise<void> {
+  if (prefersReducedMotion()) {
+    terminal.write('\x1b[2J\x1b[H');
+    return;
+  }
   const themeColor = getCurrentThemeColor();
   const cols = terminal.cols;
 
@@ -134,6 +138,10 @@ export async function playBootTransition(terminal: Terminal): Promise<void> {
  * Exit transition - plays when game quits back to shell
  */
 export async function playExitTransition(terminal: Terminal): Promise<void> {
+  if (prefersReducedMotion()) {
+    terminal.write('\x1b[2J\x1b[H');
+    return;
+  }
   const themeColor = getCurrentThemeColor();
   const cols = terminal.cols;
   const rows = terminal.rows;
@@ -178,6 +186,10 @@ export async function playExitTransition(terminal: Terminal): Promise<void> {
  * Switch transition - plays when switching to a new game
  */
 export async function playSwitchTransition(terminal: Terminal): Promise<void> {
+  if (prefersReducedMotion()) {
+    terminal.write('\x1b[2J\x1b[H');
+    return;
+  }
   const themeColor = getCurrentThemeColor();
   const cols = terminal.cols;
   const rows = terminal.rows;
@@ -220,6 +232,10 @@ export async function playSwitchTransition(terminal: Terminal): Promise<void> {
  * Quick boot - shorter version for game switching (game-to-game)
  */
 export async function playQuickBoot(terminal: Terminal): Promise<void> {
+  if (prefersReducedMotion()) {
+    terminal.write('\x1b[2J\x1b[H');
+    return;
+  }
   const themeColor = getCurrentThemeColor();
   const cols = terminal.cols;
 
@@ -253,6 +269,10 @@ export async function playQuickBoot(terminal: Terminal): Promise<void> {
  * Shows the game name with a cool reveal effect
  */
 export async function playSelectTransition(terminal: Terminal, gameName: string): Promise<void> {
+  if (prefersReducedMotion()) {
+    terminal.write('\x1b[2J\x1b[H');
+    return;
+  }
   const themeColor = getCurrentThemeColor();
   const cols = terminal.cols;
   const rows = terminal.rows;

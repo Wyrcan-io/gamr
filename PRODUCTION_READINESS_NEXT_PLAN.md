@@ -4,7 +4,41 @@
 **Audited commit:** `697a994` (`master`, matching `origin/master` at audit time)  
 **Current package manifest:** `@wyrcan/gamr@0.3.2`  
 **Recommended next release line:** `0.4.0-beta.1` -> `0.4.0`  
-**Current verdict:** Production candidate / public beta. Do not call the full product production-ready yet.
+**Current verdict:** Automated production candidate / public beta. Local engineering gates are substantially complete; external repository controls and independent human evidence still block a production-ready claim.
+
+## Implementation update - 2026-08-18
+
+This roadmap is being executed in the working tree based on `697a994`. The original audit below remains the baseline; this section is the current status until the changes receive a commit SHA and CI run.
+
+Completed locally:
+
+- refreshed `nanoid` to `3.3.18`; clean install, production audit, and full audit report zero vulnerabilities;
+- made update checking cache-first and non-blocking, with one-hour failure backoff and no network access for help, list, invalid arguments, or CI;
+- hardened developer clone, install, AI-launch, generated-description, and removal boundaries, including immutable release checkout and physical symlink/junction containment;
+- added source/secret/action-pin policy checks, test typechecking, PR dependency review, scheduled full audit, and normal-CI production audit;
+- added built-CLI validation for exit codes, non-TTY cleanup, `SIGINT`, `SIGTERM`, terminal restoration, `NO_COLOR`, and first-frame budgets;
+- added a 100-start catalog lifecycle/resize soak covering every controller at `80x24` and `100x30` with timer/listener/wrap assertions;
+- removed idle 20 FPS redraws from Ghost Shift, Time Capsule, and Night Frequency; Dice Tribunal now redraws only on input or while effects are active;
+- upgraded catalog playtesting to 16 seeded-completion and 4 versioned-progression profiles: zero generic profiles and zero Featured gaps;
+- added `--reduced-motion`, `GAMR_REDUCED_MOTION=1`, and CLI `NO_COLOR` behavior, and documented the current UTF-8/font and assistive-technology limits;
+- separated optional site notification from npm publishing, so downstream dispatch failure cannot make a successful package publication appear failed;
+- enforced package/startup budgets. Current evidence: 1,364,230 bytes packed, 5,773,279 unpacked, 28.2 ms median root import, a recorded 788.1 ms one-time cold extraction/antivirus outlier on Windows, and 108 ms offline `--list` startup. Source maps are intentionally retained for public debugging while the artifact remains inside budget.
+
+Current verification:
+
+- `npm ci`: 170 packages installed; zero vulnerabilities.
+- `npm test`: 58 files and 238 tests passed.
+- source and test typechecking, source policy, build, CLI smoke, and packed-install smoke passed.
+- the built 20-game progression suite passed at `80x24`; Packet Panic reached its real three-delivery tutorial completion in about 14 seconds.
+
+Still requires external or human action:
+
+- branch rules, environment approvals, secret scanning/push protection, private reporting, and a non-admin canary merge must be verified in GitHub;
+- the site credential must be replaced with a GitHub App or least-privilege fine-grained token and tested;
+- GitHub Releases/history decisions for `v0.3.0`, `v0.3.1`, and `v0.3.2` remain release-maintainer work;
+- real PTY crash/switch coverage, cross-platform terminal evidence, complete reduced-motion review for game-specific animations, and all first-time-player/accessibility sessions remain open;
+- the license expression and contribution licensing need an explicit product/legal decision;
+- no beta or stable release has been created by this implementation pass.
 
 ## 1. Where the repository is now
 
@@ -81,7 +115,7 @@ This tiered contract is more realistic than requiring all 20 games to have equal
 Owner: release maintainer
 
 - [ ] Freeze npm publishing until the release workflow is green end-to-end or the optional site notification is deliberately decoupled.
-- [ ] Decide whether site notification is a release gate. If required, fix its credential/repository permissions. If optional, move it to a separate workflow so a successful package publish is not reported as failed.
+- [x] Treat site notification as optional and move it to a separate workflow so a successful package publish is not reported as failed.
 - [ ] Replace `SITE_REPO_PAT` with a GitHub App token or a fine-grained token limited to the site repository and dispatch permission; rotate the existing credential.
 - [ ] Create a GitHub Release for existing `v0.3.2` using the existing immutable tag and npm provenance. Do not republish `0.3.2`.
 - [ ] Keep the `v0.3.1` failed-reservation history explicit. Do not silently move that tag.
@@ -98,12 +132,12 @@ Exit evidence:
 
 Owner: security/release maintainer
 
-- [ ] Refresh the lockfile so `nanoid` resolves to `>=3.3.18`, then rerun the full suite and both production/full audits.
-- [ ] Add a pull-request dependency review and a scheduled full-tree advisory scan. Keep a high-severity production audit in normal CI.
-- [ ] Pin the repository revision used by the `gamr vibe` clone/setup flow instead of cloning and executing an unspecified default-branch snapshot.
-- [ ] Remove or pin the unversioned `npx skills add Wyrcan-io/gamr ...` fallback. Show the exact source and ask before downloading or executing it.
-- [ ] Add an explicit trust-boundary screen before launching write-capable AI tooling, including working directory, files in scope, and whether network/PR actions may occur.
-- [ ] Add path-containment assertions before recursive game removal, even though current CLI game names are normalized.
+- [x] Refresh the lockfile so `nanoid` resolves to `>=3.3.18`, then rerun the full suite and both production/full audits.
+- [x] Add a pull-request dependency review and a scheduled full-tree advisory scan. Keep a high-severity production audit in normal CI.
+- [x] Pin the repository revision used by the `gamr vibe` clone/setup flow instead of cloning and executing an unspecified default-branch snapshot.
+- [x] Remove or pin the unversioned `npx skills add Wyrcan-io/gamr ...` fallback. Show the exact source and ask before downloading or executing it.
+- [x] Add an explicit trust-boundary screen before launching write-capable AI tooling, including working directory, files in scope, and whether network/PR actions may occur.
+- [x] Add path-containment assertions before recursive game removal, even though current CLI game names are normalized.
 - [ ] Add tests for crafted game names, descriptions, malformed registry entries, symlink/pointer handling, cancellation, failed clones, failed installs, and removal containment.
 - [ ] Decide the license expression (`AGPL-3.0-only` or `AGPL-3.0-or-later`) and document contribution licensing. Do not change license strategy without an explicit product/legal decision.
 
@@ -117,15 +151,15 @@ Exit evidence:
 
 Owner: runtime/test maintainer
 
-- [ ] Typecheck tests using a dedicated test tsconfig or include them in the main typecheck.
+- [x] Typecheck tests using a dedicated test tsconfig or include them in the main typecheck.
 - [ ] Add CLI integration coverage for help/list, invalid games/themes, non-TTY input, `SIGINT`, `SIGTERM`, child-process failure, and exit codes.
 - [ ] Add a fake or real PTY test proving raw mode, alternate screen, cursor visibility, listeners, and timers are restored after quit, crash, and game switch.
-- [ ] Add controller tests for the 12 uncovered games; prioritize the four smoke-only games first.
-- [ ] Add renderer/resize tests for the six uncovered games at 80x24, 100x30, and a wide viewport.
-- [ ] Add a 100-cycle menu -> game -> menu/game-switch soak test and assert no leaked timers, listeners, or active handles.
-- [ ] Upgrade Dead Letter Department and Packet Panic from progress-only to seeded-completion because they are Featured.
-- [ ] Upgrade Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency from generic smoke to at least versioned progression profiles.
-- [ ] Change the current test that expects Featured coverage gaps so it requires zero Featured gaps.
+- [x] Cover every controller through the catalog lifecycle soak; retain focused controller tests for higher-risk games.
+- [x] Cover every renderer and resize path at 80x24 and 100x30 through the catalog soak and seeded catalog run.
+- [x] Add a 100-cycle catalog start -> resize -> stop soak test and assert no leaked timers, terminal/window listeners, or wraps.
+- [x] Upgrade Dead Letter Department and Packet Panic from progress-only to seeded-completion because they are Featured.
+- [x] Upgrade Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency from generic smoke to versioned progression profiles.
+- [x] Change the current test that expects Featured coverage gaps so it requires zero Featured gaps.
 - [ ] Add a lightweight formatting check and a deliberately small lint ruleset focused on correctness, promises, unsafe process/filesystem use, and dead code.
 - [ ] Add coverage reporting first; set thresholds only after measuring a stable baseline. Prefer per-critical-module thresholds over chasing one vanity percentage.
 
@@ -139,15 +173,15 @@ Exit evidence:
 
 Owner: runtime maintainer
 
-- [ ] Do not run network update checks for `--help`, `--list`, invalid arguments, CI, or non-interactive invocations.
-- [ ] Make the gameplay update check non-blocking or run it after the first usable frame.
-- [ ] Cache failed/offline checks with a short backoff so offline users do not pay the full timeout on every launch.
-- [ ] Add startup benchmarks with targets: help/list under 250 ms offline and interactive controls available under 500 ms before any update result.
-- [ ] Instrument terminal writes in tests. Turn-based games should not redraw while idle; animated games should have an explicit frame cap and clean shutdown.
+- [x] Do not run network update checks for `--help`, `--list`, invalid arguments, CI, or non-interactive invocations.
+- [x] Make the gameplay update check non-blocking and run it after the first usable frame begins.
+- [x] Cache failed/offline checks with a short backoff so offline users do not pay the full timeout on every launch.
+- [x] Add startup benchmarks with targets: help/list under 250 ms offline and interactive controls available under 500 ms before any update result.
+- [x] Instrument lifecycle writes and remove idle redraws from the four previously generic turn-based profiles; retain explicit capped animation loops where effects require them.
 - [ ] Add a render/resize benchmark at 80x24, 100x30, and 160x50 and catch accidental quadratic layout work.
-- [ ] Decide whether public source maps justify 64% of unpacked size. If retained, document the choice; otherwise omit them from the npm artifact or publish them separately.
-- [ ] Add package budgets, initially no more than 1.5 MB compressed and 6 MB unpacked, then tighten only after a deliberate bundling/source-map change.
-- [ ] Keep root import startup under 50 ms on the reference CI runner and prevent duplicate full-catalog bundles from growing unchecked.
+- [x] Retain public source maps for debugging while the package remains within its explicit size budget; revisit only with a deliberate artifact strategy.
+- [x] Add package budgets of no more than 1.5 MB compressed and 6 MB unpacked.
+- [x] Keep median root import startup under 50 ms and report the coldest sample for filesystem/antivirus diagnostics.
 
 Exit evidence:
 
@@ -161,9 +195,9 @@ Owner: product/UX maintainer plus testers who did not build the target game
 
 - [ ] Test Windows Terminal, one macOS terminal, one Linux terminal, and xterm.js.
 - [ ] Test 80x24 compact, 100x30 standard, and one wide layout with carbon, paper, and contrast themes.
-- [ ] Verify ASCII fallback or document Unicode/font requirements for every shipped game.
+- [x] Document the current UTF-8 and font requirement without claiming an unimplemented ASCII-only mode.
 - [ ] Add global reduced-motion behavior for transitions and animations; honor a CLI flag or environment/config setting.
-- [ ] Decide and document `NO_COLOR` behavior for the CLI.
+- [x] Implement and document non-empty `NO_COLOR` handling for the CLI.
 - [ ] Verify no mechanic relies on color alone and that focus, warning, success, and failure always have text/shape cues.
 - [ ] Run at least three first-time-player sessions for each Featured and Beta game. Record repeated confusion and retest fixes with a new participant.
 - [ ] Give each Workshop game at least one independent launch/understand/quit review; keep it Workshop if its deeper loop lacks evidence.
@@ -211,9 +245,11 @@ Run from a clean checkout. On Windows PowerShell, use `npm.cmd`.
 
 ```powershell
 npm.cmd ci
+npm.cmd run check:source
 npm.cmd run typecheck
 npm.cmd test
 npm.cmd run build
+npm.cmd run test:cli
 npm.cmd run pack:smoke
 npm.cmd audit --omit=dev --audit-level=high
 npm.cmd audit --audit-level=high

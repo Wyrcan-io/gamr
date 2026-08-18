@@ -1,11 +1,14 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Terminal } from '@xterm/xterm';
 import {
   enterAlternateBuffer,
   exitAlternateBuffer,
   forceExitAlternateBuffer,
   isInAlternateBuffer,
+  prefersReducedMotion,
+  setReducedMotion,
 } from './utils';
+import { playBootTransition } from './gameTransitions';
 
 function fakeTerminal() {
   return { element: {}, write: vi.fn() } as unknown as Terminal;
@@ -28,5 +31,20 @@ describe('alternate buffer lifecycle', () => {
     enterAlternateBuffer(terminal, 'test');
     forceExitAlternateBuffer(terminal, 'error');
     expect(isInAlternateBuffer(terminal)).toBe(false);
+  });
+});
+
+describe('reduced motion', () => {
+  afterEach(() => setReducedMotion(false));
+
+  it('skips animated transition frames when enabled', async () => {
+    const terminal = fakeTerminal();
+    setReducedMotion(true);
+    expect(prefersReducedMotion()).toBe(true);
+
+    await playBootTransition(terminal);
+
+    expect(terminal.write).toHaveBeenCalledOnce();
+    expect(terminal.write).toHaveBeenCalledWith('\x1b[2J\x1b[H');
   });
 });

@@ -21,8 +21,9 @@ export function runTimeCapsuleGame(terminal: Terminal): TimeCapsuleController {
   let capsuleKind = 0;
   let capsuleCandidate = 0;
   let state: GameState = createState(Date.now());
-  let renderInterval: ReturnType<typeof setInterval> | undefined;
   let keyListener: { dispose: () => void } | undefined;
+  let resizeListener: { dispose: () => void } | undefined;
+  let startupTimer: ReturnType<typeof setTimeout> | undefined;
 
   const controller: TimeCapsuleController = {
     stop: () => { running = false; },
@@ -161,17 +162,18 @@ export function runTimeCapsuleGame(terminal: Terminal): TimeCapsuleController {
   controller.stop = () => {
     if (!running) return;
     running = false;
-    if (renderInterval) clearInterval(renderInterval);
+    if (startupTimer) clearTimeout(startupTimer);
     keyListener?.dispose();
+    resizeListener?.dispose();
     terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m');
     baseStop();
   };
 
-  setTimeout(() => {
+  startupTimer = setTimeout(() => {
     if (!running) return;
     terminal.write('\x1b[?1049h\x1b[?25l');
-    renderInterval = setInterval(() => { if (running) render(); }, 50);
-    keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); });
+    keyListener = terminal.onKey(({ domEvent }) => { if (!running) return; handleKey(domEvent); if (running) render(); });
+    resizeListener = terminal.onResize(() => { if (running) render(); });
     render();
   }, 50);
 

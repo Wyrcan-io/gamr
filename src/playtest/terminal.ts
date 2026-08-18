@@ -22,6 +22,7 @@ interface WindowShim {
   removeEventListener: (type: string, handler: (event: Event) => void) => void;
   dispatchEvent: (event: Event) => boolean;
   clearListeners?: () => void;
+  listenerCount?: () => number;
 }
 
 function ensureWindow(): WindowShim {
@@ -40,6 +41,9 @@ function ensureWindow(): WindowShim {
       return true;
     },
     clearListeners() { listeners.clear(); },
+    listenerCount() {
+      return [...listeners.values()].reduce((total, values) => total + values.size, 0);
+    },
   };
   (globalThis as Record<string, unknown>).window = shim;
   return shim;
@@ -48,6 +52,11 @@ function ensureWindow(): WindowShim {
 export function resetPlaytestWindowListeners(): void {
   const existing = (globalThis as Record<string, unknown>).window as WindowShim | undefined;
   existing?.clearListeners?.();
+}
+
+export function playtestWindowListenerCount(): number {
+  const existing = (globalThis as Record<string, unknown>).window as WindowShim | undefined;
+  return existing?.listenerCount?.() ?? 0;
 }
 
 function rawForKey(key: string): string {
@@ -90,6 +99,13 @@ export class VirtualTerminal {
 
   get cols(): number { return this._cols; }
   get rows(): number { return this._rows; }
+  get listenerCounts(): { key: number; data: number; resize: number } {
+    return {
+      key: this.keyListeners.size,
+      data: this.dataListeners.size,
+      resize: this.resizeListeners.size,
+    };
+  }
 
   write(data: string): void {
     if (this.disposed) return;

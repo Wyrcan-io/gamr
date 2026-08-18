@@ -49,7 +49,7 @@ describe('Packet Panic renderer', () => {
     const upgrade = stripAnsi(renderFrame({ ...state, phase: 'upgrade' }, 80, 28, model(state), palette));
     const won = stripAnsi(renderFrame({ ...state, phase: 'won', score: 1200, maxTrace: 34 }, 80, 28, model(state), palette));
     expect(upgrade).toContain('SECTOR CLEAR / UPGRADE');
-    expect(won).toContain('[+] SHIFT COMPLETE');
+    expect(won).toContain('[+] TUTORIAL COMPLETE');
     expect(won).toContain('FINAL SCORE  1200');
   });
 });

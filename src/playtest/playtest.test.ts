@@ -47,6 +47,13 @@ describe('virtual terminal screen', () => {
     expect(screen.snapshot().wrappedLines).toBe(0);
   });
 
+  it('models the cooked CLI terminal by returning to column zero on LF', () => {
+    const screen = new VirtualScreen(4, 3);
+    screen.write('ABCD\nEF');
+    expect(screen.snapshot().lines).toEqual(['ABCD', 'EF', '']);
+    expect(screen.snapshot().wrappedLines).toBe(0);
+  });
+
   it('records a line that exceeds the terminal width', () => {
     const screen = new VirtualScreen(4, 2);
     screen.write('ABCDE');
@@ -61,7 +68,7 @@ describe('playtest registry', () => {
     expect(registry.size).toBe(allGames.length);
     expect(incompletePlaytestSpecs(allGames, registry)).not.toContain('stack-trace');
     expect(incompletePlaytestSpecs(allGames, registry)).not.toContain('five-minute-kingdom');
-    expect(featuredCoverageGaps(allGames, registry)).toEqual(['dead-letter-department', 'packet-panic']);
+    expect(featuredCoverageGaps(allGames, registry)).toEqual([]);
     expect(coverageSummary(allGames, registry)).toHaveLength(allGames.length);
   });
 });
@@ -127,6 +134,19 @@ describe('playtest runner', () => {
     expect(report.replay).toContain('dead-letter-department');
   }, 10000);
 
+  it('passes every versioned progression profile', async () => {
+    const registry = createPlaytestRegistry(allGames);
+    const runner = new PlaytestRunner({ registry, defaultWaitMs: 45 });
+    const reports = [];
+    for (const game of allGames) {
+      if (registry.get(game.id)?.coverage !== 'black-box-progress') continue;
+      reports.push(await runner.run(game.id, { seed: 20260818, maxElapsedMs: 5000 }));
+    }
+    expect(reports.map(report => ({ gameId: report.gameId, status: report.status, failures: report.failures }))).toEqual(
+      reports.map(report => ({ gameId: report.gameId, status: 'passed', failures: [] })),
+    );
+  }, 20000);
+
   it('completes the first Stack Trace repair through keyboard input', async () => {
     const report = await new PlaytestRunner({ defaultWaitMs: 40 }).run('stack-trace', {
       seed: 7,
@@ -138,15 +158,16 @@ describe('playtest runner', () => {
     expect(report.milestones['first-clear']).toBe(true);
   }, 10000);
 
-  it('starts Packet Panic and accepts route-building input', async () => {
+  it('completes Packet Panic training through an authored route', async () => {
     const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('packet-panic', {
       seed: 13,
-      maxActions: 18,
-      maxElapsedMs: 6000,
+      maxActions: 55,
+      maxElapsedMs: 16000,
     });
-    expect(report.status).toBe('passed');
+    expect(report.status, JSON.stringify({ failures: report.failures, actions: report.actions, terminalText: report.terminalText }, null, 2)).toBe('passed');
     expect(report.milestones['router-action']).toBe(true);
-  }, 15000);
+    expect(report.milestones['tutorial-complete']).toBe(true);
+  }, 25000);
 
   it('completes a nine-turn Five-Minute Kingdom chronicle', async () => {
     const report = await new PlaytestRunner({ defaultWaitMs: 45 }).run('five-minute-kingdom', {

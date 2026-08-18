@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createState } from './engine';
+import { applyCommand, createState, type Command } from './engine';
 
 describe('containment protocol engine', () => {
   it('keeps configuration free until a cycle is committed', () => {
@@ -27,11 +27,11 @@ describe('containment protocol engine', () => {
   });
 
   it('replays the same command sequence from a seed', () => {
-    const commands = [
-      { type: 'startRun', mode: 'campaign' as const, seed: 99 },
-      { type: 'dismissBriefing' as const },
-      { type: 'setLamp', roomId: 'A' as const, lamp: 'bright' as const },
-      { type: 'commitCycle' as const },
+    const commands: Command[] = [
+      { type: 'startRun', mode: 'campaign', seed: 99 },
+      { type: 'dismissBriefing' },
+      { type: 'setLamp', roomId: 'A', lamp: 'bright' },
+      { type: 'commitCycle' },
     ];
     const run = () => commands.reduce((state, command) => applyCommand(state, command), createState(99));
     expect(JSON.stringify(run())).toBe(JSON.stringify(run()));

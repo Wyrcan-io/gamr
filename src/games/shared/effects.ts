@@ -7,6 +7,8 @@
  * Based on patterns from chopper/effects.ts and used across 16+ games.
  */
 
+import { prefersReducedMotion } from '../utils';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -77,6 +79,7 @@ export function spawnParticles(
   color: string,
   chars: string[] = ['✦', '★', '◆', '●'],
 ): void {
+  if (prefersReducedMotion()) return;
   if (particles.length >= MAX_PARTICLES) return;
 
   const actualCount = Math.min(count, MAX_PARTICLES - particles.length);
@@ -104,6 +107,7 @@ export function spawnFirework(
   y: number,
   intensity: number = 1,
 ): void {
+  if (prefersReducedMotion()) return;
   const chars = PARTICLE_CHARS.firework;
 
   // Central burst
@@ -146,6 +150,7 @@ export function spawnSparkleTrail(
   count: number = 6,
   color: string = '\x1b[1;93m',
 ): void {
+  if (prefersReducedMotion()) return;
   for (let i = 0; i < count; i++) {
     particles.push({
       x: x + (Math.random() - 0.5) * 4,
@@ -187,6 +192,7 @@ export function addScorePopup(
   text: string,
   color: string = '\x1b[1;33m',
 ): void {
+  if (prefersReducedMotion()) return;
   popups.push({ x, y, text, frames: 18, color });
 }
 
@@ -222,6 +228,7 @@ export function createShakeState(): ScreenShakeState {
  * - 3-4: Big explosion
  */
 export function triggerShake(state: ScreenShakeState, frames: number, intensity: number): void {
+  if (prefersReducedMotion()) return;
   state.frames = frames;
   state.intensity = intensity;
 }
@@ -257,6 +264,7 @@ export function createFlashState(): FlashState {
  * Trigger a flash effect for N frames.
  */
 export function triggerFlash(state: FlashState, frames: number): void {
+  if (prefersReducedMotion()) return;
   state.frames = frames;
 }
 

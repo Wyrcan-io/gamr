@@ -67,6 +67,9 @@ export class VirtualScreen {
         this.wrapPending = false;
       } else if (char === '\n') {
         this.cursorY = clamp(this.cursorY + 1, 0, this.rows - 1);
+        // The Node CLI writes to a cooked terminal where LF advances to the
+        // beginning of the next row. Game renderers intentionally use `\n`.
+        this.cursorX = 0;
         this.wrapPending = false;
       } else if (char === '\b') {
         this.cursorX = clamp(this.cursorX - 1, 0, this.cols - 1);

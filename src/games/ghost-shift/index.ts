@@ -12,7 +12,7 @@ const panels: PanelId[] = ['feed', 'evidence', 'log', 'files'];
 
 export function runGhostShiftGame(terminal: Terminal): GhostShiftController {
   let running = true; let paused = false; let pauseSelection = 0; let frame = 0; let help = false; let suspectIndex = 0;
-  let state = createState(Date.now()); let renderInterval: ReturnType<typeof setInterval> | undefined; let keyListener: { dispose: () => void } | undefined;
+  let state = createState(Date.now()); let keyListener: { dispose: () => void } | undefined; let resizeListener: { dispose: () => void } | undefined; let startupTimer: ReturnType<typeof setTimeout> | undefined;
   const controller: GhostShiftController = { stop: () => { running = false; }, get isRunning() { return running; } };
   const run = (command: Command): void => { state = applyCommand(state, command).state; };
   const quit = (): void => { controller.stop(); dispatchGameQuit(terminal); };
@@ -49,7 +49,7 @@ export function runGhostShiftGame(terminal: Terminal): GhostShiftController {
   };
   const render = (): void => { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { frame: frame++, helpOpen: help }); if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); terminal.write(output); };
   const baseStop = controller.stop;
-  controller.stop = () => { if (!running) return; running = false; if (renderInterval) clearInterval(renderInterval); keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); baseStop(); };
-  setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); renderInterval = setInterval(() => { if (running) render(); }, 50); keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); }); render(); }, 50);
+  controller.stop = () => { if (!running) return; running = false; if (startupTimer) clearTimeout(startupTimer); keyListener?.dispose(); resizeListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); baseStop(); };
+  startupTimer = setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); keyListener = terminal.onKey(({ domEvent }) => { if (!running) return; handleKey(domEvent); if (running) render(); }); resizeListener = terminal.onResize(() => { if (running) render(); }); render(); }, 50);
   return controller;
 }

@@ -5,10 +5,14 @@
  * and submitting PRs — all powered by clack prompts and Claude Code.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, statSync } from 'fs';
-import { resolve, relative, dirname } from 'path';
-import { execSync, spawn } from 'child_process';
+import { execFileSync, spawn } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, relative, resolve } from 'node:path';
 import * as p from '@clack/prompts';
+import { assertSafeExistingGameDirectory, isPathWithin, isValidGameId, resolveGameDirectory } from './create-safety';
+import { getCurrentVersion } from './update-check';
+
+const REPOSITORY_URL = 'https://github.com/Wyrcan-io/gamr.git';
 
 // ---------------------------------------------------------------------------
 // Name utilities
@@ -49,7 +53,7 @@ function resolveSkillDirectory(repoRoot: string): string | null {
       const pointer = readFileSync(candidate, 'utf-8').trim();
       if (pointer) {
         const target = resolve(dirname(candidate), pointer);
-        if (existsSync(target) && statSync(target).isDirectory()) return target;
+        if (isPathWithin(repoRoot, target) && existsSync(target) && statSync(target).isDirectory()) return target;
       }
     } catch {
       // Try the next candidate if a skill path is malformed or inaccessible.
@@ -100,7 +104,7 @@ function getUserGames(repoRoot: string): RegisteredGame[] {
   // Games tracked in git are built-in; untracked ones are the user's
   let trackedFiles: string;
   try {
-    trackedFiles = execSync('git ls-files src/games/', { cwd: repoRoot, encoding: 'utf-8' });
+    trackedFiles = execFileSync('git', ['ls-files', 'src/games/'], { cwd: repoRoot, encoding: 'utf8' });
   } catch {
     return allGames;
   }
@@ -158,10 +162,20 @@ async function findOrSetupRepo(): Promise<string | null> {
     return null;
   }
 
+  const releaseRef = `v${getCurrentVersion()}`;
+  p.note(
+    `Source: ${REPOSITORY_URL}\nRevision: ${releaseRef}\nTarget: ${targetDir}\nNext command: npm ci`,
+    'Repository setup trust boundary',
+  );
+  const approved = await p.confirm({
+    message: 'Clone this immutable release and install its locked dependencies?',
+  });
+  if (p.isCancel(approved) || !approved) return null;
+
   const s = p.spinner();
-  s.start('Cloning Wyrcan-io/gamr...');
+  s.start(`Cloning Wyrcan-io/gamr at ${releaseRef}...`);
   try {
-    execSync('git clone https://github.com/Wyrcan-io/gamr.git', {
+    execFileSync('git', ['clone', '--branch', releaseRef, '--depth', '1', REPOSITORY_URL, targetDir], {
       cwd,
       stdio: 'ignore',
     });
@@ -174,11 +188,16 @@ async function findOrSetupRepo(): Promise<string | null> {
 
   s.start('Installing dependencies...');
   try {
-    execSync('npm install', { cwd: targetDir, stdio: 'ignore' });
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    execFileSync(npmCommand, ['ci'], {
+      cwd: targetDir,
+      stdio: 'ignore',
+      shell: process.platform === 'win32',
+    });
     s.stop('Dependencies installed.');
   } catch {
-    s.stop('npm install failed.');
-    p.log.warn('You may need to run npm install manually.');
+    s.stop('npm ci failed.');
+    p.log.warn('Review the lockfile and dependency scripts before retrying manually.');
   }
 
   return targetDir;
@@ -240,7 +259,16 @@ function removeFromIndex(indexPath: string, kebab: string) {
 // Launch Claude Code
 // ---------------------------------------------------------------------------
 
-function launchClaude(repoRoot: string, prompt: string): Promise<void> {
+async function launchClaude(repoRoot: string, prompt: string, scope: string): Promise<boolean> {
+  p.note(
+    `Working directory: ${repoRoot}\nScope: ${scope}\nClaude Code may modify files and use network or Git credentials according to its own configuration.`,
+    'External AI trust boundary',
+  );
+  const approved = await p.confirm({
+    message: 'Launch Claude Code with this access?',
+  });
+  if (p.isCancel(approved) || !approved) return false;
+
   p.log.info('Launching Claude Code...');
 
   const child = spawn('claude', [prompt], {
@@ -249,10 +277,13 @@ function launchClaude(repoRoot: string, prompt: string): Promise<void> {
   });
 
   return new Promise((res) => {
-    child.on('close', () => res());
+    child.on('close', (code) => {
+      if (code !== 0) p.log.error(`Claude Code exited with status ${code ?? 'unknown'}.`);
+      res(code === 0);
+    });
     child.on('error', () => {
       p.log.error('Could not launch Claude Code. Is it installed? Run: npm install -g @anthropic-ai/claude-code');
-      res();
+      res(false);
     });
   });
 }
@@ -284,13 +315,13 @@ async function doCreate(repoRoot: string, initialName?: string) {
     kebab = toKebab(nameInput);
   }
 
-  if (!/^[a-z][a-z0-9-]*$/.test(kebab) || kebab.length < 2) {
+  if (!isValidGameId(kebab)) {
     p.log.error(`Invalid game name: "${kebab}"`);
     return;
   }
 
   const gamesDir = resolve(repoRoot, 'src/games');
-  const gameDir = resolve(gamesDir, kebab);
+  const gameDir = resolveGameDirectory(gamesDir, kebab);
 
   if (existsSync(gameDir)) {
     p.log.error(`Game "${kebab}" already exists at src/games/${kebab}/`);
@@ -309,21 +340,10 @@ async function doCreate(repoRoot: string, initialName?: string) {
   const title = toTitle(kebab);
   const runFn = `run${pascal}Game`;
 
-  // Install skill if needed
-  let skillPath = resolveSkillDirectory(repoRoot);
+  const skillPath = resolveSkillDirectory(repoRoot);
   if (!skillPath) {
-    const s = p.spinner();
-    s.start('Installing game-dev skill for Claude Code...');
-    try {
-      execSync('npx skills add Wyrcan-io/gamr -a claude-code -s game-dev -y', {
-        cwd: repoRoot,
-        stdio: 'ignore',
-      });
-      s.stop('Installed game-dev skill.');
-    } catch {
-      s.stop('Could not install game-dev skill.');
-    }
-    skillPath = resolveSkillDirectory(repoRoot);
+    p.cancel('The checked-in game-dev skill is missing. Restore it from the reviewed repository revision.');
+    return;
   }
 
   // Read and fill template
@@ -352,12 +372,12 @@ async function doCreate(repoRoot: string, initialName?: string) {
   p.log.success('Registered in src/games/index.ts');
 
   // Offer to launch Claude Code
-  const vibeNow = await p.confirm({
-    message: 'Launch Claude Code to start vibe coding?',
-  });
-  if (!p.isCancel(vibeNow) && vibeNow) {
-    await launchClaude(repoRoot, `Build out the ${kebab} game. It should be: ${description}. Use the game-dev skill — check src/games/${kebab}/index.ts for the scaffold.`);
-  } else {
+  const launched = await launchClaude(
+    repoRoot,
+    `Build out the ${kebab} game. It should be: ${description}. Use the game-dev skill — check src/games/${kebab}/index.ts for the scaffold.`,
+    `Edit src/games/${kebab}/ and its registry entry; do not publish or open a PR without another explicit request.`,
+  );
+  if (!launched) {
     const needsCd = resolve(repoRoot) !== resolve(process.cwd());
     const rel = relative(process.cwd(), repoRoot);
     const cdPath = rel.startsWith('..') ? resolve(repoRoot) : rel;
@@ -382,7 +402,12 @@ async function playGame(repoRoot: string, gameId: string) {
   const s = p.spinner();
   s.start('Building...');
   try {
-    execSync('npm run build', { cwd: repoRoot, stdio: 'ignore' });
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    execFileSync(npmCommand, ['run', 'build'], {
+      cwd: repoRoot,
+      stdio: 'ignore',
+      shell: process.platform === 'win32',
+    });
     s.stop('Build complete.');
   } catch {
     s.stop('Build failed.');
@@ -393,7 +418,7 @@ async function playGame(repoRoot: string, gameId: string) {
   p.log.info(`Launching ${gameId}... (press Q to quit back here)`);
 
   const cliPath = resolve(repoRoot, 'dist/cli.js');
-  const child = spawn('node', [cliPath, gameId], {
+  const child = spawn(process.execPath, [cliPath, gameId], {
     cwd: repoRoot,
     stdio: 'inherit',
   });
@@ -410,13 +435,17 @@ async function vibeCodeGame(repoRoot: string, gameId: string) {
   });
   if (p.isCancel(idea) || !idea) return;
 
-  await launchClaude(repoRoot, `${idea}. Work on src/games/${gameId}/index.ts. Use the game-dev skill for patterns and conventions.`);
+  await launchClaude(
+    repoRoot,
+    `${idea}. Work on src/games/${gameId}/index.ts. Use the game-dev skill for patterns and conventions.`,
+    `Edit src/games/${gameId}/ only; do not publish or open a PR.`,
+  );
 }
 
 async function removeGame(repoRoot: string, gameId: string) {
   const gamesDir = resolve(repoRoot, 'src/games');
   const game = getGames(repoRoot).find(g => g.id === gameId)!;
-  const gameDir = resolve(gamesDir, gameId);
+  const gameDir = resolveGameDirectory(gamesDir, gameId);
 
   const confirmed = await p.confirm({
     message: `Remove ${game.name}? This deletes src/games/${gameId}/ and unregisters it.`,
@@ -424,6 +453,7 @@ async function removeGame(repoRoot: string, gameId: string) {
   if (p.isCancel(confirmed) || !confirmed) return;
 
   if (existsSync(gameDir)) {
+    assertSafeExistingGameDirectory(gamesDir, gameDir);
     rmSync(gameDir, { recursive: true });
     p.log.success(`Deleted src/games/${gameId}/`);
   }
@@ -434,7 +464,11 @@ async function removeGame(repoRoot: string, gameId: string) {
 
 async function submitPR(repoRoot: string, gameId: string) {
   const game = getGames(repoRoot).find(g => g.id === gameId)!;
-  await launchClaude(repoRoot, `Help me submit a PR for the ${game.name} game. Check git status, create a branch if needed, commit the changes in src/games/${gameId}/ and src/games/index.ts, and open a PR.`);
+  await launchClaude(
+    repoRoot,
+    `Help me submit a PR for the ${game.name} game. Check git status, create a branch if needed, commit the changes in src/games/${gameId}/ and src/games/index.ts, and open a PR.`,
+    `Review and commit src/games/${gameId}/ plus src/games/index.ts, then use network credentials to open a PR.`,
+  );
 }
 
 async function showGameActions(repoRoot: string, gameId: string) {

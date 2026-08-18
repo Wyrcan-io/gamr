@@ -1,5 +1,6 @@
 import { actionsForCurrentRoom, currentRoom, episode, formatClock, neighbours } from './engine';
 import type { AnchorKind, GameState } from './types';
+import { displayWidth } from '../../ui/terminal';
 
 export interface TimeCapsuleRenderModel { frame?: number; capsuleKind?: number; capsuleCandidate?: number; helpOpen?: boolean; }
 
@@ -49,8 +50,10 @@ function clockMeter(state: GameState): string {
 
 function renderStart(cols: number, rows: number, theme: string): string {
   const title = 'T I M E   C A P S U L E';
-  const x = Math.max(1, Math.floor((cols - title.length) / 2));
-  return `${esc}2J${esc}H${pos(4, x, `${theme}${BRIGHT}${title}${RESET}`)}${pos(7, x + 2, 'The day ends at noon. Three things may cross.')}${pos(9, x + 2, `${CYAN}[T]${RESET} tutorial    ${CYAN}[C]${RESET} campaign    ${CYAN}[Q]${RESET} quit`)}${pos(12, x + 2, `${DIM}A deterministic narrative puzzle about what survives.${RESET}`)}${pos(rows - 2, 3, `${theme}Arrows select   ENTER choose   ESC pause${RESET}`)}`;
+  const premise = 'The day ends at noon. Three things may cross.';
+  const description = 'A deterministic narrative puzzle about what survives.';
+  const center = (text: string): number => Math.max(1, Math.floor((cols - displayWidth(text)) / 2) + 1);
+  return `${esc}2J${esc}H${pos(4, center(title), `${theme}${BRIGHT}${title}${RESET}`)}${pos(7, center(premise), premise)}${pos(9, center('[T] tutorial    [C] campaign    [Q] quit'), `${CYAN}[T]${RESET} tutorial    ${CYAN}[C]${RESET} campaign    ${CYAN}[Q]${RESET} quit`)}${pos(12, center(description), `${DIM}${description}${RESET}`)}${pos(rows - 2, 3, `${theme}Arrows select   ENTER choose   ESC pause${RESET}`)}`;
 }
 
 function renderBriefing(state: GameState, cols: number, rows: number, theme: string): string {

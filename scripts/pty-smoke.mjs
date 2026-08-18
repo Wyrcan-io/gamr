@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { chmodSync, existsSync } from 'node:fs';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
@@ -15,6 +16,21 @@ const baseEnv = {
 };
 
 const delay = (ms) => new Promise(resolveDelay => setTimeout(resolveDelay, ms));
+
+function ensureUnixSpawnHelperIsExecutable() {
+  if (process.platform === 'win32') return;
+
+  // npm can unpack node-pty's prebuilt helper without its executable bit when
+  // dependency lifecycle scripts require approval. The helper is part of the
+  // locked dev dependency and must be executable before node-pty can fork.
+  const candidates = [
+    resolve(root, 'node_modules', 'node-pty', 'build', 'Release', 'spawn-helper'),
+    resolve(root, 'node_modules', 'node-pty', 'prebuilds', `${process.platform}-${process.arch}`, 'spawn-helper'),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) chmodSync(candidate, 0o755);
+  }
+}
 
 function start(args, env = {}) {
   const terminal = spawn(process.execPath, args, {
@@ -104,6 +120,7 @@ async function exerciseCrashCleanup() {
   assertRestored(session.output);
 }
 
+ensureUnixSpawnHelperIsExecutable();
 await exerciseSwitchAndQuit();
 await exerciseCrashCleanup();
 console.log(`PTY lifecycle smoke passed on ${process.platform}: raw input, resize, switch, Ctrl-C, crash, and terminal restoration.`);

@@ -93,6 +93,6 @@
   ],
   "author": "wyrcan.io",
   "dependencies": {
-    "@clack/prompts": "^1.0.1"
+    "@clack/prompts": "^1.7.0"
   }
 }

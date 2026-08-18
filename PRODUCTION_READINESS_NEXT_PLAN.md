@@ -4,9 +4,10 @@
 **Audited commit:** `697a994` (`master`, matching `origin/master` at audit time)  
 **Implementation commit:** `a9bfe33` (`master`, matching `origin/master`)
 **Implementation CI:** [run 32153814198](https://github.com/Wyrcan-io/gamr/actions/runs/32153814198) passed on Ubuntu Node 22/24, Windows Node 24, and the production dependency audit
+**Repository-controls canary:** [PR #8](https://github.com/Wyrcan-io/gamr/pull/8) passed all five required checks after the dependency graph was enabled
 **Current package manifest:** `@wyrcan/gamr@0.3.2`  
 **Recommended next release line:** `0.4.0-beta.1` -> `0.4.0`  
-**Current verdict:** Automated production candidate / public beta. Local engineering gates are substantially complete; external repository controls and independent human evidence still block a production-ready claim.
+**Current verdict:** Automated production candidate / public beta. Engineering gates and core repository controls are substantially complete; release approval, credential, terminal, and independent human evidence still block a production-ready claim.
 
 ## Implementation update - 2026-08-18
 
@@ -32,10 +33,13 @@ Current verification:
 - `npm test`: 58 files and 239 tests passed in CI.
 - source and test typechecking, source policy, build, CLI smoke, and packed-install smoke passed.
 - the built 20-game progression suite passed at `80x24`; Packet Panic reached its real three-delivery tutorial completion in about 14 seconds.
+- the dependency graph, Dependabot alerts/security updates, secret scanning/push protection, and private vulnerability reporting are enabled;
+- `master` requires pull requests and fresh passes from dependency review, production audit, Ubuntu Node 22/24, and Windows Node 24; enforcement includes admins and blocks force pushes and branch deletion;
+- PR #8 proved the dependency-review gate fails closed when its repository prerequisite is unavailable and passes after that prerequisite is enabled.
 
 Still requires external or human action:
 
-- branch rules, environment approvals, secret scanning/push protection, private reporting, and a non-admin canary merge must be verified in GitHub;
+- the `release` environment exists but still needs an explicit reviewer/approval policy, and a non-admin canary merge remains to be tested;
 - the site credential must be replaced with a GitHub App or least-privilege fine-grained token and tested;
 - GitHub Releases/history decisions for `v0.3.0`, `v0.3.1`, and `v0.3.2` remain release-maintainer work;
 - real PTY crash/switch coverage, cross-platform terminal evidence, complete reduced-motion review for game-specific animations, and all first-time-player/accessibility sessions remain open;
@@ -122,7 +126,9 @@ Owner: release maintainer
 - [ ] Create a GitHub Release for existing `v0.3.2` using the existing immutable tag and npm provenance. Do not republish `0.3.2`.
 - [ ] Keep the `v0.3.1` failed-reservation history explicit. Do not silently move that tag.
 - [ ] Decide whether to backfill a verified historical `v0.3.0` tag/release or explicitly record that it will remain npm-only. Never republish `0.3.0`.
-- [ ] Verify and record branch rules, required CI checks, force-push/deletion protection, the `release` environment approval policy, private vulnerability reporting, secret scanning, and push protection.
+- [x] Protect `master` for admins and non-admins with required pull requests, fresh CI checks, linear history, conversation resolution, and force-push/deletion protection.
+- [x] Enable and verify the dependency graph, Dependabot alerts/security updates, secret scanning, push protection, and private vulnerability reporting.
+- [ ] Assign and test an explicit reviewer/approval policy for the `release` environment.
 
 Exit evidence:
 
@@ -229,16 +235,16 @@ Owner: release maintainer
 
 Gamr may be called production-ready when all of the following are true:
 
-- [ ] Current `master` CI is green and required by branch rules.
-- [ ] Production/full dependency findings have no unaccepted high or critical issue.
+- [x] Current `master` CI is green and required by branch rules.
+- [x] Production/full dependency findings have no unaccepted high or critical issue.
 - [ ] Package publication, provenance, Git tag, changelog, GitHub Release, and site version agree.
-- [ ] Optional downstream notification failure cannot disguise the actual npm publication result.
-- [ ] Help/list and initial interaction stay within startup budgets while offline.
+- [x] Optional downstream notification failure cannot disguise the actual npm publication result.
+- [x] Help/list and initial interaction stay within startup budgets while offline.
 - [ ] CLI signal, terminal restoration, repeated switch, and controller cleanup tests pass.
 - [ ] All Featured games have seeded-completion and human sign-off.
 - [ ] Beta and Workshop limitations are visible before launch and match their evidence.
 - [ ] Supported terminals, sizes, Unicode/ASCII behavior, motion, and color behavior are documented and tested.
-- [ ] A clean packed artifact installs and runs on supported Node versions and operating systems.
+- [x] A clean packed artifact installs and runs on supported Node versions and operating systems.
 - [ ] A release candidate completed the observation window without an unresolved blocker.
 
 ## 6. Repeatable command gate

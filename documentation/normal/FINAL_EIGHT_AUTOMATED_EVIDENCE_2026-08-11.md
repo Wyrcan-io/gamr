@@ -44,8 +44,6 @@ node scripts/playtest.mjs --seed=20260811 --artifacts=artifacts/final-eight-2026
 
 The playtest runner now uses a 30-second elapsed-time ceiling and 240 stalled-frame tolerance when invoked by the evidence script, which is necessary for real-time profiles such as Blackout Grid and for long traversal profiles such as Dungeon Courier.
 
-Graphify refresh was attempted with `graphify update .`, but the executable is unavailable in this environment; no current graph state is claimed.
-
 ## Implementation notes
 
 - The generic response milestone now compares against the initial frame, so timer-driven redraws cannot hide a valid input response.

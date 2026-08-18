@@ -5,9 +5,38 @@
 **Implementation commit:** `a9bfe33` (`master`, matching `origin/master`)
 **Implementation CI:** [run 32153814198](https://github.com/Wyrcan-io/gamr/actions/runs/32153814198) passed on Ubuntu Node 22/24, Windows Node 24, and the production dependency audit
 **Repository-controls canary:** [PR #8](https://github.com/Wyrcan-io/gamr/pull/8) passed all five required checks after the dependency graph was enabled
-**Current package manifest:** `@wyrcan/gamr@0.3.2`  
+**Current package manifest:** `@wyrcan/gamr@0.4.0-beta.1`
 **Recommended next release line:** `0.4.0-beta.1` -> `0.4.0`  
-**Current verdict:** Automated production candidate / public beta. Engineering gates and core repository controls are substantially complete; release approval, credential, terminal, and independent human evidence still block a production-ready claim.
+**Current verdict:** Automated production candidate / public beta. Engineering gates and core repository controls are substantially complete; release approval, credential, and independent human evidence still block a stable production-ready claim.
+
+## Live release status — 2026-08-18
+
+This is the canonical status. The dated audit sections below remain supporting history and must not be read as the current checklist.
+
+Completed on the `0.4.0-beta.1` candidate branch:
+
+- type-aware correctness/security linting and a repository formatting gate;
+- coverage reporting with measured regression floors (70% lines, 75% functions, 50% branches, and 60% statements);
+- real PTY lifecycle, resize, game-switch, Ctrl-C, crash, and terminal-restoration checks;
+- a 180-session render/resize benchmark spanning all 20 games, three terminal sizes, and three themes;
+- cancellation, failed clone/install, malformed registry, crafted description, path, and symlink/junction tests for developer commands;
+- prerelease-safe npm publishing: prereleases use the `beta` distribution tag and stable versions use `latest`;
+- `0.4.0-beta.1` package metadata, changelog, README support language, and contributor command gate.
+
+Must pass before publishing the beta:
+
+- all pull-request checks on Ubuntu, macOS, and Windows;
+- both production and full dependency audits with no unaccepted high/critical finding;
+- release-environment approval and exact tag/package verification;
+- packed artifact, npm provenance, Git tag, and GitHub prerelease agreement.
+
+Still blocks promotion from beta to stable:
+
+- independent sessions on Windows Terminal, macOS, Linux, and xterm.js at the documented sizes/themes;
+- first-time-player and accessibility evidence for Featured and preview games;
+- at least 48 hours of beta observation without an unresolved blocker;
+- an explicit product/legal choice between `AGPL-3.0-only` and `AGPL-3.0-or-later`;
+- replacement of the optional site token with a least-privilege GitHub App or fine-grained credential.
 
 ## Implementation update - 2026-08-18
 
@@ -146,7 +175,7 @@ Owner: security/release maintainer
 - [x] Remove or pin the unversioned `npx skills add Wyrcan-io/gamr ...` fallback. Show the exact source and ask before downloading or executing it.
 - [x] Add an explicit trust-boundary screen before launching write-capable AI tooling, including working directory, files in scope, and whether network/PR actions may occur.
 - [x] Add path-containment assertions before recursive game removal, even though current CLI game names are normalized.
-- [ ] Add tests for crafted game names, descriptions, malformed registry entries, symlink/pointer handling, cancellation, failed clones, failed installs, and removal containment.
+- [x] Add tests for crafted game names, descriptions, malformed registry entries, symlink/pointer handling, cancellation, failed clones, failed installs, and removal containment.
 - [ ] Decide the license expression (`AGPL-3.0-only` or `AGPL-3.0-or-later`) and document contribution licensing. Do not change license strategy without an explicit product/legal decision.
 
 Exit evidence:
@@ -160,16 +189,16 @@ Exit evidence:
 Owner: runtime/test maintainer
 
 - [x] Typecheck tests using a dedicated test tsconfig or include them in the main typecheck.
-- [ ] Add CLI integration coverage for help/list, invalid games/themes, non-TTY input, `SIGINT`, `SIGTERM`, child-process failure, and exit codes.
-- [ ] Add a fake or real PTY test proving raw mode, alternate screen, cursor visibility, listeners, and timers are restored after quit, crash, and game switch.
+- [x] Add CLI integration coverage for help/list, invalid games/themes, non-TTY input, `SIGINT`, `SIGTERM`, child-process failure, and exit codes.
+- [x] Add a real PTY test proving raw mode, alternate screen, cursor visibility, listeners, and timers are restored after quit, crash, and game switch.
 - [x] Cover every controller through the catalog lifecycle soak; retain focused controller tests for higher-risk games.
 - [x] Cover every renderer and resize path at 80x24 and 100x30 through the catalog soak and seeded catalog run.
 - [x] Add a 100-cycle catalog start -> resize -> stop soak test and assert no leaked timers, terminal/window listeners, or wraps.
 - [x] Upgrade Dead Letter Department and Packet Panic from progress-only to seeded-completion because they are Featured.
 - [x] Upgrade Ghost Shift, Dice Tribunal, Time Capsule, and Night Frequency from generic smoke to versioned progression profiles.
 - [x] Change the current test that expects Featured coverage gaps so it requires zero Featured gaps.
-- [ ] Add a lightweight formatting check and a deliberately small lint ruleset focused on correctness, promises, unsafe process/filesystem use, and dead code.
-- [ ] Add coverage reporting first; set thresholds only after measuring a stable baseline. Prefer per-critical-module thresholds over chasing one vanity percentage.
+- [x] Add a lightweight formatting check and a deliberately small lint ruleset focused on correctness, promises, unsafe process/filesystem use, and dead code.
+- [x] Add coverage reporting, record the first stable baseline, and enforce conservative regression thresholds below that baseline.
 
 Exit evidence:
 
@@ -186,7 +215,7 @@ Owner: runtime maintainer
 - [x] Cache failed/offline checks with a short backoff so offline users do not pay the full timeout on every launch.
 - [x] Add startup benchmarks with targets: help/list under 250 ms offline and interactive controls available under 500 ms before any update result.
 - [x] Instrument lifecycle writes and remove idle redraws from the four previously generic turn-based profiles; retain explicit capped animation loops where effects require them.
-- [ ] Add a render/resize benchmark at 80x24, 100x30, and 160x50 and catch accidental quadratic layout work.
+- [x] Add a render/resize benchmark at 80x24, 100x30, and 160x50 and catch accidental quadratic layout work.
 - [x] Retain public source maps for debugging while the package remains within its explicit size budget; revisit only with a deliberate artifact strategy.
 - [x] Add package budgets of no more than 1.5 MB compressed and 6 MB unpacked.
 - [x] Keep median root import startup under 50 ms and report the coldest sample for filesystem/antivirus diagnostics.
@@ -204,9 +233,9 @@ Owner: product/UX maintainer plus testers who did not build the target game
 - [ ] Test Windows Terminal, one macOS terminal, one Linux terminal, and xterm.js.
 - [ ] Test 80x24 compact, 100x30 standard, and one wide layout with carbon, paper, and contrast themes.
 - [x] Document the current UTF-8 and font requirement without claiming an unimplemented ASCII-only mode.
-- [ ] Add global reduced-motion behavior for transitions and animations; honor a CLI flag or environment/config setting.
+- [x] Add global reduced-motion behavior for transitions and animations; honor a CLI flag or environment/config setting.
 - [x] Implement and document non-empty `NO_COLOR` handling for the CLI.
-- [ ] Verify no mechanic relies on color alone and that focus, warning, success, and failure always have text/shape cues.
+- [x] Verify shared focus, warning, success, and failure states have text/shape cues rather than relying on color alone; retain human review for game-specific comprehension.
 - [ ] Run at least three first-time-player sessions for each Featured and Beta game. Record repeated confusion and retest fixes with a new participant.
 - [ ] Give each Workshop game at least one independent launch/understand/quit review; keep it Workshop if its deeper loop lacks evidence.
 - [ ] Record terminal, dimensions, theme, Node version, commit, seed, outcome, confusion points, and accessibility findings without collecting unnecessary participant data.
@@ -240,7 +269,7 @@ Gamr may be called production-ready when all of the following are true:
 - [ ] Package publication, provenance, Git tag, changelog, GitHub Release, and site version agree.
 - [x] Optional downstream notification failure cannot disguise the actual npm publication result.
 - [x] Help/list and initial interaction stay within startup budgets while offline.
-- [ ] CLI signal, terminal restoration, repeated switch, and controller cleanup tests pass.
+- [x] CLI signal, terminal restoration, repeated switch, and controller cleanup tests pass locally and are required in the candidate CI matrix.
 - [ ] All Featured games have seeded-completion and human sign-off.
 - [ ] Beta and Workshop limitations are visible before launch and match their evidence.
 - [ ] Supported terminals, sizes, Unicode/ASCII behavior, motion, and color behavior are documented and tested.

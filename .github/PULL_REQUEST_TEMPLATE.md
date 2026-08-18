@@ -5,9 +5,15 @@
 ## Verification
 
 - [ ] `npm ci`
+- [ ] `npm run check:format`
+- [ ] `npm run check:source`
+- [ ] `npm run lint`
 - [ ] `npm run typecheck`
 - [ ] `npm test`
 - [ ] `npm run build`
+- [ ] `npm run test:cli`
+- [ ] `npm run test:pty`
+- [ ] `npm run test:render-performance`
 - [ ] `npm run pack:smoke`
 - [ ] Manual terminal playtest completed where relevant (include OS, terminal, and dimensions)
 

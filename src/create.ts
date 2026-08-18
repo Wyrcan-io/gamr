@@ -30,6 +30,10 @@ function toTitle(kebab: string): string {
   return kebab.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
 }
 
+export function sanitizeTemplateDescription(description: string): string {
+  return description.replace(/\*\//g, '* /');
+}
+
 // ---------------------------------------------------------------------------
 // Repo detection
 // ---------------------------------------------------------------------------
@@ -76,19 +80,25 @@ function findRepoRoot(from: string): string | null {
 // Game registry parsing
 // ---------------------------------------------------------------------------
 
-interface RegisteredGame {
+export interface RegisteredGame {
   id: string;
   name: string;
   description: string;
 }
 
-function parseRegisteredGames(indexContent: string): RegisteredGame[] {
+export function parseRegisteredGames(indexContent: string): RegisteredGame[] {
   const games: RegisteredGame[] = [];
   const regex = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*description:\s*(?:"((?:\\.|[^"\\])*)"|'([^']+)')/g;
   let match;
   while ((match = regex.exec(indexContent)) !== null) {
-    const description = match[3] !== undefined ? JSON.parse(`"${match[3]}"`) : match[4];
-    games.push({ id: match[1], name: match[2], description });
+    try {
+      const description = match[3] !== undefined ? JSON.parse(`"${match[3]}"`) : match[4];
+      if (isValidGameId(match[1]) && match[2].trim() && typeof description === 'string') {
+        games.push({ id: match[1], name: match[2], description });
+      }
+    } catch {
+      // Ignore malformed generated or hand-edited entries instead of crashing the developer menu.
+    }
   }
   return games;
 }
@@ -122,7 +132,7 @@ function getUserGames(repoRoot: string): RegisteredGame[] {
 // Interactive repo setup
 // ---------------------------------------------------------------------------
 
-async function findOrSetupRepo(): Promise<string | null> {
+export async function findOrSetupRepo(): Promise<string | null> {
   const cwd = process.cwd();
   const found = findRepoRoot(cwd);
   if (found) return found;
@@ -356,7 +366,7 @@ async function doCreate(repoRoot: string, initialName?: string) {
   let template = readFileSync(templatePath, 'utf-8');
   // The description is placed in a block comment in the scaffold. Prevent a
   // crafted `*/` from ending that comment and becoming generated source.
-  const templateDescription = description.replace(/\*\//g, '* /');
+  const templateDescription = sanitizeTemplateDescription(description);
   template = template.replace(/\{GameName\}/g, pascal);
   template = template.replace(/\{GAME_NAME\}/g, title);
   template = template.replace(/\{GAME_DESCRIPTION\}/g, templateDescription);

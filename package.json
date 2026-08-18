@@ -1,6 +1,6 @@
 {
   "name": "@wyrcan/gamr",
-  "version": "0.3.2",
+  "version": "0.4.0-beta.1",
   "description": "A curated anthology of original terminal games for xterm.js and CLI",
   "license": "AGPL-3.0",
   "type": "module",
@@ -42,13 +42,18 @@
     "start": "node scripts/start.mjs",
     "start:build": "npm run build && npm run start",
     "dev": "tsup --watch",
+    "check:format": "node scripts/check-format.mjs",
     "check:source": "node scripts/check-source.mjs",
+    "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.reporter=text-summary --coverage.reporter=json-summary --coverage.thresholds.lines=70 --coverage.thresholds.functions=75 --coverage.thresholds.branches=50 --coverage.thresholds.statements=60",
     "test:watch": "vitest",
     "test:cli": "node scripts/cli-smoke.mjs",
+    "test:pty": "node scripts/pty-smoke.mjs",
+    "test:render-performance": "node scripts/render-benchmark.mjs",
     "pack:smoke": "node scripts/pack-smoke.mjs",
-    "prepublishOnly": "npm run check:source && npm run typecheck && npm test && npm run build && npm run test:cli && npm run pack:smoke"
+    "prepublishOnly": "npm run check:format && npm run check:source && npm run lint && npm run typecheck && npm test && npm run build && npm run test:cli && npm run test:pty && npm run test:render-performance && npm run pack:smoke"
   },
   "peerDependencies": {
     "@xterm/xterm": ">=5.0.0 <7"
@@ -60,9 +65,13 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "4.1.10",
     "@xterm/xterm": "^6.0.0",
+    "eslint": "9.39.2",
+    "node-pty": "1.1.0",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",
+    "typescript-eslint": "8.64.0",
     "vitest": "^4.0.18"
   },
   "repository": {

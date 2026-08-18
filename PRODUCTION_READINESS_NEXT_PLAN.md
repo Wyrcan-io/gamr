@@ -2,15 +2,17 @@
 
 **Audit date:** 2026-08-18  
 **Audited commit:** `697a994` (`master`, matching `origin/master` at audit time)  
+**Implementation commit:** `a9bfe33` (`master`, matching `origin/master`)
+**Implementation CI:** [run 32153814198](https://github.com/Wyrcan-io/gamr/actions/runs/32153814198) passed on Ubuntu Node 22/24, Windows Node 24, and the production dependency audit
 **Current package manifest:** `@wyrcan/gamr@0.3.2`  
 **Recommended next release line:** `0.4.0-beta.1` -> `0.4.0`  
 **Current verdict:** Automated production candidate / public beta. Local engineering gates are substantially complete; external repository controls and independent human evidence still block a production-ready claim.
 
 ## Implementation update - 2026-08-18
 
-This roadmap is being executed in the working tree based on `697a994`. The original audit below remains the baseline; this section is the current status until the changes receive a commit SHA and CI run.
+The original audit below remains the baseline. The implementation was committed and pushed as `a9bfe33`; its full GitHub CI run completed successfully on 2026-08-18. This section is now the current engineering status.
 
-Completed locally:
+Completed in the implementation commit:
 
 - refreshed `nanoid` to `3.3.18`; clean install, production audit, and full audit report zero vulnerabilities;
 - made update checking cache-first and non-blocking, with one-hour failure backoff and no network access for help, list, invalid arguments, or CI;
@@ -27,7 +29,7 @@ Completed locally:
 Current verification:
 
 - `npm ci`: 170 packages installed; zero vulnerabilities.
-- `npm test`: 58 files and 238 tests passed.
+- `npm test`: 58 files and 239 tests passed in CI.
 - source and test typechecking, source policy, build, CLI smoke, and packed-install smoke passed.
 - the built 20-game progression suite passed at `80x24`; Packet Panic reached its real three-delivery tutorial completion in about 14 seconds.
 

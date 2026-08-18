@@ -15,6 +15,6 @@ describe('Ghost Shift renderer', () => {
   });
 
   it('shows an honest resize frame', () => {
-    expect(stripAnsi(renderFrame(createState(1), 79, 28, getThemePalette('carbon')))).toContain('NEED 80x28');
+    expect(stripAnsi(renderFrame(createState(1), 79, 28, getThemePalette('carbon')))).toContain('NEED 80x24');
   });
 });

@@ -8,7 +8,7 @@ describe('Last Train Home renderer', () => {
   it('renders briefing and honest resize guidance', () => {
     const frame = stripAnsi(renderFrame(createState(7), 80, 28, getThemePalette('carbon')));
     expect(frame).toContain('LAST TRAIN HOME');
-    expect(stripAnsi(renderFrame(createState(7), 79, 28, getThemePalette('paper')))).toContain('NEED 80x28');
+    expect(stripAnsi(renderFrame(createState(7), 79, 28, getThemePalette('paper')))).toContain('NEED 80x24');
   });
 
   it('shows a pre-commit projection and help overlay', () => {

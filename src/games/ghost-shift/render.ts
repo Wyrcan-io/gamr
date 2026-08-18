@@ -6,7 +6,7 @@ import { getCurrentThemePalette, type TerminalThemePalette } from '../utils';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 const PEOPLE: PersonId[] = ['NORA', 'SAM', 'PRIYA', 'LEON', 'MICA'];
 
 export interface GhostRenderModel { frame?: number; helpOpen?: boolean; }

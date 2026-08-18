@@ -22,7 +22,7 @@ describe('Market of Mirrors renderer', () => {
     const help = stripAnsi(renderFrame(state, 80, 28, getThemePalette('paper'), { ...model, helpOpen: true }));
     expect(preview).toContain('ACTION PREVIEW');
     expect(help).toContain('LEDGER CARD');
-    expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper'), model))).toContain('NEED 80x28');
+    expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper'), model))).toContain('NEED 80x24');
   });
 
   it('renders a themed title with truthful start controls', () => {

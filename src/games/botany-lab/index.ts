@@ -191,7 +191,7 @@ export function runBotanyLabGame(terminal: Terminal): BotanyLabController {
 
   const render = (): void => {
     let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), 0);
-    if (terminal.cols >= 80 && terminal.rows >= 28) {
+    if (terminal.cols >= 80 && terminal.rows >= 24) {
       if (paused) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: 11, showShortcuts: false });
       if (overlay) output += menuOutput(state, overlay, terminal.cols, overlaySelection);
     }

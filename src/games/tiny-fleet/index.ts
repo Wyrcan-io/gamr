@@ -68,7 +68,7 @@ export function runTinyFleetGame(terminal: Terminal): TinyFleetController {
   }
 
   function pauseOverlay(): string { return renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); }
-  function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette()); if (paused && !state.helpOpen && terminal.cols >= 80 && terminal.rows >= 28) output += pauseOverlay(); terminal.write(output); }
+  function render(): void { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette()); if (paused && !state.helpOpen && terminal.cols >= 80 && terminal.rows >= 24) output += pauseOverlay(); terminal.write(output); }
 
   const originalStop = controller.stop;
   controller.stop = () => { if (!running) return; running = false; keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); originalStop(); };

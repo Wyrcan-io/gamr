@@ -6,14 +6,19 @@ import type { GameState, Point, Tile, Train } from './types';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 const MAP_X = 3;
 const MAP_Y = 6;
 const CELL_W = 3;
 
-function put(out: string[], x: number, y: number, value: string): void { out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${value}`); }
+function put(out: string[], x: number, y: number, value: string): void {
+  out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${clipToWidth(value, Math.max(0, 80 - Math.max(1, x)), '')}`);
+}
 function line(value: string, width: number, color = ''): string { return `${color}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
-function centered(out: string[], cols: number, y: number, value: string, color: string): void { put(out, Math.max(1, Math.floor((cols - displayWidth(value)) / 2) + 1), y, `${color}${value}${RESET}`); }
+function centered(out: string[], cols: number, y: number, value: string, color: string): void {
+  const text = clipToWidth(value, cols - 2, '');
+  put(out, Math.max(1, Math.floor((cols - displayWidth(text)) / 2) + 1), y, `${color}${text}${RESET}`);
+}
 function trainAt(trains: Record<string, Train>, point: Point): Train | undefined { return Object.values(trains).find(train => train.status !== 'evacuated' && train.position.x === point.x && train.position.y === point.y); }
 function tileStyle(tile: Tile, palette: TerminalThemePalette): string { if (tile.closed) return palette.danger; if (tile.obstruction) return palette.warning; if (tile.safeTerminus) return palette.good; if (tile.station) return palette.focus; return palette.ink; }
 function forecastIcon(kind: string): string { return kind === 'flood' ? '~' : kind === 'fire' ? '!' : kind === 'landslide' ? '#' : '?'; }
@@ -32,8 +37,8 @@ export function renderFrame(state: GameState, cols: number, rows: number, palett
   if (state.phase === 'start') return startFrame(out, cols, palette);
   if (state.phase === 'briefing') return briefingFrame(out, cols, state, palette);
   if (state.phase === 'ending' || state.phase === 'gameOver') return endingFrame(out, cols, state, palette);
-  if (state.phase === 'turnReport') reportFrame(out, cols, state, palette);
-  else planningFrame(out, cols, state, palette);
+  if (state.phase === 'turnReport') reportFrame(out, cols, state, palette, rows);
+  else planningFrame(out, cols, state, palette, rows);
   return out.join('');
 }
 
@@ -53,7 +58,7 @@ function briefingFrame(out: string[], cols: number, state: GameState, palette: T
 
 function tutorialObjective(step: number): string { return ['TUTORIAL 1/3  Select the marked junction, switch it, then commit.', 'TUTORIAL 2/3  TAB to the medical train and hold it for one turn.', 'TUTORIAL 3/3  Select a forecast tile, reinforce it, then commit.', 'INDUCTION COMPLETE  ENTER  continue.'][Math.min(3, step)]!; }
 
-function planningFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): void {
+function planningFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette, rows: number): void {
   drawMap(out, state, palette);
   const panel = MAP_X + state.scenario.width * CELL_W + 4;
   put(out, panel, MAP_Y, `${palette.focus}${BOLD}TIMETABLE${RESET}`);
@@ -70,8 +75,9 @@ function planningFrame(out: string[], cols: number, state: GameState, palette: T
   projection.trains.slice(0, 4).forEach((train, i) => put(out, 3, 20 + i, line(`${train.id} ${train.outcome.toUpperCase()}${train.to ? ` -> ${train.to.x},${train.to.y}` : ''}`, 38, train.outcome === 'block' ? palette.danger : palette.ink)));
   put(out, 44, 19, `${palette.focus}${BOLD}EVENT TAPE${RESET}`);
   state.eventLog.slice(0, 4).forEach((event, i) => put(out, 44, 20 + i, line(`${event.tone === 'bad' ? '[x]' : event.tone === 'warn' ? '[!]' : event.tone === 'good' ? '[+]' : '[ ]'} ${event.text}`, cols - 46, event.tone === 'bad' ? palette.danger : event.tone === 'warn' ? palette.warning : event.tone === 'good' ? palette.good : palette.muted)));
-  if (state.mode === 'tutorial' && state.tutorialStep !== null) put(out, 3, 25, line(tutorialObjective(state.tutorialStep), cols - 6, palette.focus));
-  else put(out, 3, 25, line('ARROWS MOVE  TAB TRAINS  1 SWITCH  2 HOLD  3 REPAIR  4 CLEAR  SPACE COMMIT  ? HELP  ESC PAUSE', cols - 6, palette.muted));
+  const footerRow = Math.max(1, rows - 1);
+  if (state.mode === 'tutorial' && state.tutorialStep !== null) put(out, 3, footerRow, line(tutorialObjective(state.tutorialStep), cols - 6, palette.focus));
+  else put(out, 3, footerRow, line('ARROWS MOVE  TAB TRAINS  1 SWITCH  2 HOLD  3 REPAIR  4 CLEAR  SPACE COMMIT  ? HELP  ESC PAUSE', cols - 6, palette.muted));
 }
 
 function drawMap(out: string[], state: GameState, palette: TerminalThemePalette): void {
@@ -88,10 +94,10 @@ function drawMap(out: string[], state: GameState, palette: TerminalThemePalette)
   }
 }
 
-function reportFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): void {
+function reportFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette, rows: number): void {
   put(out, 3, 19, `${palette.warning}${BOLD}TURN ${state.turn - 1} RESOLUTION${RESET}`);
   state.lastResolution?.events.slice(0, 5).forEach((event, i) => put(out, 3, 21 + i, line(`${event.tone === 'bad' ? '[x]' : event.tone === 'warn' ? '[!]' : event.tone === 'good' ? '[+]' : '[ ]'} ${event.text}`, cols - 6, event.tone === 'bad' ? palette.danger : event.tone === 'warn' ? palette.warning : event.tone === 'good' ? palette.good : palette.ink)));
-  centered(out, cols, 27, 'ENTER  RETURN TO DISPATCH', palette.muted);
+  centered(out, cols, Math.max(1, rows - 1), 'ENTER  RETURN TO DISPATCH', palette.muted);
 }
 
 function endingFrame(out: string[], cols: number, state: GameState, palette: TerminalThemePalette): string {

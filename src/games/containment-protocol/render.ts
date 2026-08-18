@@ -2,15 +2,15 @@ import { getCurrentThemePalette } from '../utils';
 import { anomalyGlyph, anomalyName, currentShift, projectCycle } from './engine';
 import { ROOM_NAMES, ROOMS } from './content';
 import type { GameState, RoomId } from './types';
+import { clipToWidth, stripAnsi } from '../../ui/terminal';
 
 const RESET = '\x1b[0m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 
 function clean(value: string): string { return value.replace(/\x1b\[[0-9;]*m/g, ''); }
 function fit(value: string, width: number): string {
-  const text = clean(value);
-  return text.length > width ? `${text.slice(0, Math.max(0, width - 1))}…` : text.padEnd(width, ' ');
+  return clipToWidth(stripAnsi(clean(value)).replace(/[\r\n]+/g, ' '), Math.max(0, width - 2), '');
 }
 function bar(value: number, max: number, width = 8): string {
   const filled = Math.round(Math.max(0, Math.min(1, value / Math.max(1, max))) * width);
@@ -18,6 +18,9 @@ function bar(value: number, max: number, width = 8): string {
 }
 function line(text: string, palette: ReturnType<typeof getCurrentThemePalette>, role: keyof ReturnType<typeof getCurrentThemePalette> = 'ink'): string {
   return `${palette[role]}${text}${RESET}`;
+}
+function frame(out: string[], cols: number): string {
+  return [out[0]!, ...out.slice(1).map(value => fit(value, cols))].join('\r\n');
 }
 function roomRow(state: GameState, projected: GameState, roomId: RoomId, selected: boolean): string {
   const room = state.rooms[roomId];
@@ -40,18 +43,18 @@ export function renderFrame(state: GameState, cols: number, rows: number, _theme
   out.push(line('g/ CONTAINMENT PROTOCOL', palette, 'focus'));
   if (state.phase === 'start') {
     out.push('', line('HALCYON ANNEX // FOUR ROOMS, ONE RULE AT A TIME', palette, 'ink'), '', 'T  TUTORIAL     C  CAMPAIGN     N  NIGHT WATCH     Q  QUIT', '', line('Tune the room. Read the projection. Commit one cycle.', palette, 'muted'));
-    return out.join('\n');
+    return frame(out, cols);
   }
   if (state.phase === 'briefing') {
     const shift = currentShift(state);
     out.push('', line(`SHIFT ${state.shiftIndex + 1}: ${shift.title}`, palette, 'focus'), '', fit(shift.brief, cols - 4), '', 'ACTIVE ANOMALIES');
     Object.values(state.anomalies).forEach(anomaly => out.push(`  ${anomalyGlyph(anomaly.id)} ${anomalyName(anomaly.id)}  ROOM ${anomaly.roomId}`));
     out.push('', line('ENTER  open the containment bench    R  dossier', palette, 'muted'));
-    return out.join('\n');
+    return frame(out, cols);
   }
   if (state.phase === 'gameOver' || state.phase === 'ending') {
     out.push('', line(state.phase === 'ending' ? 'HANDOFF ACCEPTED' : 'CONTAINMENT FAILED', palette, state.phase === 'ending' ? 'good' : 'danger'), '', `INTEGRITY ${state.integrity}/6  SCORE ${state.score}`, '', fit(state.notice, cols - 4), '', 'R restart shift   N next game   Q quit');
-    return out.join('\n');
+    return frame(out, cols);
   }
   const projection = state.phase === 'working' ? projectCycle(state) : { state, accepted: true };
   const projected = projection.state;
@@ -70,5 +73,5 @@ export function renderFrame(state: GameState, cols: number, rows: number, _theme
   out.push(line('[Enter] commit  [R] rules  [L] log  [H] help  [Esc] pause  [Q] quit', palette, 'muted'));
   if (state.phase === 'cycleReport') out.push('', line('CYCLE RESOLVED — ENTER to continue', palette, 'good'));
   if (state.phase === 'shiftReport') out.push('', line('SHIFT COMPLETE — ENTER to continue', palette, 'good'));
-  return out.join('\n');
+  return frame(out, cols);
 }

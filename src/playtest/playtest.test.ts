@@ -39,6 +39,19 @@ describe('virtual terminal screen', () => {
     windowValue.removeEventListener('keydown', listener);
     terminal.dispose();
   });
+
+  it('does not add a blank row after a full-width CRLF line', () => {
+    const screen = new VirtualScreen(4, 3);
+    screen.write('ABCD\r\nEF');
+    expect(screen.snapshot().lines).toEqual(['ABCD', 'EF', '']);
+    expect(screen.snapshot().wrappedLines).toBe(0);
+  });
+
+  it('records a line that exceeds the terminal width', () => {
+    const screen = new VirtualScreen(4, 2);
+    screen.write('ABCDE');
+    expect(screen.snapshot().wrappedLines).toBe(1);
+  });
 });
 
 describe('playtest registry', () => {
@@ -66,6 +79,42 @@ describe('playtest determinism', () => {
 });
 
 describe('playtest runner', () => {
+  it('runs a seeded completion at the compact gameplay viewport', async () => {
+    const report = await new PlaytestRunner({ defaultWaitMs: 40 }).run('stack-trace', {
+      seed: 7,
+      viewport: { cols: 80, rows: 24 },
+      maxActions: 8,
+      maxElapsedMs: 2500,
+    });
+    expect(report.status).toBe('passed');
+    expect(report.observations.every((observation) => observation.cols === 80 && observation.rows === 24)).toBe(true);
+    expect(Math.max(...report.observations.map((observation) => observation.wrappedLines))).toBe(0);
+  }, 10000);
+
+  it('keeps the full seeded catalog inside the compact viewport', async () => {
+    const registry = createPlaytestRegistry(allGames);
+    const runner = new PlaytestRunner({ registry, defaultWaitMs: 70 });
+    const reports = [];
+    for (const game of allGames) {
+      if (registry.get(game.id)?.coverage !== 'seeded-completion') continue;
+      reports.push(await runner.run(game.id, {
+        seed: 20260811,
+        viewport: { cols: 80, rows: 24 },
+        maxStalledFrames: 240,
+        maxElapsedMs: 30000,
+      }));
+    }
+    const failures = reports
+      .filter(report => report.status !== 'passed' || report.observations.some(observation => observation.wrappedLines !== 0))
+      .map(report => ({
+        gameId: report.gameId,
+        status: report.status,
+        maxWrappedLines: Math.max(0, ...report.observations.map(observation => observation.wrappedLines)),
+        failures: report.failures,
+      }));
+    expect(failures).toEqual([]);
+  }, 120000);
+
   it('can progress through a real game using terminal keys', async () => {
     const report = await new PlaytestRunner({ defaultWaitMs: 70 }).run('dead-letter-department', {
       maxActions: 10,

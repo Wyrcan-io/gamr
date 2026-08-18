@@ -88,7 +88,7 @@ export function runMarketOfMirrorsGame(terminal: Terminal): MarketOfMirrorsContr
   function render(): void {
     const model: MarketRenderModel = { selectedGood, secondGood, selectedArtifact, selectedFaction, frame: selectedFrameIndex, intensity: selectedIntensity, focus, helpOpen, paused };
     let output = title ? renderTitle(terminal.cols, terminal.rows, getCurrentThemePalette()) : renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), model);
-    if (paused && !helpOpen && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
+    if (paused && !helpOpen && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   }
   const originalStop = controller.stop;

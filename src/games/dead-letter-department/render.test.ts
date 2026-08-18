@@ -47,7 +47,6 @@ describe('Dead Letter Department renderer', () => {
     expect(ledger.split('\r\n').every((line) => displayWidth(line) <= 80)).toBe(true);
     expect(help.split('\r\n').every((line) => displayWidth(line) <= 80)).toBe(true);
     expect(wide.split('\r\n').every((line) => displayWidth(line) <= 100)).toBe(true);
-    expect(stripAnsi(renderFrame(createState(42), 79, 28, palette))).toContain('Need 80x28');
+    expect(stripAnsi(renderFrame(createState(42), 79, 28, palette))).toContain('Need 80x24');
   });
 });
-

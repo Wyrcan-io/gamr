@@ -8,7 +8,7 @@ describe('Signal//Noise renderer', () => {
   it('renders the receiver start and resize states', () => {
     const start = stripAnsi(renderFrame(createState(7), 80, 28, getThemePalette('carbon')));
     expect(start).toContain('SIGNAL//NOISE');
-    expect(stripAnsi(renderFrame(createState(7), 79, 28, getThemePalette('paper')))).toContain('NEED 80x28');
+    expect(stripAnsi(renderFrame(createState(7), 79, 28, getThemePalette('paper')))).toContain('NEED 80x24');
   });
 
   it('keeps listening, help, and response frames within width', () => {

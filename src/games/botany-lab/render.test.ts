@@ -23,7 +23,7 @@ describe('Botany Lab renderer', () => {
   it('shows a resize message below the minimum terminal size', () => {
     const frame = stripAnsi(renderFrame(createState(3), 79, 28, '\x1b[96m', 0));
     expect(frame).toContain('TERMINAL TOO SMALL');
-    expect(frame).toContain('NEED 80x28');
+    expect(frame).toContain('NEED 80x24');
   });
 
   it('keeps plant identity readable in ASCII mode', () => {

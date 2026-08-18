@@ -13,7 +13,7 @@ const YELLOW = '\x1b[93m';
 const MAGENTA = '\x1b[95m';
 
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 const CARD_WIDTH = 23;
 
 function stripAnsi(value: string): string { return value.replace(/\x1b\[[0-9;]*m/g, ''); }

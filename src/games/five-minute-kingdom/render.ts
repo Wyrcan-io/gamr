@@ -28,7 +28,7 @@ function resizeFrame(cols: number, rows: number, palette: TerminalThemePalette):
     `${palette.focus}${BOLD}${center('g/ FIVE-MINUTE KINGDOM', cols)}${RESET}`,
     '',
     center('The survey needs a larger page.', cols),
-    center(`Need 80x28  Have ${cols}x${rows}`, cols),
+    center(`Need 80x24  Have ${cols}x${rows}`, cols),
     center('Resize the terminal before drafting the next square.', cols),
   ];
   return `${ESC}2J${ESC}H${content.join('\r\n')}`;
@@ -188,7 +188,7 @@ export function renderFrame(
   palette: TerminalThemePalette = getCurrentThemePalette(),
   options: FiveMinuteRenderOptions = {},
 ): string {
-  if (cols < 80 || rows < 28) return resizeFrame(cols, rows, palette);
+  if (cols < 80 || rows < 24) return resizeFrame(cols, rows, palette);
   if (options.helpOpen) return helpFrame(cols, palette);
   if (options.ledgerOpen && state.phase !== 'briefing') return ledgerFrame(state, cols, palette);
   if (state.phase === 'briefing') return briefingFrame(state, cols, palette);

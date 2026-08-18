@@ -20,6 +20,8 @@ export class VirtualScreen {
   private alternateGrid: string[][];
   private cursorX = 0;
   private cursorY = 0;
+  private wrapPending = false;
+  private wrappedLines = 0;
   private savedCursor = { x: 0, y: 0 };
   private alternateCursor = { x: 0, y: 0 };
   private usingAlternate = false;
@@ -47,6 +49,7 @@ export class VirtualScreen {
     this.alternateGrid = blankGrid(cols, rows);
     this.cursorX = 0;
     this.cursorY = 0;
+    this.wrapPending = false;
     this.alternateCursor = { x: 0, y: 0 };
   }
 
@@ -61,19 +64,26 @@ export class VirtualScreen {
       }
       if (char === '\r') {
         this.cursorX = 0;
+        this.wrapPending = false;
       } else if (char === '\n') {
         this.cursorY = clamp(this.cursorY + 1, 0, this.rows - 1);
+        this.wrapPending = false;
       } else if (char === '\b') {
         this.cursorX = clamp(this.cursorX - 1, 0, this.cols - 1);
+        this.wrapPending = false;
       } else if (char === '\t') {
         this.cursorX = clamp(this.cursorX + (8 - (this.cursorX % 8)), 0, this.cols - 1);
+        this.wrapPending = false;
       } else if (char >= ' ') {
-        this.currentGrid()[this.cursorY]![this.cursorX] = char;
-        this.cursorX++;
-        if (this.cursorX >= this.cols) {
+        if (this.wrapPending) {
+          this.wrappedLines++;
           this.cursorX = 0;
           this.cursorY = clamp(this.cursorY + 1, 0, this.rows - 1);
+          this.wrapPending = false;
         }
+        this.currentGrid()[this.cursorY]![this.cursorX] = char;
+        if (this.cursorX === this.cols - 1) this.wrapPending = true;
+        else this.cursorX++;
       }
       index++;
     }
@@ -92,6 +102,7 @@ export class VirtualScreen {
       lines,
       changed: text !== this.lastText,
       alternateBuffer: this.usingAlternate,
+      wrappedLines: this.wrappedLines,
     };
     this.lastText = text;
     this.lastAt = snapshot.at;
@@ -153,6 +164,7 @@ export class VirtualScreen {
         break;
       default: break;
     }
+    this.wrapPending = false;
     return match[0].length;
   }
 

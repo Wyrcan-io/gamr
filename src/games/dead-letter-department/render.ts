@@ -20,7 +20,7 @@ function resizeFrame(cols: number, rows: number, palette: TerminalThemePalette):
     `${palette.focus}${BOLD}${center('g/ DEAD LETTER DEPARTMENT', cols)}${RESET}`,
     '',
     center('The sorting desk needs a larger page.', cols),
-    center(`Need 80x28  Have ${cols}x${rows}`, cols),
+    center(`Need 80x24  Have ${cols}x${rows}`, cols),
     center('Resize the terminal before opening the next letter.', cols),
   ];
   return `${ESC}2J${ESC}H${lines.join('\r\n')}`;
@@ -230,7 +230,7 @@ export function renderFrame(
   rows: number,
   palette: TerminalThemePalette = getCurrentThemePalette(),
 ): string {
-  if (cols < 80 || rows < 28) return resizeFrame(cols, rows, palette);
+  if (cols < 80 || rows < 24) return resizeFrame(cols, rows, palette);
   if (state.helpOpen) return helpFrame(state, cols, palette);
   if (state.phase === 'start') return startFrame(cols, palette);
   if (state.phase === 'briefing') return briefingFrame(state, cols, palette);

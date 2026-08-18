@@ -20,6 +20,8 @@ export interface TerminalSnapshot {
   lines: string[];
   changed: boolean;
   alternateBuffer: boolean;
+  /** Number of printable lines that crossed the right edge before this snapshot. */
+  wrappedLines: number;
 }
 
 export interface PlaytestObservation extends TerminalSnapshot {

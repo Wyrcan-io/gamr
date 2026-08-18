@@ -10,7 +10,7 @@ const YELLOW = '\x1b[93m';
 const RED = '\x1b[91m';
 const MAGENTA = '\x1b[95m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 
 function put(out: string[], x: number, y: number, text: string): void { out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${text}`); }
 function center(out: string[], cols: number, y: number, text: string, color: string): void { put(out, Math.max(1, Math.floor((cols - text.length) / 2) + 1), y, `${color}${text}${RESET}`); }

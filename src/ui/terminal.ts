@@ -8,6 +8,24 @@
 
 const ANSI_PATTERN = /\x1b\[[0-?]*[ -/]*[@-~]/g;
 
+/** Shared terminal-size contract for the launcher and active game catalog. */
+export const LAUNCHER_MIN_COLS = 60;
+export const LAUNCHER_MIN_ROWS = 20;
+export const GAMEPLAY_MIN_COLS = 80;
+export const GAMEPLAY_MIN_ROWS = 24;
+export const GAMEPLAY_STANDARD_ROWS = 28;
+export const GAMEPLAY_WIDE_COLS = 100;
+export const GAMEPLAY_WIDE_ROWS = 30;
+
+export type TerminalLayoutTier = 'compact' | 'standard' | 'wide' | 'undersized';
+
+export function getTerminalLayoutTier(cols: number, rows: number): TerminalLayoutTier {
+  if (cols < GAMEPLAY_MIN_COLS || rows < GAMEPLAY_MIN_ROWS) return 'undersized';
+  if (cols >= GAMEPLAY_WIDE_COLS && rows >= GAMEPLAY_WIDE_ROWS) return 'wide';
+  if (rows >= GAMEPLAY_STANDARD_ROWS) return 'standard';
+  return 'compact';
+}
+
 export function stripAnsi(value: string): string {
   return value.replace(ANSI_PATTERN, '');
 }

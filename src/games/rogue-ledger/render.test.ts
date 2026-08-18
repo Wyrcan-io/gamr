@@ -22,7 +22,7 @@ describe('Rogue Ledger renderer', () => {
     const help = stripAnsi(renderFrame(state, 100, 30, getThemePalette('paper'), { selectedTreatment: 0, helpOpen: true, paused: false }));
     expect(preview).toContain('RED-PENCIL MARGIN');
     expect(help).toContain('ACCOUNTING CARD');
-    expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper')))).toContain('NEED 80x28');
+    expect(stripAnsi(renderFrame(state, 79, 28, getThemePalette('paper')))).toContain('NEED 80x24');
   });
 
   it('renders a themed title with only reachable start controls', () => {

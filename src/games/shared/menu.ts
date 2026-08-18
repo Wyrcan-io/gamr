@@ -6,6 +6,7 @@
  */
 
 import { getCurrentThemeColor } from '../utils';
+import { clipToWidth, displayWidth } from '../../ui/terminal';
 
 export interface MenuItem {
   label: string;
@@ -309,8 +310,9 @@ export function renderSimpleMenu(
     const text = isSelected ? `► ${displayText} ◄` : `  ${displayText}  `;
     const style = isSelected ? '\x1b[1;93m' : `\x1b[2m${themeColor}`;
 
-    const itemX = centerX - Math.floor(text.length / 2);
-    output += `\x1b[${startY + i};${itemX}H${style}${text}\x1b[0m`;
+    const safeText = clipToWidth(text, 78, '');
+    const itemX = Math.max(1, Math.min(80 - displayWidth(safeText), centerX - Math.floor(displayWidth(safeText) / 2)));
+    output += `\x1b[${startY + i};${itemX}H${style}${safeText}\x1b[0m`;
   });
 
   return output;

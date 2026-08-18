@@ -18,7 +18,7 @@ const RESET = `${ESC}0m`;
 const BOLD = `${ESC}1m`;
 
 export const PACKET_MIN_COLS = 80;
-export const PACKET_MIN_ROWS = 28;
+export const PACKET_MIN_ROWS = 24;
 
 export interface PacketRenderModel {
   gameStarted: boolean;
@@ -61,7 +61,7 @@ function resizeFrame(cols: number, rows: number, palette: TerminalThemePalette):
     `${palette.focus}${BOLD}${center('g/ PACKET PANIC', cols)}${RESET}`,
     '',
     center('The network board needs a wider pane.', cols),
-    center(`Need 80x28  Have ${cols}x${rows}`, cols),
+    center(`Need 80x24  Have ${cols}x${rows}`, cols),
     center('Resize before the next packet tick.', cols),
   ].join('\r\n')}`;
 }

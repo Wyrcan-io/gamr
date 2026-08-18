@@ -94,13 +94,13 @@ export function runBlackoutGridGame(terminal: Terminal): BlackoutGridController 
   function render(): void {
     if (!running) return;
     let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor(), 0, upgradeChoices(state).map(choice => choice.name), message);
-    if (helpOpen && terminal.cols >= 80 && terminal.rows >= 28) {
+    if (helpOpen && terminal.cols >= 80 && terminal.rows >= 24) {
       const x = Math.max(3, Math.floor(terminal.cols / 2) - 30);
       output += `\x1b[8;${x}H\x1b[7m  HELP — OPERATE A RADIAL CITY GRID  \x1b[0m`;
       HELP_LINES.forEach((line, index) => { output += `\x1b[${10 + index};${x}H\x1b[96m${line.slice(0, 58)}\x1b[0m`; });
       output += `\x1b[17;${x}H\x1b[2mPRESS H TO CLOSE HELP\x1b[0m`;
     }
-    if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
+    if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   }
 

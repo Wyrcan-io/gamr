@@ -5,7 +5,7 @@ import { currentTransaction, offerLabel, tagLabel, type GameState } from './engi
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 export interface RogueRenderModel { selectedTreatment: number; helpOpen: boolean; paused: boolean; }
 
 function put(out: string[], x: number, y: number, text: string): void { out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${text}`); }

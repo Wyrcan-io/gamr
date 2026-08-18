@@ -7,7 +7,7 @@ import { getCurrentThemePalette, type TerminalThemePalette } from '../utils';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 const FACE: Record<FaceSymbol, string> = { fact: 'F', witness: 'W', law: 'L', rhetoric: 'R', objection: 'O', gaffe: 'X' };
 
 export interface DiceRenderModel { selection?: number; helpOpen?: boolean; paused?: boolean; }

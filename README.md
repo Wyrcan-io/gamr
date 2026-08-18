@@ -6,7 +6,7 @@ The lineup contains twenty original games. The former compatibility archive has 
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. The index shows difficulty, pace, and expected session length before launch. The current active-game layout targets terminals at least 80 columns by 28 rows; compact-layout work is in progress.
+The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. The index shows difficulty, pace, and expected session length before launch. The current active-game layout supports terminals at least 80 columns by 24 rows; the launcher supports 60 columns by 20 rows.
 
 ## Quick Start
 

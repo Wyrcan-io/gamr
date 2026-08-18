@@ -48,7 +48,7 @@ describe('Five-Minute Kingdom renderer', () => {
     const wide = stripAnsi(renderFrame(state, 100, 30, getThemePalette('paper')));
     expect(compact.split('\r\n').every((line) => displayWidth(line) <= 80)).toBe(true);
     expect(wide.split('\r\n').every((line) => displayWidth(line) <= 100)).toBe(true);
-    expect(stripAnsi(renderFrame(createState(7), 79, 28, palette))).toContain('Need 80x28');
+    expect(stripAnsi(renderFrame(createState(7), 79, 28, palette))).toContain('Need 80x24');
   });
 
   it('provides ledger and help as readable overlays', () => {
@@ -60,4 +60,3 @@ describe('Five-Minute Kingdom renderer', () => {
     expect(help).toContain('Draft -> survey -> preview -> commit');
   });
 });
-

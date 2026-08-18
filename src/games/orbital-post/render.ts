@@ -2,13 +2,14 @@ import { currentShift, getPlacementValidation, getQueueJobs, jobIcon, laneLabel,
 import { getCurrentThemePalette } from '../utils';
 import { WEATHER } from './content';
 import type { GameState, Job, LaneId } from './types';
+import { clipToWidth, stripAnsi } from '../../ui/terminal';
 
 const RESET = '\x1b[0m';
 const esc = '\x1b[';
 const ICONS: Record<string, string> = { dock: '▣', eva: '◇', comms: '◉', clear: '☼', veil: '≈', flare: '!', storm: '#', recovery: '✦', complete: '✓', blocked: '⚠' };
 const ASCII: Record<string, string> = { dock: 'D', eva: 'E', comms: 'C', clear: 'O', veil: '~', flare: '!', storm: '#', recovery: '+', complete: '+', blocked: '!' };
 const strip = (value: string): string => value.replace(/\x1b\[[0-9;]*m/g, '');
-const fit = (value: string, width: number): string => { const clean = strip(value); return clean.length > width ? `${clean.slice(0, Math.max(0, width - 1))}…` : clean.padEnd(width, ' '); };
+const fit = (value: string, width: number): string => clipToWidth(stripAnsi(strip(value)).replace(/[\r\n]+/g, ' '), Math.max(0, width - 2), '');
 const box = (title: string, width = 76): string => `┌─ ${title} ${'─'.repeat(Math.max(0, width - title.length - 4))}┐`;
 const bar = (value: number, max: number, width: number, glyph = '▰'): string => { const filled = Math.min(width, Math.max(0, Math.round((value / Math.max(1, max)) * width))); return `${glyph.repeat(filled)}${'·'.repeat(Math.max(0, width - filled))}`; };
 const icon = (name: string, ascii = false): string => (ascii ? ASCII[name] ?? '*' : ICONS[name] ?? '*');
@@ -21,13 +22,13 @@ function titleBlock(cols: number, theme: string): string[] {
 
 function startScreen(cols: number, rows: number, theme: string): string {
   const lines = [' ', ...titleBlock(cols, theme), ' ', 'A calm schedule is about to meet the Sun.', '', 'C  CAMPAIGN     O  OPEN ORBIT (SEEDED)     Q  QUIT', '', 'Schedule cargo. Repair the relay. Keep the signal alive.', '', 'Forecasts are exact. Consequences are not hidden.', '', 'Press a mode key to begin.'];
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function briefing(state: GameState, cols: number, rows: number, theme: string): string {
   const shift = currentShift(state);
   const lines = [' ', ...titleBlock(cols, theme), '', `${shift.title}   SEED ${state.seed}`, '', box('BRIEFING'), `│ ${fit(shift.briefing, 72)} │`, '│', `│ FORECAST: ${state.weather.map((weather, i) => `W${String(i + 1).padStart(2, '0')} ${icon(weather)} ${weatherLabel(weather)}`).slice(0, 6).join('   ')}`, '│', `│ FAULTS: ${Object.values(state.faults).filter(fault => fault.active).map(fault => `${fault.glyph} ${fault.name}`).join('  ') || 'NONE'}`, '│', '│ Every job shows its lane, duration, power, weather, and deadline.', `└${'─'.repeat(74)}┘`, '', 'Read the station brief, then press ENTER to open the workbench.', '', 'H  HELP   ESC  PAUSE'];
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function forecast(state: GameState, ascii: boolean): string {
@@ -78,36 +79,36 @@ function workingScreen(state: GameState, cols: number, rows: number, theme: stri
   if (state.helpOpen) { lines.push(''); lines.push(box('HELP')); lines.push('│ Schedule an order, then arm and resolve one window at a time.            │'); lines.push('│ Blocked jobs stay in place; move them after the report if their deadline │'); lines.push('│ permits. Weather restrictions are exact and shown in the forecast.       │'); lines.push(`└${'─'.repeat(74)}┘`); }
   if (state.logOpen) { lines.push(''); lines.push(box('INCIDENT LOG')); state.log.slice(0, 5).forEach(item => lines.push(`│ W${String(item.window + 1).padStart(2, '0')} ${fit(item.text, 68)} │`)); lines.push(`└${'─'.repeat(74)}┘`); }
   while (lines.length < rows) lines.push('');
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function reportScreen(state: GameState, cols: number, rows: number, theme: string): string {
   void cols;
   const report = state.reports[0]; const lines: string[] = [' ', ...titleBlock(cols, theme), '', box(`WINDOW ${String((report?.window ?? state.currentWindow) + 1).padStart(2, '0')} REPORT`), `│ WEATHER: ${report ? WEATHER[report.weather].label : 'UNKNOWN'} · POWER ${report?.batteryBefore ?? state.battery} → ${report?.batteryAfter ?? state.battery} · INTEGRITY ${report?.integrityBefore ?? state.integrity} → ${report?.integrityAfter ?? state.integrity}`.slice(0, 74) + ' │', '│', `│ ${report?.notices.slice(0, 7).join('\n│ ') ?? state.notice}`.slice(0, 74), `└${'─'.repeat(74)}┘`, '', 'Press ENTER to return to the schedule.'];
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function shiftReport(state: GameState, cols: number, rows: number, theme: string): string {
   const lines = [' ', ...titleBlock(cols, theme), '', box(currentShift(state).title), `│ INTEGRITY ${state.integrity}/${state.integrityMax} · STANDING ${state.standing} · SCORE ${state.score}`, '│', `│ ${state.notice}`, '│', `│ COMPLETE ${Object.values(state.jobs).filter(job => job.state === 'complete').length}   MISSED ${Object.values(state.jobs).filter(job => job.state === 'missed').length}   BLOCKED ${Object.values(state.jobs).filter(job => job.state === 'blocked').length}`, `└${'─'.repeat(74)}┘`, '', 'Press ENTER to file the shift report.'];
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function upgradeScreen(state: GameState, cols: number, rows: number, theme: string): string {
   const lines = [' ', ...titleBlock(cols, theme), '', box('FLIGHT-DECK UPGRADE'), `│ ${state.notice}`, `└${'─'.repeat(74)}┘`, ''];
   state.upgradeOffers.forEach((offer, index) => { lines.push(`${index + 1}. ${offer.name}`); lines.push(`   ${offer.text}`); lines.push(''); });
   lines.push('Choose 1, 2, or 3. The next shift begins after installation.');
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 function terminalEnd(state: GameState, cols: number, rows: number, theme: string): string {
   const lines = [' ', ...titleBlock(cols, theme), '', box(state.phase === 'ending' ? 'RELAY REPORT · CAMPAIGN COMPLETE' : 'RELAY REPORT · SHIFT FAILED'), `│ ${state.notice}`, `│ STANDING ${state.standing} · SCORE ${state.score} · SEED ${state.seed}`, `└${'─'.repeat(74)}┘`, '', state.phase === 'ending' ? 'The fleet has the route. Kestrel remains on the line.' : 'The station can be restarted from the beginning of this shift.', '', 'R restart shift   Q quit'];
-  return `${esc}2J${esc}H${lines.slice(0, rows).join('\n')}`;
+  return `${esc}2J${esc}H${lines.slice(0, rows).map(line => fit(line, cols - 1)).join('\r\n')}`;
 }
 
 export function renderFrame(state: GameState, cols: number, rows: number, theme: string, ascii = false): string {
   const palette = getCurrentThemePalette();
   theme = palette.ink;
-  if (cols < 80 || rows < 28) return `${esc}2J${esc}H\n\n  Terminal too small for Kestrel Station.\n\n  Need: 80x28   Have: ${cols}x${rows}\n\n  Make the pane larger, then return.`;
+  if (cols < 80 || rows < 24) return `${esc}2J${esc}H\n\n  Terminal too small for Kestrel Station.\n\n  Need: 80x24   Have: ${cols}x${rows}\n\n  Make the pane larger, then return.`;
   if (state.phase === 'start') return startScreen(cols, rows, theme);
   if (state.phase === 'briefing') return briefing(state, cols, rows, theme);
   if (state.phase === 'working' || state.phase === 'cancelConfirm') return workingScreen(state, cols, rows, theme, ascii);

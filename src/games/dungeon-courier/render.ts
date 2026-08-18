@@ -12,10 +12,11 @@ const YELLOW = '\x1b[93m';
 const CYAN = '\x1b[96m';
 const MAGENTA = '\x1b[95m';
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 
 function plain(value: string, max = 46): string {
-  return padToWidth(clipToWidth(value.replace(/\x1b\[[0-9;]*m/g, ''), max, ''), max);
+  const clean = value.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\r\n]+/g, ' ');
+  return padToWidth(clipToWidth(clean, max - 1, ''), max - 1);
 }
 
 function centered(cols: number, value: string): string {
@@ -137,9 +138,18 @@ function panelLines(state: GameState): string[] {
 }
 
 function renderTraversal(state: GameState, cols: number): string[] {
-  void cols;
   const map = renderMap(state);
   const panel = panelLines(state);
+  if (cols < 100) {
+    const compactMapWidth = Math.min(52, cols - 2);
+    const compact: string[] = [plain(header(state, CYAN), cols - 2), ''];
+    compact.push(...map.slice(0, 15).map(row => plain(row, compactMapWidth)));
+    compact.push(...panel.slice(0, 4).map(row => plain(row, cols - 2)));
+    compact.push(plain(`LOG: ${state.eventLog[0] ?? 'No events yet.'}`, cols - 2));
+    compact.push(plain('[Arrows/WASD] Aim  [Space/Enter] Commit  [B] Brace  [.] Wait  [E] Interact', cols - 2));
+    compact.push(plain('[1-4] Tool  [I] Satchel  [Tab] Survey  [H] Help  [Esc] Pause', cols - 2));
+    return compact.slice(0, 24);
+  }
   const rows: string[] = [header(state, CYAN), ''];
   for (let i = 0; i < map.length; i++) rows.push(`${map[i]}  │ ${plain(panel[i] ?? '', 29)}`);
   rows.push(`${DIM}──────────────────────────────────────────────  └─────────────────────────────${RESET}`);
@@ -195,7 +205,10 @@ export function renderFrame(state: GameState, cols: number, rows: number, theme:
   else if (state.phase === 'upgrade') lines = renderUpgrade(state, cols);
   else lines = renderEnding(state, cols);
   if (state.helpOpen) lines = renderHelp(state, cols);
-  out.push(lines.map(line => line.replace(/\s+$/, '')).join('\n'));
+  const renderedLines = cols < 100
+    ? lines.map(line => plain(line, cols - 1).replace(/\s+$/, ''))
+    : lines.map(line => line.replace(/\s+$/, ''));
+  out.push(renderedLines.join('\r\n'));
   out.push(`\x1b[${Math.min(rows, lines.length + 1)};1H`);
   return out.join('');
 }

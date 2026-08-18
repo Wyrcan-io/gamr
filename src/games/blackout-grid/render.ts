@@ -3,6 +3,7 @@ import { getCurrentThemePalette } from '../utils';
 import { closePreview, districtContent, selectedActionPreview, selectedAsset, serviceRatioForState } from './engine';
 import type { GameState, GridEdge, GridNode, Point } from './types';
 import { GRID_HEIGHT, GRID_WIDTH } from './types';
+import { clipToWidth } from '../../ui/terminal';
 
 const RESET = '\x1b[0m';
 const DIM = '\x1b[2m';
@@ -16,7 +17,9 @@ const MAP_X = 3;
 const MAP_Y = 6;
 const CELL_W = 3;
 
-function put(out: string[], x: number, y: number, text: string): void { out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${text}`); }
+function put(out: string[], x: number, y: number, text: string): void {
+  out.push(`\x1b[${Math.max(1, y)};${Math.max(1, x)}H${clipToWidth(text, Math.max(0, 80 - Math.max(1, x)), '')}`);
+}
 function center(out: string[], cols: number, y: number, text: string, color = ''): void { put(out, Math.max(1, Math.floor((cols - text.length) / 2) + 1), y, color + text + RESET); }
 function meter(value: number, max: number, width: number): string { const filled = Math.round(clamp(value / Math.max(1, max), 0, 1) * width); return '■'.repeat(filled) + '·'.repeat(width - filled); }
 function clamp(value: number, min: number, max: number): number { return Math.max(min, Math.min(max, value)); }
@@ -151,7 +154,7 @@ export function renderFrame(state: GameState, cols: number, rows: number, theme:
   const palette = getCurrentThemePalette();
   theme = palette.ink;
   const out: string[] = ['\x1b[2J\x1b[H'];
-  if (cols < 80 || rows < 28) { center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', RED + BOLD); center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED 80x28  HAVE ${cols}x${rows}`, DIM + theme); return out.join(''); }
+  if (cols < 80 || rows < 24) { center(out, cols, Math.max(2, Math.floor(rows / 2) - 1), 'TERMINAL TOO SMALL', RED + BOLD); center(out, cols, Math.max(3, Math.floor(rows / 2) + 1), `NEED 80x24  HAVE ${cols}x${rows}`, DIM + theme); return out.join(''); }
   const titleOffset = glitchFrame % 60 >= 56 ? (glitchFrame % 3) - 1 : 0;
   put(out, Math.max(1, Math.floor((cols - 23) / 2) + 1 + titleOffset), 1, `${theme}${BOLD}◆ BLACKOUT GRID ◆${RESET}`);
   const stage = state.stages[state.stageIndex];
@@ -186,6 +189,6 @@ export function renderFrame(state: GameState, cols: number, rows: number, theme:
   state.jobs.slice(0, 2).forEach((job, index) => put(out, 3, statusY + 3 + index, `${CYAN}◈ ${state.edges[job.edgeId]?.label.slice(0, 22)} [${meter(job.totalBeats - job.remainingBeats, job.totalBeats, 8)}]${RESET}`));
   state.eventLog.slice(0, 3).forEach((entry, index) => put(out, 3, 23 + index, `${entry.tone === 'bad' ? RED : entry.tone === 'good' ? GREEN : entry.tone === 'warn' ? YELLOW : theme}> ${entry.text.slice(0, 48)}${RESET}`));
   if (message) put(out, 52, 24, `${YELLOW}${message.slice(0, 27)}${RESET}`);
-  put(out, 3, 27, `${DIM}${theme}ARROWS/WASD MOVE  TAB ASSETS  1 SWITCH  2 REPAIR  3 LOAD  4 GEN  SPACE FOCUS  ESC PAUSE${RESET}`);
+  put(out, Math.max(1, 3), Math.max(1, rows - 1), `${DIM}${theme}ARROWS/WASD MOVE  TAB ASSETS  1 SWITCH  2 REPAIR  3 LOAD  4 GEN  SPACE FOCUS  ESC PAUSE${RESET}`);
   return out.join('');
 }

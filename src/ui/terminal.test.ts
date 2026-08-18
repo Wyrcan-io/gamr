@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { clipToWidth, displayWidth, padToWidth, wrapText } from './terminal';
+import {
+  clipToWidth,
+  displayWidth,
+  GAMEPLAY_MIN_COLS,
+  GAMEPLAY_MIN_ROWS,
+  getTerminalLayoutTier,
+  padToWidth,
+  wrapText,
+} from './terminal';
 
 describe('terminal layout helpers', () => {
   it('measures terminal cells rather than UTF-16 code units', () => {
@@ -19,5 +27,13 @@ describe('terminal layout helpers', () => {
     const lines = wrapText('Every action leaves readable evidence.', 12);
     expect(lines).toEqual(['Every action', 'leaves', 'readable', 'evidence.']);
     expect(lines.every((line) => displayWidth(line) <= 12)).toBe(true);
+  });
+
+  it('classifies the shared gameplay layout contract', () => {
+    expect([GAMEPLAY_MIN_COLS, GAMEPLAY_MIN_ROWS]).toEqual([80, 24]);
+    expect(getTerminalLayoutTier(79, 24)).toBe('undersized');
+    expect(getTerminalLayoutTier(80, 24)).toBe('compact');
+    expect(getTerminalLayoutTier(80, 28)).toBe('standard');
+    expect(getTerminalLayoutTier(100, 30)).toBe('wide');
   });
 });

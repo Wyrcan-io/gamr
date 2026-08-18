@@ -63,7 +63,7 @@ export function runOrbitalPostGame(terminal: Terminal): OrbitalPostController {
   };
   const render = (): void => {
     let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemeColor());
-    if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
+    if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false });
     terminal.write(output);
   };
   const originalStop = controller.stop;

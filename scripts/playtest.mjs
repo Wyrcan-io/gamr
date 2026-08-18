@@ -12,6 +12,12 @@ const suiteArgument = args.find(value => value.startsWith('--suite='));
 const suite = suiteArgument?.slice('--suite='.length) ?? 'all';
 const artifactArgument = args.find(value => value.startsWith('--artifacts='));
 const artifactRoot = artifactArgument?.slice('--artifacts='.length);
+const colsArgument = args.find(value => value.startsWith('--cols='));
+const rowsArgument = args.find(value => value.startsWith('--rows='));
+const cols = colsArgument ? Number(colsArgument.slice('--cols='.length)) : undefined;
+const rows = rowsArgument ? Number(rowsArgument.slice('--rows='.length)) : undefined;
+if (cols !== undefined && (!Number.isInteger(cols) || cols < 1)) throw new Error(`Invalid --cols value: ${colsArgument}`);
+if (rows !== undefined && (!Number.isInteger(rows) || rows < 1)) throw new Error(`Invalid --rows value: ${rowsArgument}`);
 const requested = args.filter(value => !value.startsWith('--'));
 const registry = createPlaytestRegistry(games);
 if (args.includes('--coverage-report')) {
@@ -39,7 +45,12 @@ const gameIds = requested.length > 0 ? requested : selectedCatalog.map(game => g
 const runner = new PlaytestRunner({ registry });
 const reports = [];
 for (const gameId of gameIds) {
-  const report = await runner.run(gameId, { seed, maxStalledFrames: 240, maxElapsedMs: 30000 });
+  const report = await runner.run(gameId, {
+    seed,
+    maxStalledFrames: 240,
+    maxElapsedMs: 30000,
+    viewport: cols !== undefined || rows !== undefined ? { cols: cols ?? 80, rows: rows ?? 28 } : undefined,
+  });
   reports.push(report);
   if (artifactRoot) {
     const runRoot = `${artifactRoot}/${gameId}`;

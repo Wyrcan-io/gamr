@@ -6,7 +6,7 @@ import type { GameState, Point } from './types';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 export const QUIET_HEIST_MIN_COLS = 80;
-export const QUIET_HEIST_MIN_ROWS = 28;
+export const QUIET_HEIST_MIN_ROWS = 24;
 
 function row(value: string, width: number, style = ''): string { return `${style}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
 function center(value: string, width: number): string { return centerText(value, width); }
@@ -15,7 +15,7 @@ function same(a: Point, b: Point): boolean { return a.x === b.x && a.y === b.y; 
 function glyphFor(cell: string): string { return cell === '#' ? '#' : cell === 'E' ? '<' : cell === 'S' ? '>' : '.'; }
 
 function resize(cols: number, rows: number, palette: TerminalThemePalette): string {
-  return ['\x1b[2J\x1b[H', row('g/ THE QUIET HEIST', cols, `${palette.focus}${BOLD}`), '', center('THE ARCHITECT\'S PLAN NEEDS MORE ROOM.', cols), center(`NEED 80x28  HAVE ${cols}x${rows}`, cols), center('Resize the terminal to keep NOW and AFTER COMMIT legible.', cols)].join('\r\n');
+  return ['\x1b[2J\x1b[H', row('g/ THE QUIET HEIST', cols, `${palette.focus}${BOLD}`), '', center('THE ARCHITECT\'S PLAN NEEDS MORE ROOM.', cols), center(`NEED 80x24  HAVE ${cols}x${rows}`, cols), center('Resize the terminal to keep NOW and AFTER COMMIT legible.', cols)].join('\r\n');
 }
 
 function start(cols: number, palette: TerminalThemePalette): string {

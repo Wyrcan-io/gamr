@@ -47,7 +47,7 @@ export function runGhostShiftGame(terminal: Terminal): GhostShiftController {
     else if (key === 'f') run({ type: 'togglePanel', panel: 'files' });
     else if (key === 'enter') { const candidate = state.selected.kind === 'person' ? state.selected.id : state.candidates.find(c => c.status === 'possible')?.id; if (candidate) run({ type: 'detain', suspect: candidate }); }
   };
-  const render = (): void => { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { frame: frame++, helpOpen: help }); if (paused && terminal.cols >= 80 && terminal.rows >= 28) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); terminal.write(output); };
+  const render = (): void => { let output = renderFrame(state, terminal.cols, terminal.rows, getCurrentThemePalette(), { frame: frame++, helpOpen: help }); if (paused && terminal.cols >= 80 && terminal.rows >= 24) output += renderSimpleMenu(PAUSE_MENU_ITEMS, pauseSelection, { centerX: Math.floor(terminal.cols / 2), startY: Math.floor(terminal.rows / 2) - 3, showShortcuts: false }); terminal.write(output); };
   const baseStop = controller.stop;
   controller.stop = () => { if (!running) return; running = false; if (renderInterval) clearInterval(renderInterval); keyListener?.dispose(); terminal.write('\x1b[?25h\x1b[?1049l\x1b[0m'); baseStop(); };
   setTimeout(() => { if (!running) return; terminal.write('\x1b[?1049h\x1b[?25l'); renderInterval = setInterval(() => { if (running) render(); }, 50); keyListener = terminal.onKey(({ domEvent }) => { if (running) handleKey(domEvent); }); render(); }, 50);

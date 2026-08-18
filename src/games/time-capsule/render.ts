@@ -171,7 +171,7 @@ function kindsForTimeline(state: GameState): string[] {
 }
 
 export function renderFrame(state: GameState, cols: number, rows: number, theme: string, frame = 0, model: TimeCapsuleRenderModel = {}): string {
-  if (cols < 80 || rows < 28) return `${esc}2J${esc}H${pos(Math.max(2, Math.floor(rows / 2)), 3, `${YELLOW}Terminal too small. Need 80x28; have ${cols}x${rows}.${RESET}`)}`;
+  if (cols < 80 || rows < 24) return `${esc}2J${esc}H${pos(Math.max(2, Math.floor(rows / 2)), 3, `${YELLOW}Terminal too small. Need 80x24; have ${cols}x${rows}.${RESET}`)}`;
   if (state.phase === 'start') return renderStart(cols, rows, theme);
   if (state.phase === 'briefing') return renderBriefing(state, cols, rows, theme);
   if (state.phase === 'capsule') return renderCapsule(state, rows, theme, model);

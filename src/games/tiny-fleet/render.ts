@@ -7,14 +7,14 @@ import type { GameState, Point, ShipState } from './types';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 export const TINY_FLEET_MIN_COLS = 80;
-export const TINY_FLEET_MIN_ROWS = 28;
+export const TINY_FLEET_MIN_ROWS = 24;
 function row(value: string, width: number, style = ''): string { return `${style}${padToWidth(clipToWidth(value, width, ''), width)}${RESET}`; }
 function center(value: string, width: number): string { return centerText(value, width); }
 function arrow(facing: ShipState['facing']): string { return ({ N: '^', E: '>', S: 'v', W: '<' }[facing]); }
 function shipGlyph(ship: ShipState): string { return ship.side === 'player' ? ship.classId === 'scout' ? 'S' : ship.classId === 'escort' ? 'E' : 'F' : ship.side === 'neutral' ? 'C' : 'P'; }
 function cell(point: Point): string { return `${String.fromCharCode(65 + point.x)}${point.y + 1}`; }
 
-function resize(cols: number, rows: number, palette: TerminalThemePalette): string { return ['\x1b[2J\x1b[H', row('g/ TINY FLEET', cols, `${palette.focus}${BOLD}`), '', center('THE PLOTTING TABLE NEEDS MORE ROOM.', cols), center(`NEED 80x28  HAVE ${cols}x${rows}`, cols), center('Resize before sealing the fleet.', cols)].join('\r\n'); }
+function resize(cols: number, rows: number, palette: TerminalThemePalette): string { return ['\x1b[2J\x1b[H', row('g/ TINY FLEET', cols, `${palette.focus}${BOLD}`), '', center('THE PLOTTING TABLE NEEDS MORE ROOM.', cols), center(`NEED 80x24  HAVE ${cols}x${rows}`, cols), center('Resize before sealing the fleet.', cols)].join('\r\n'); }
 
 function mapRows(state: GameState, palette: TerminalThemePalette): string[] {
   const view = deriveObservation(state, 'player');

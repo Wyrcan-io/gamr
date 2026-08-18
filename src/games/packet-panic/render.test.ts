@@ -41,7 +41,7 @@ describe('Packet Panic renderer', () => {
     expect(help).toContain('g/ PACKET PANIC / HELP');
     expect(help).toContain('The letter and route shape remain visible without colour.');
     expect(wide.split('\r\n').every((line) => displayWidth(line) <= 100)).toBe(true);
-    expect(small).toContain('Need 80x28');
+    expect(small).toContain('Need 80x24');
   });
 
   it('shows upgrade and end states as readable reports', () => {
@@ -53,4 +53,3 @@ describe('Packet Panic renderer', () => {
     expect(won).toContain('FINAL SCORE  1200');
   });
 });
-

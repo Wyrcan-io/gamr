@@ -144,5 +144,5 @@ export function renderGame(state: GameState, cols: number, rows: number, theme: 
   lines.push('');
   lines.push(center(color(theme, theme.muted, 'ARROWS / A,F move   SPACE queue   TAB rider   ENTER go   ? help   ESC pause'), width));
   const visible = lines.length <= rows ? lines : [...lines.slice(0, Math.max(1, rows - 1)), center(color(theme, theme.muted, '… MORE — RESIZE OR OPEN LOG'), width)];
-  return output + visible.join('\n');
+  return output + visible.map(line => padToWidth(clipToWidth(stripAnsi(line).replace(/[\r\n]+/g, ' '), cols - 2, ''), cols - 2)).join('\r\n');
 }

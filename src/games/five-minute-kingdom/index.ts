@@ -8,7 +8,7 @@ import { renderFrame } from './render';
 export interface FiveMinuteKingdomController { stop: () => void; isRunning: boolean }
 
 const MIN_COLS = 80;
-const MIN_ROWS = 28;
+const MIN_ROWS = 24;
 
 export function runFiveMinuteKingdomGame(terminal: Terminal): FiveMinuteKingdomController {
   let running = true;

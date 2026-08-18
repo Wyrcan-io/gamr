@@ -2,11 +2,13 @@
 
 Gamr is a curated anthology of terminal games that run in any xterm.js terminal or directly in your CLI.
 
+> `0.4.0-beta.1` is a public beta. Install it explicitly with `npm install -g @wyrcan/gamr@beta`. Automated cross-platform lifecycle, rendering, package, and security gates are enforced; independent human terminal and accessibility validation is still in progress.
+
 The lineup contains twenty original games. The former compatibility archive has been retired so the package, launcher, and support promise all describe the same catalog.
 
 Small, stylish terminal games where every system is visible and every failure can be understood.
 
-The TUI catalog is curated by maturity: four Featured games, two public betas, and fourteen Workshop experiments. The index shows difficulty, pace, and expected session length before launch. The current active-game layout supports terminals at least 80 columns by 24 rows; the launcher supports 60 columns by 20 rows.
+The TUI catalog has four Featured placements, two previews, and fourteen Workshop experiments. Featured describes catalog placement, not independent production sign-off. The index shows readiness, difficulty, pace, and expected session length before launch. The current active-game layout supports terminals at least 80 columns by 24 rows; the launcher supports 60 columns by 20 rows.
 
 ## Quick Start
 
@@ -27,6 +29,9 @@ npx @wyrcan/gamr stack-trace --theme carbon
 # Global install
 npm install -g @wyrcan/gamr
 gamr
+
+# Public beta channel
+npm install -g @wyrcan/gamr@beta
 
 # Or as a project dependency (for xterm.js integration)
 npm install @wyrcan/gamr

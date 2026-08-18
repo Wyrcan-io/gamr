@@ -53,7 +53,7 @@ Each game requires at least three valid first-time sessions. Across those sessio
 |---|---|
 | Terminal size | One `80x24`, one `80x28`, one `100x30` |
 | Theme | Carbon, Paper, and Contrast represented |
-| Glyph mode | At least one ASCII and one Unicode session |
+| Output/font | UTF-8 with a font that covers the documented box and symbol glyphs |
 | Input | Keyboard-only in every session |
 | Platform | At least two terminal environments across the three sessions where practical |
 | Outcome | Taught unit completed or a documented product blocker found |
@@ -63,7 +63,7 @@ Catalog-wide accessibility specialists additionally review:
 - ANSI-stripped state equivalence and text-only captures;
 - color-independent status and legality markers;
 - high-contrast theme readability;
-- ASCII/Unicode mechanical equivalence;
+- missing-glyph behavior and the documented lack of an ASCII-only mode;
 - focus, overlay, Escape, pause, quit, and restart consistency;
 - flashing, rapid redraw, motion, and real-time timing burden;
 - screen-reader feasibility and known alternate-buffer limitations;

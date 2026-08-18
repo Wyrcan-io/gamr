@@ -133,6 +133,7 @@ function createNodeTerminal(): NodeTerminal {
   const dataListeners: ((data: string) => void)[] = [];
   const resizeListeners: ((size: { cols: number; rows: number }) => void)[] = [];
   const noColor = Boolean(process.env.NO_COLOR);
+  let cleanedUp = false;
 
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
@@ -140,9 +141,10 @@ function createNodeTerminal(): NodeTerminal {
   process.stdin.resume();
   process.stdin.setEncoding('utf8');
 
-  process.stdin.on('data', (data: string) => {
+  const handleData = (chunk: string | Buffer): void => {
+    const data = chunk.toString();
     if (data === '\x03') {
-      cleanup();
+      shutdown();
       process.exit(0);
     }
 
@@ -172,23 +174,62 @@ function createNodeTerminal(): NodeTerminal {
     for (const listener of [...dataListeners]) {
       listener(data);
     }
-  });
+  };
+  process.stdin.on('data', handleData);
 
-  process.stdout.on('resize', () => {
+  const handleResize = (): void => {
     const size = { cols: process.stdout.columns || 80, rows: process.stdout.rows || 24 };
     for (const listener of [...resizeListeners]) {
       listener(size);
     }
-  });
+  };
+  process.stdout.on('resize', handleResize);
 
-  function cleanup() {
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(false);
+  function cleanup(): void {
+    if (cleanedUp) return;
+    cleanedUp = true;
+
+    for (const timer of heldKeys.values()) clearTimeout(timer);
+    heldKeys.clear();
+    keyListeners.length = 0;
+    dataListeners.length = 0;
+    resizeListeners.length = 0;
+    process.stdin.off('data', handleData);
+    process.stdout.off('resize', handleResize);
+
+    try {
+      if (process.stdin.isTTY) process.stdin.setRawMode(false);
+      process.stdin.pause();
+    } catch {
+      // The stream may already be closed during fatal process teardown.
     }
-    process.stdin.pause();
-    process.stdout.write('\x1b[?1049l');
-    process.stdout.write('\x1b[?25h');
-    if (!noColor) process.stdout.write('\x1b[0m');
+
+    try {
+      process.stdout.write('\x1b[?1049l');
+      process.stdout.write('\x1b[?25h');
+      if (!noColor) process.stdout.write('\x1b[0m');
+    } catch {
+      // Cleanup is best-effort when stdout itself caused the failure.
+    }
+  }
+
+  function shutdown(): void {
+    try {
+      activeController?.stop();
+    } finally {
+      activeController = null;
+      cleanup();
+    }
+  }
+
+  function fatal(reason: unknown): void {
+    shutdown();
+    const message = reason instanceof Error ? (reason.stack ?? reason.message) : String(reason);
+    try {
+      process.stderr.write(`Fatal error: ${message}\n`);
+    } finally {
+      process.exit(1);
+    }
   }
 
   // Synchronized output: wrap writes with DEC sync sequences so the
@@ -234,13 +275,11 @@ function createNodeTerminal(): NodeTerminal {
     },
   };
 
-  process.on('exit', () => {
-    activeController?.stop();
-    activeController = null;
-    cleanup();
-  });
-  process.on('SIGINT', () => { activeController?.stop(); cleanup(); process.exit(0); });
-  process.on('SIGTERM', () => { activeController?.stop(); cleanup(); process.exit(0); });
+  process.once('exit', shutdown);
+  process.once('SIGINT', () => { shutdown(); process.exit(0); });
+  process.once('SIGTERM', () => { shutdown(); process.exit(0); });
+  process.once('uncaughtException', fatal);
+  process.once('unhandledRejection', fatal);
 
   return terminal;
 }
@@ -284,7 +323,6 @@ function setupGameEvents(terminal: NodeTerminal) {
 function openMenu(terminal: NodeTerminal) {
   stopActiveGame();
   // Use the exact same games menu from the library
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   showGamesMenu(terminal as any, {
     onGameSelect: (gameId: string) => {
       const game = allGames.find(g => g.id === gameId);
@@ -325,7 +363,6 @@ function launchVibeFromMenu() {
 
 function launchGame(terminal: NodeTerminal, game: GameInfo) {
   stopActiveGame();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   activeController = game.run(terminal as any);
 }
 
@@ -430,10 +467,15 @@ function main(): boolean {
 // Entry — branch between developer commands and game runtime
 // ---------------------------------------------------------------------------
 const cliArgs = process.argv.slice(2);
+const reportCommandFailure = (reason: unknown): void => {
+  const message = reason instanceof Error ? reason.message : String(reason);
+  console.error(`Command failed: ${message}`);
+  process.exitCode = 1;
+};
 if (cliArgs[0] === 'vibe' || cliArgs[0] === 'create') {
-  import('./create').then(m => m.vibeCommand(cliArgs.slice(1)));
+  void import('./create').then(m => m.vibeCommand(cliArgs.slice(1))).catch(reportCommandFailure);
 } else if (cliArgs[0] === 'remove') {
-  import('./create').then(m => m.removeCommand(cliArgs.slice(1)));
+  void import('./create').then(m => m.removeCommand(cliArgs.slice(1))).catch(reportCommandFailure);
 } else {
   // Cached notices are local. Refresh only after an interactive runtime starts.
   import('./update-check').then(m => {

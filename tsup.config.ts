@@ -7,6 +7,7 @@ export default defineConfig([
       index: 'src/index.ts',
       themes: 'src/themes/index.ts',
       playtest: 'src/playtest/index.ts',
+      'playtestr-adapter': 'src/playtestr-adapter.ts',
     },
     format: ['esm'],
     dts: true,

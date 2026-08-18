@@ -31,6 +31,10 @@
     "./playtest": {
       "types": "./dist/playtest.d.ts",
       "import": "./dist/playtest.js"
+    },
+    "./playtestr-adapter": {
+      "types": "./dist/playtestr-adapter.d.ts",
+      "import": "./dist/playtestr-adapter.js"
     }
   },
   "files": [

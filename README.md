@@ -97,6 +97,18 @@ console.log(report.status, report.milestones, report.replay);
 
 From a checkout, run one game with `node scripts/playtest.mjs dead-letter-department --seed=42`, run a tier with `node scripts/playtest.mjs --suite=progression`, or inspect the catalog with `node scripts/playtest.mjs --coverage-report`. New games receive generic launch and interaction coverage automatically; deeper progression is added through a game-specific playtest profile.
 
+Gamr also exports `@wyrcan/gamr/playtestr-adapter`. It creates a stable external-process manifest and maps Gamr's existing milestones into Playtestr's structural adapter protocol without adding a Playtestr runtime dependency:
+
+```ts
+import { createGamrPlaytestrTarget } from '@wyrcan/gamr/playtestr-adapter';
+
+const { manifest, adapter } = createGamrPlaytestrTarget('blackout-grid', {
+  cliPath: '/path/to/gamr/dist/cli.js',
+});
+```
+
+Gamr remains responsible for game-specific milestones and semantics; Playtestr remains the generic external autonomous engine.
+
 ### Themes
 
 ```typescript
